@@ -1,0 +1,134 @@
+import os
+import pandas as pd
+from dataclasses import dataclass
+import os
+import json
+
+# Define the file path
+csv_file_path = os.getenv("CSV_FILE_PATH", "data.csv")  # Replace with your CSV file path
+
+# Verify that the file exists
+if not os.path.exists(csv_file_path):
+    raise FileNotFoundError(f"The file '{csv_file_path}' was not found.")
+
+# Define the CSV headers
+expected_headers = [
+    "Submission ID", "Common Name", "Scientific Name", "Taxonomic Order", "Count", "State/Province",
+    "County", "Location ID", "Location", "Latitude", "Longitude", "Date", "Time", "Protocol",
+    "Duration (Min)", "All Obs Reported", "Distance Traveled (km)", "Area Covered (ha)",
+    "Number of Observers", "Breeding Code", "Observation Details", "Checklist Comments", "ML Catalog Numbers"
+]
+
+# Define a data class for each row
+@dataclass
+class Observation:
+    submission_id: str
+    common_name: str
+    scientific_name: str
+    taxonomic_order: int
+    count: int
+    state_province: str
+    county: str
+    location_id: str
+    location: str
+    latitude: float
+    longitude: float
+    date: str
+    time: str
+    protocol: str
+    duration_min: int
+    all_obs_reported: str
+    distance_traveled_km: float
+    area_covered_ha: float
+    number_of_observers: int
+    breeding_code: str
+    observation_details: str
+    checklist_comments: str
+    ml_catalog_numbers: str
+
+# Parse the CSV file
+def parse_csv(file_path):
+    df = pd.read_csv(file_path)
+    # Check that the headers match the expected headers
+    if list(df.columns) != expected_headers:
+        raise ValueError("The CSV headers do not match the expected headers.")
+    
+    # Sort the dataframe by Date and Time columns
+    df.sort_values(by=["Date", "Time"], inplace=True)
+    
+    # Convert each row into an Observation data class
+    observations = [
+        Observation(
+            submission_id=row["Submission ID"],
+            common_name=row["Common Name"],
+            scientific_name=row["Scientific Name"],
+            taxonomic_order=row["Taxonomic Order"],
+            count=row["Count"],
+            state_province=row["State/Province"],
+            county=row["County"],
+            location_id=row["Location ID"],
+            location=row["Location"],
+            latitude=row["Latitude"],
+            longitude=row["Longitude"],
+            date=row["Date"],
+            time=row["Time"],
+            protocol=row["Protocol"],
+            duration_min=row["Duration (Min)"],
+            all_obs_reported=row["All Obs Reported"],
+            distance_traveled_km=row["Distance Traveled (km)"],
+            area_covered_ha=row["Area Covered (ha)"],
+            number_of_observers=row["Number of Observers"],
+            breeding_code=row["Breeding Code"],
+            observation_details=row["Observation Details"],
+            checklist_comments=row["Checklist Comments"],
+            ml_catalog_numbers=row["ML Catalog Numbers"]
+        )
+        for _, row in df.iterrows()
+    ]
+    return observations
+
+# Get lifers (first observation of each species)
+def get_lifers(observations):
+    lifers = {}
+    for obs in observations:
+        if obs.scientific_name not in lifers:
+            lifers[obs.scientific_name] = obs
+    return list(lifers.values())
+
+# Output lifers to JSON
+def output_lifers_to_json(lifers, output_file_path):
+    lifers_data = [
+        {
+            "common_name": lifer.common_name,
+            "latitude": lifer.latitude,
+            "longitude": lifer.longitude,
+            "date": lifer.date,
+            "taxonomic_order": lifer.taxonomic_order
+        }
+        for lifer in lifers
+    ]
+    with open(output_file_path, 'w', encoding='utf-8') as json_file:
+        json.dump(lifers_data, json_file, ensure_ascii=False, indent=4)
+
+# Example usage
+try:
+    observations = parse_csv(csv_file_path)
+    # Printing a sample entry from the observations
+    if observations:
+        print("Sample entry:", observations[0])
+        
+        # Get and print lifers
+        lifers = get_lifers(observations)
+        print("\nList of lifers:")
+        for lifer in lifers:
+            print(lifer)
+        
+        # Output lifers to JSON
+        output_file_path = "lifers.json"
+        output_lifers_to_json(lifers, output_file_path)
+        print(f"\nLifers data has been written to '{output_file_path}'")
+    else:
+        print("The CSV file is empty.")
+      
+except Exception as e:
+    print("Error:", e)

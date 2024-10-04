@@ -1,0 +1,4055 @@
+[
+    {
+        "common_name": "Northern Harrier",
+        "latitude": 29.819019,
+        "longitude": -89.61216,
+        "date": "2022-11-21",
+        "taxonomic_order": 7950
+    },
+    {
+        "common_name": "Great Blue Heron",
+        "latitude": 29.819019,
+        "longitude": -89.61216,
+        "date": "2022-11-24",
+        "taxonomic_order": 7514
+    },
+    {
+        "common_name": "Brown Pelican",
+        "latitude": 29.819019,
+        "longitude": -89.61216,
+        "date": "2022-11-24",
+        "taxonomic_order": 7289
+    },
+    {
+        "common_name": "Tricolored Heron",
+        "latitude": 29.819019,
+        "longitude": -89.61216,
+        "date": "2022-11-24",
+        "taxonomic_order": 7402
+    },
+    {
+        "common_name": "Snowy Egret",
+        "latitude": 29.819019,
+        "longitude": -89.61216,
+        "date": "2022-11-24",
+        "taxonomic_order": 7416
+    },
+    {
+        "common_name": "Carolina Chickadee",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 21671
+    },
+    {
+        "common_name": "Northern Cardinal",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 33967
+    },
+    {
+        "common_name": "Song Sparrow",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 32748
+    },
+    {
+        "common_name": "Mourning Dove",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 2427
+    },
+    {
+        "common_name": "Downy Woodpecker",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 11175
+    },
+    {
+        "common_name": "Tufted Titmouse",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 21771
+    },
+    {
+        "common_name": "Carolina Wren",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 26897
+    },
+    {
+        "common_name": "Brown Thrasher",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 27577
+    },
+    {
+        "common_name": "Northern Mockingbird",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 27652
+    },
+    {
+        "common_name": "House Finch",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 31790
+    },
+    {
+        "common_name": "Eastern Towhee",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-25",
+        "taxonomic_order": 32888
+    },
+    {
+        "common_name": "American Robin",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-26",
+        "taxonomic_order": 28096
+    },
+    {
+        "common_name": "Turkey Vulture",
+        "latitude": 33.546492,
+        "longitude": -86.71539,
+        "date": "2022-12-27",
+        "taxonomic_order": 7624
+    },
+    {
+        "common_name": "Canada Goose",
+        "latitude": 33.514602,
+        "longitude": -86.779028,
+        "date": "2022-12-28",
+        "taxonomic_order": 324
+    },
+    {
+        "common_name": "Muscovy Duck (Domestic type)",
+        "latitude": 33.520983,
+        "longitude": -86.771869,
+        "date": "2022-12-28",
+        "taxonomic_order": 424
+    },
+    {
+        "common_name": "Red-tailed Hawk",
+        "latitude": 33.514602,
+        "longitude": -86.779028,
+        "date": "2022-12-28",
+        "taxonomic_order": 8312
+    },
+    {
+        "common_name": "Red-headed Woodpecker",
+        "latitude": 33.514602,
+        "longitude": -86.779028,
+        "date": "2022-12-28",
+        "taxonomic_order": 10926
+    },
+    {
+        "common_name": "Eastern Bluebird",
+        "latitude": 33.514602,
+        "longitude": -86.779028,
+        "date": "2022-12-28",
+        "taxonomic_order": 27662
+    },
+    {
+        "common_name": "Blue Jay",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-30",
+        "taxonomic_order": 20899
+    },
+    {
+        "common_name": "House Sparrow",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-30",
+        "taxonomic_order": 31018
+    },
+    {
+        "common_name": "White-throated Sparrow",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2022-12-30",
+        "taxonomic_order": 32672
+    },
+    {
+        "common_name": "White-breasted Nuthatch",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-01-01",
+        "taxonomic_order": 26436
+    },
+    {
+        "common_name": "American Black Duck",
+        "latitude": 40.733707,
+        "longitude": -74.010655,
+        "date": "2023-01-02",
+        "taxonomic_order": 537
+    },
+    {
+        "common_name": "European Starling",
+        "latitude": 40.733707,
+        "longitude": -74.010655,
+        "date": "2023-01-02",
+        "taxonomic_order": 27356
+    },
+    {
+        "common_name": "Mute Swan",
+        "latitude": 41.293797,
+        "longitude": -73.677632,
+        "date": "2023-01-08",
+        "taxonomic_order": 358
+    },
+    {
+        "common_name": "American Crow",
+        "latitude": 41.293797,
+        "longitude": -73.677632,
+        "date": "2023-01-08",
+        "taxonomic_order": 21168
+    },
+    {
+        "common_name": "American Tree Sparrow",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-01-08",
+        "taxonomic_order": 32567
+    },
+    {
+        "common_name": "American Goldfinch",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2023-02-05",
+        "taxonomic_order": 32095
+    },
+    {
+        "common_name": "Wood Duck",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 433
+    },
+    {
+        "common_name": "Mallard",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 515
+    },
+    {
+        "common_name": "Bufflehead",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 701
+    },
+    {
+        "common_name": "Hooded Merganser",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 712
+    },
+    {
+        "common_name": "Ruddy Duck",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 736
+    },
+    {
+        "common_name": "American Coot",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-03-05",
+        "taxonomic_order": 5474
+    },
+    {
+        "common_name": "Red-bellied Woodpecker",
+        "latitude": 40.780301,
+        "longitude": -73.966992,
+        "date": "2023-03-05",
+        "taxonomic_order": 10979
+    },
+    {
+        "common_name": "Cedar Waxwing",
+        "latitude": 33.295897,
+        "longitude": -86.245727,
+        "date": "2023-03-11",
+        "taxonomic_order": 29386
+    },
+    {
+        "common_name": "Fish Crow",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2023-03-12",
+        "taxonomic_order": 21181
+    },
+    {
+        "common_name": "Dark-eyed Junco",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2023-03-12",
+        "taxonomic_order": 32595
+    },
+    {
+        "common_name": "Killdeer",
+        "latitude": 33.916291,
+        "longitude": -87.084302,
+        "date": "2023-03-15",
+        "taxonomic_order": 5798
+    },
+    {
+        "common_name": "Belted Kingfisher",
+        "latitude": 33.916291,
+        "longitude": -87.084302,
+        "date": "2023-03-15",
+        "taxonomic_order": 10022
+    },
+    {
+        "common_name": "Oak Titmouse",
+        "latitude": 37.986828,
+        "longitude": -122.589159,
+        "date": "2023-03-22",
+        "taxonomic_order": 21761
+    },
+    {
+        "common_name": "Chestnut-backed Chickadee",
+        "latitude": 37.974615,
+        "longitude": -122.581306,
+        "date": "2023-03-22",
+        "taxonomic_order": 21705
+    },
+    {
+        "common_name": "Ruby-crowned Kinglet",
+        "latitude": 37.974615,
+        "longitude": -122.581306,
+        "date": "2023-03-22",
+        "taxonomic_order": 26391
+    },
+    {
+        "common_name": "Anna's Hummingbird",
+        "latitude": 37.974615,
+        "longitude": -122.581306,
+        "date": "2023-03-22",
+        "taxonomic_order": 4787
+    },
+    {
+        "common_name": "California Scrub-Jay",
+        "latitude": 37.986828,
+        "longitude": -122.589159,
+        "date": "2023-03-22",
+        "taxonomic_order": 20908
+    },
+    {
+        "common_name": "Spotted Towhee",
+        "latitude": 37.974615,
+        "longitude": -122.581306,
+        "date": "2023-03-22",
+        "taxonomic_order": 32860
+    },
+    {
+        "common_name": "Fox Sparrow",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-03-26",
+        "taxonomic_order": 32571
+    },
+    {
+        "common_name": "Eastern Phoebe",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2023-04-01",
+        "taxonomic_order": 16697
+    },
+    {
+        "common_name": "Black-capped Chickadee",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2023-04-01",
+        "taxonomic_order": 21676
+    },
+    {
+        "common_name": "Golden-crowned Kinglet",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2023-04-02",
+        "taxonomic_order": 26395
+    },
+    {
+        "common_name": "Yellow-bellied Sapsucker",
+        "latitude": 40.797246,
+        "longitude": -73.955603,
+        "date": "2023-04-08",
+        "taxonomic_order": 10907
+    },
+    {
+        "common_name": "Brown Creeper",
+        "latitude": 40.797246,
+        "longitude": -73.955603,
+        "date": "2023-04-08",
+        "taxonomic_order": 26564
+    },
+    {
+        "common_name": "Hermit Thrush",
+        "latitude": 40.797246,
+        "longitude": -73.955603,
+        "date": "2023-04-08",
+        "taxonomic_order": 27866
+    },
+    {
+        "common_name": "Palm Warbler",
+        "latitude": 40.663186,
+        "longitude": -73.968827,
+        "date": "2023-04-08",
+        "taxonomic_order": 33611
+    },
+    {
+        "common_name": "Chipping Sparrow",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2023-04-11",
+        "taxonomic_order": 32460
+    },
+    {
+        "common_name": "Red-winged Blackbird",
+        "latitude": 40.797246,
+        "longitude": -73.955603,
+        "date": "2023-04-13",
+        "taxonomic_order": 33251
+    },
+    {
+        "common_name": "Northern Flicker",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2023-04-21",
+        "taxonomic_order": 11665
+    },
+    {
+        "common_name": "Gray Catbird",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-04-24",
+        "taxonomic_order": 27539
+    },
+    {
+        "common_name": "Common Grackle",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-04-24",
+        "taxonomic_order": 33327
+    },
+    {
+        "common_name": "Yellow-rumped Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-04-24",
+        "taxonomic_order": 33622
+    },
+    {
+        "common_name": "Brant",
+        "latitude": 40.733707,
+        "longitude": -74.010655,
+        "date": "2023-05-06",
+        "taxonomic_order": 296
+    },
+    {
+        "common_name": "Ovenbird",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-07",
+        "taxonomic_order": 33419
+    },
+    {
+        "common_name": "Blue-winged Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-07",
+        "taxonomic_order": 33430
+    },
+    {
+        "common_name": "Hooded Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-07",
+        "taxonomic_order": 33528
+    },
+    {
+        "common_name": "Chestnut-sided Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-07",
+        "taxonomic_order": 33599
+    },
+    {
+        "common_name": "Magnolia Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 33550
+    },
+    {
+        "common_name": "Hairy Woodpecker",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 11202
+    },
+    {
+        "common_name": "Blue-headed Vireo",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 18873
+    },
+    {
+        "common_name": "Wood Thrush",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 27880
+    },
+    {
+        "common_name": "Baltimore Oriole",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 33241
+    },
+    {
+        "common_name": "Common Yellowthroat",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 33499
+    },
+    {
+        "common_name": "Black-throated Blue Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-09",
+        "taxonomic_order": 33604
+    },
+    {
+        "common_name": "Black-and-white Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-10",
+        "taxonomic_order": 33435
+    },
+    {
+        "common_name": "Blackburnian Warbler",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-10",
+        "taxonomic_order": 33555
+    },
+    {
+        "common_name": "Summer Tanager",
+        "latitude": 40.77632,
+        "longitude": -73.969346,
+        "date": "2023-05-10",
+        "taxonomic_order": 33885
+    },
+    {
+        "common_name": "American Redstart",
+        "latitude": 40.866016,
+        "longitude": -73.930877,
+        "date": "2023-05-11",
+        "taxonomic_order": 33529
+    },
+    {
+        "common_name": "Chimney Swift",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 3874
+    },
+    {
+        "common_name": "Spotted Sandpiper",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 6091
+    },
+    {
+        "common_name": "Monk Parakeet",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 12576
+    },
+    {
+        "common_name": "Eastern Wood-Pewee",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 16615
+    },
+    {
+        "common_name": "Eastern Kingbird",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 17156
+    },
+    {
+        "common_name": "Veery",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 27846
+    },
+    {
+        "common_name": "Bay-breasted Warbler",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33554
+    },
+    {
+        "common_name": "Yellow Warbler",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33557
+    },
+    {
+        "common_name": "Blackpoll Warbler",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33601
+    },
+    {
+        "common_name": "Canada Warbler",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33798
+    },
+    {
+        "common_name": "Wilson's Warbler",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33799
+    },
+    {
+        "common_name": "Scarlet Tanager",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33889
+    },
+    {
+        "common_name": "Northern Parula",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 33534
+    },
+    {
+        "common_name": "Yellow-throated Vireo",
+        "latitude": 40.6537472,
+        "longitude": -73.9986235,
+        "date": "2023-05-13",
+        "taxonomic_order": 18867
+    },
+    {
+        "common_name": "Barn Swallow",
+        "latitude": 36.974,
+        "longitude": -87.496653,
+        "date": "2023-05-17",
+        "taxonomic_order": 23772
+    },
+    {
+        "common_name": "Pileated Woodpecker",
+        "latitude": 35.397621,
+        "longitude": -82.813268,
+        "date": "2023-05-18",
+        "taxonomic_order": 11527
+    },
+    {
+        "common_name": "Great Crested Flycatcher",
+        "latitude": 33.53549,
+        "longitude": -86.748997,
+        "date": "2023-05-21",
+        "taxonomic_order": 17021
+    },
+    {
+        "common_name": "Broad-winged Hawk",
+        "latitude": 33.5586903,
+        "longitude": -86.7074616,
+        "date": "2023-05-21",
+        "taxonomic_order": 8293
+    },
+    {
+        "common_name": "Red-eyed Vireo",
+        "latitude": 33.5586903,
+        "longitude": -86.7074616,
+        "date": "2023-05-21",
+        "taxonomic_order": 18910
+    },
+    {
+        "common_name": "Blue-gray Gnatcatcher",
+        "latitude": 33.5586903,
+        "longitude": -86.7074616,
+        "date": "2023-05-21",
+        "taxonomic_order": 26669
+    },
+    {
+        "common_name": "Pine Warbler",
+        "latitude": 33.5586903,
+        "longitude": -86.7074616,
+        "date": "2023-05-21",
+        "taxonomic_order": 33616
+    },
+    {
+        "common_name": "Wild Turkey",
+        "latitude": 35.124151,
+        "longitude": -86.332137,
+        "date": "2023-05-22",
+        "taxonomic_order": 1222
+    },
+    {
+        "common_name": "Bald Eagle",
+        "latitude": 35.124151,
+        "longitude": -86.332137,
+        "date": "2023-05-22",
+        "taxonomic_order": 8187
+    },
+    {
+        "common_name": "Cliff Swallow",
+        "latitude": 35.124151,
+        "longitude": -86.332137,
+        "date": "2023-05-22",
+        "taxonomic_order": 23861
+    },
+    {
+        "common_name": "Indigo Bunting",
+        "latitude": 35.124151,
+        "longitude": -86.332137,
+        "date": "2023-05-22",
+        "taxonomic_order": 34060
+    },
+    {
+        "common_name": "Ruby-throated Hummingbird",
+        "latitude": 33.543336,
+        "longitude": -86.710171,
+        "date": "2023-05-24",
+        "taxonomic_order": 4776
+    },
+    {
+        "common_name": "White-eyed Vireo",
+        "latitude": 33.543336,
+        "longitude": -86.710171,
+        "date": "2023-05-24",
+        "taxonomic_order": 18816
+    },
+    {
+        "common_name": "Black-billed Cuckoo",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 3235
+    },
+    {
+        "common_name": "Red-shouldered Hawk",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 8284
+    },
+    {
+        "common_name": "Willow Flycatcher",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 16643
+    },
+    {
+        "common_name": "Tree Swallow",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 23649
+    },
+    {
+        "common_name": "Orchard Oriole",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 33153
+    },
+    {
+        "common_name": "Cerulean Warbler",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 33532
+    },
+    {
+        "common_name": "Prairie Warbler",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 33643
+    },
+    {
+        "common_name": "Rose-breasted Grosbeak",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-05-27",
+        "taxonomic_order": 34009
+    },
+    {
+        "common_name": "Black-crowned Night Heron",
+        "latitude": 40.6690561,
+        "longitude": -73.9683616,
+        "date": "2023-05-28",
+        "taxonomic_order": 7373
+    },
+    {
+        "common_name": "Brown-headed Cowbird",
+        "latitude": 40.6690561,
+        "longitude": -73.9683616,
+        "date": "2023-05-28",
+        "taxonomic_order": 33307
+    },
+    {
+        "common_name": "Laughing Gull",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 6448
+    },
+    {
+        "common_name": "Ring-billed Gull",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 6479
+    },
+    {
+        "common_name": "Herring Gull (American)",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 6497
+    },
+    {
+        "common_name": "Great Black-backed Gull",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 6516
+    },
+    {
+        "common_name": "Double-crested Cormorant",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 7253
+    },
+    {
+        "common_name": "Great Egret",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 7491
+    },
+    {
+        "common_name": "Glossy Ibis",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 7551
+    },
+    {
+        "common_name": "Osprey",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 7640
+    },
+    {
+        "common_name": "House Wren",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2023-05-29",
+        "taxonomic_order": 26737
+    },
+    {
+        "common_name": "Worm-eating Warbler",
+        "latitude": 41.594169,
+        "longitude": -73.592871,
+        "date": "2023-06-03",
+        "taxonomic_order": 33423
+    },
+    {
+        "common_name": "American Oystercatcher",
+        "latitude": 40.4769212,
+        "longitude": -74.0107298,
+        "date": "2023-06-19",
+        "taxonomic_order": 5770
+    },
+    {
+        "common_name": "Black Vulture",
+        "latitude": 40.4769212,
+        "longitude": -74.0107298,
+        "date": "2023-06-19",
+        "taxonomic_order": 7620
+    },
+    {
+        "common_name": "Great-tailed Grackle",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-26",
+        "taxonomic_order": 33338
+    },
+    {
+        "common_name": "Plain Chachalaca",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-28",
+        "taxonomic_order": 811
+    },
+    {
+        "common_name": "Magnificent Frigatebird",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-28",
+        "taxonomic_order": 7147
+    },
+    {
+        "common_name": "White Ibis",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-28",
+        "taxonomic_order": 7546
+    },
+    {
+        "common_name": "Yucatan Jay",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-28",
+        "taxonomic_order": 20857
+    },
+    {
+        "common_name": "Tropical Mockingbird",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-28",
+        "taxonomic_order": 27639
+    },
+    {
+        "common_name": "Masked Tityra",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2023-06-29",
+        "taxonomic_order": 15671
+    },
+    {
+        "common_name": "Northern Waterthrush",
+        "latitude": 40.7779667,
+        "longitude": -73.9697165,
+        "date": "2023-08-13",
+        "taxonomic_order": 33426
+    },
+    {
+        "common_name": "hawk sp.",
+        "latitude": 33.5586903,
+        "longitude": -86.7074616,
+        "date": "2023-08-20",
+        "taxonomic_order": 8380
+    },
+    {
+        "common_name": "Mountain Bluebird",
+        "latitude": 39.866469,
+        "longitude": -105.480352,
+        "date": "2023-09-23",
+        "taxonomic_order": 27680
+    },
+    {
+        "common_name": "Downy/Hairy Woodpecker",
+        "latitude": 39.5563469,
+        "longitude": -105.0788105,
+        "date": "2023-09-24",
+        "taxonomic_order": 11225
+    },
+    {
+        "common_name": "Say's Phoebe",
+        "latitude": 39.5563469,
+        "longitude": -105.0788105,
+        "date": "2023-09-24",
+        "taxonomic_order": 16699
+    },
+    {
+        "common_name": "Black-billed Magpie",
+        "latitude": 39.5563469,
+        "longitude": -105.0788105,
+        "date": "2023-09-24",
+        "taxonomic_order": 21085
+    },
+    {
+        "common_name": "Lesser Goldfinch",
+        "latitude": 39.5563469,
+        "longitude": -105.0788105,
+        "date": "2023-09-24",
+        "taxonomic_order": 32087
+    },
+    {
+        "common_name": "Townsend's Warbler",
+        "latitude": 37.950908,
+        "longitude": -122.598137,
+        "date": "2023-10-25",
+        "taxonomic_order": 33663
+    },
+    {
+        "common_name": "Roseate Spoonbill",
+        "latitude": 29.2477637,
+        "longitude": -90.6612396,
+        "date": "2023-11-16",
+        "taxonomic_order": 7614
+    },
+    {
+        "common_name": "Boat-tailed Grackle",
+        "latitude": 29.2477637,
+        "longitude": -90.6612396,
+        "date": "2023-11-16",
+        "taxonomic_order": 33332
+    },
+    {
+        "common_name": "Northern Shoveler",
+        "latitude": 40.785358,
+        "longitude": -73.966486,
+        "date": "2023-12-24",
+        "taxonomic_order": 474
+    },
+    {
+        "common_name": "Sandhill Crane",
+        "latitude": 34.557821,
+        "longitude": -86.949939,
+        "date": "2023-12-30",
+        "taxonomic_order": 5671
+    },
+    {
+        "common_name": "Great Thrush",
+        "latitude": 4.700446,
+        "longitude": -74.045064,
+        "date": "2024-01-02",
+        "taxonomic_order": 28143
+    },
+    {
+        "common_name": "Rufous-collared Sparrow",
+        "latitude": 4.700446,
+        "longitude": -74.045064,
+        "date": "2024-01-02",
+        "taxonomic_order": 32629
+    },
+    {
+        "common_name": "Black Flowerpiercer",
+        "latitude": 4.700446,
+        "longitude": -74.045064,
+        "date": "2024-01-02",
+        "taxonomic_order": 34726
+    },
+    {
+        "common_name": "Blue-winged Teal",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 460
+    },
+    {
+        "common_name": "Bogota Rail",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 5276
+    },
+    {
+        "common_name": "Spot-flanked Gallinule",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 5424
+    },
+    {
+        "common_name": "Common Gallinule",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 5442
+    },
+    {
+        "common_name": "Southern Lapwing",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 5862
+    },
+    {
+        "common_name": "Little Blue Heron",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 7401
+    },
+    {
+        "common_name": "Striated Heron",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 7439
+    },
+    {
+        "common_name": "Western Cattle Egret",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 7487
+    },
+    {
+        "common_name": "Bare-faced Ibis",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 7562
+    },
+    {
+        "common_name": "White-tailed Kite",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 7657
+    },
+    {
+        "common_name": "Short-eared Owl",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 9068
+    },
+    {
+        "common_name": "Crested Caracara",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 11727
+    },
+    {
+        "common_name": "Andean Siskin",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 32104
+    },
+    {
+        "common_name": "Eastern Meadowlark",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 33044
+    },
+    {
+        "common_name": "Shiny Cowbird",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 33291
+    },
+    {
+        "common_name": "Yellow-hooded Blackbird",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 33411
+    },
+    {
+        "common_name": "Grassland Yellow-Finch",
+        "latitude": 4.7214555,
+        "longitude": -74.1390549,
+        "date": "2024-01-04",
+        "taxonomic_order": 34924
+    },
+    {
+        "common_name": "Tropical Kingbird",
+        "latitude": 4.709826,
+        "longitude": -74.074877,
+        "date": "2024-01-04",
+        "taxonomic_order": 17139
+    },
+    {
+        "common_name": "Eared Dove",
+        "latitude": 4.710341,
+        "longitude": -74.074793,
+        "date": "2024-01-04",
+        "taxonomic_order": 2415
+    },
+    {
+        "common_name": "Vermilion Flycatcher",
+        "latitude": 4.432641,
+        "longitude": -75.733142,
+        "date": "2024-01-06",
+        "taxonomic_order": 16718
+    },
+    {
+        "common_name": "Great Kiskadee",
+        "latitude": 4.432641,
+        "longitude": -75.733142,
+        "date": "2024-01-06",
+        "taxonomic_order": 17055
+    },
+    {
+        "common_name": "Blue-gray Tanager",
+        "latitude": 4.432641,
+        "longitude": -75.733142,
+        "date": "2024-01-06",
+        "taxonomic_order": 34378
+    },
+    {
+        "common_name": "Bay-headed Tanager",
+        "latitude": 4.432641,
+        "longitude": -75.733142,
+        "date": "2024-01-06",
+        "taxonomic_order": 34533
+    },
+    {
+        "common_name": "Tyrian Metaltail",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 4517
+    },
+    {
+        "common_name": "Golden-breasted Puffleg",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 4572
+    },
+    {
+        "common_name": "Shining Sunbeam",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 4579
+    },
+    {
+        "common_name": "Great Sapphirewing",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 4643
+    },
+    {
+        "common_name": "Pale-naped Brushfinch",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 32955
+    },
+    {
+        "common_name": "Lacrimose Mountain Tanager",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 34315
+    },
+    {
+        "common_name": "Scarlet-bellied Mountain Tanager",
+        "latitude": 4.9700471,
+        "longitude": -75.3780127,
+        "date": "2024-01-07",
+        "taxonomic_order": 34326
+    },
+    {
+        "common_name": "Andean Guan",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 846
+    },
+    {
+        "common_name": "Sickle-winged Guan",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 894
+    },
+    {
+        "common_name": "White-throated Quail-Dove",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 2390
+    },
+    {
+        "common_name": "Sparkling Violetear",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 4329
+    },
+    {
+        "common_name": "Tourmaline Sunangel",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 4389
+    },
+    {
+        "common_name": "Mountain Velvetbreast",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 4634
+    },
+    {
+        "common_name": "White-bellied Woodstar",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 4756
+    },
+    {
+        "common_name": "Equatorial Antpitta",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 14006
+    },
+    {
+        "common_name": "Crescent-faced Antpitta",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 14091
+    },
+    {
+        "common_name": "Barred Fruiteater",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 15561
+    },
+    {
+        "common_name": "Mountain Elaenia",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 16415
+    },
+    {
+        "common_name": "Yellow-bellied Chat-Tyrant",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 16870
+    },
+    {
+        "common_name": "Mountain Wren",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 26785
+    },
+    {
+        "common_name": "Gray-browed Brushfinch",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 32512
+    },
+    {
+        "common_name": "Slaty Brushfinch",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 32948
+    },
+    {
+        "common_name": "Masked Flowerpiercer",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 34775
+    },
+    {
+        "common_name": "Paramo Seedeater",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 35066
+    },
+    {
+        "common_name": "Buffy Helmetcrest",
+        "latitude": 4.9339632,
+        "longitude": -75.3492243,
+        "date": "2024-01-07",
+        "taxonomic_order": 4508
+    },
+    {
+        "common_name": "Black-chested Buzzard-Eagle",
+        "latitude": 4.9339632,
+        "longitude": -75.3492243,
+        "date": "2024-01-07",
+        "taxonomic_order": 8263
+    },
+    {
+        "common_name": "Andean Tit-Spinetail",
+        "latitude": 4.9339632,
+        "longitude": -75.3492243,
+        "date": "2024-01-07",
+        "taxonomic_order": 15053
+    },
+    {
+        "common_name": "Plumbeous Sierra Finch",
+        "latitude": 4.9339632,
+        "longitude": -75.3492243,
+        "date": "2024-01-07",
+        "taxonomic_order": 34820
+    },
+    {
+        "common_name": "Andean Duck",
+        "latitude": 4.980861,
+        "longitude": -75.33539,
+        "date": "2024-01-07",
+        "taxonomic_order": 738
+    },
+    {
+        "common_name": "Hooded Mountain Tanager",
+        "latitude": 5.0224866,
+        "longitude": -75.3683513,
+        "date": "2024-01-07",
+        "taxonomic_order": 34286
+    },
+    {
+        "common_name": "Bananaquit",
+        "latitude": 4.808857,
+        "longitude": -75.688645,
+        "date": "2024-01-08",
+        "taxonomic_order": 35086
+    },
+    {
+        "common_name": "Saffron Finch",
+        "latitude": 4.808857,
+        "longitude": -75.688645,
+        "date": "2024-01-08",
+        "taxonomic_order": 34918
+    },
+    {
+        "common_name": "Ruddy Ground Dove",
+        "latitude": 4.7907532,
+        "longitude": -75.6887788,
+        "date": "2024-01-09",
+        "taxonomic_order": 2286
+    },
+    {
+        "common_name": "Rufous-tailed Hummingbird",
+        "latitude": 4.7907532,
+        "longitude": -75.6887788,
+        "date": "2024-01-09",
+        "taxonomic_order": 5078
+    },
+    {
+        "common_name": "Black-billed Thrush",
+        "latitude": 4.7907532,
+        "longitude": -75.6887788,
+        "date": "2024-01-09",
+        "taxonomic_order": 28124
+    },
+    {
+        "common_name": "Green Honeycreeper",
+        "latitude": 4.7907532,
+        "longitude": -75.6887788,
+        "date": "2024-01-09",
+        "taxonomic_order": 34633
+    },
+    {
+        "common_name": "Fork-tailed Flycatcher",
+        "latitude": 4.8153921,
+        "longitude": -75.7365569,
+        "date": "2024-01-09",
+        "taxonomic_order": 17176
+    },
+    {
+        "common_name": "Blue-and-white Swallow",
+        "latitude": 4.8153921,
+        "longitude": -75.7365569,
+        "date": "2024-01-09",
+        "taxonomic_order": 23713
+    },
+    {
+        "common_name": "Gadwall",
+        "latitude": 40.6996104,
+        "longitude": -73.9973745,
+        "date": "2024-01-13",
+        "taxonomic_order": 478
+    },
+    {
+        "common_name": "Cooper's Hawk",
+        "latitude": 40.727749,
+        "longitude": -74.003885,
+        "date": "2024-01-13",
+        "taxonomic_order": 8122
+    },
+    {
+        "common_name": "Red-breasted Merganser",
+        "latitude": 40.5960975,
+        "longitude": -73.8814259,
+        "date": "2024-01-22",
+        "taxonomic_order": 728
+    },
+    {
+        "common_name": "Black-bellied Plover",
+        "latitude": 40.5960975,
+        "longitude": -73.8814259,
+        "date": "2024-01-22",
+        "taxonomic_order": 5782
+    },
+    {
+        "common_name": "Sanderling",
+        "latitude": 40.5960975,
+        "longitude": -73.8814259,
+        "date": "2024-01-22",
+        "taxonomic_order": 6153
+    },
+    {
+        "common_name": "American Pipit",
+        "latitude": 40.5960975,
+        "longitude": -73.8814259,
+        "date": "2024-01-22",
+        "taxonomic_order": 31361
+    },
+    {
+        "common_name": "Common Merganser",
+        "latitude": 41.2124605,
+        "longitude": -73.9661317,
+        "date": "2024-01-27",
+        "taxonomic_order": 720
+    },
+    {
+        "common_name": "Common Raven",
+        "latitude": 41.2945762,
+        "longitude": -74.0590062,
+        "date": "2024-01-27",
+        "taxonomic_order": 21235
+    },
+    {
+        "common_name": "Purple Sandpiper",
+        "latitude": 40.7214282,
+        "longitude": -74.0153579,
+        "date": "2024-02-05",
+        "taxonomic_order": 6171
+    },
+    {
+        "common_name": "Lincoln's Sparrow",
+        "latitude": 40.727775,
+        "longitude": -73.999049,
+        "date": "2024-02-06",
+        "taxonomic_order": 32781
+    },
+    {
+        "common_name": "Snow Goose",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2024-02-19",
+        "taxonomic_order": 256
+    },
+    {
+        "common_name": "Field Sparrow",
+        "latitude": 40.6188482,
+        "longitude": -73.8307995,
+        "date": "2024-02-19",
+        "taxonomic_order": 32473
+    },
+    {
+        "common_name": "Long-tailed Duck",
+        "latitude": 40.7309779,
+        "longitude": -73.9621816,
+        "date": "2024-02-21",
+        "taxonomic_order": 700
+    },
+    {
+        "common_name": "Pied-billed Grebe",
+        "latitude": 40.6553787,
+        "longitude": -73.9686421,
+        "date": "2024-02-21",
+        "taxonomic_order": 1831
+    },
+    {
+        "common_name": "Rufous Hummingbird",
+        "latitude": 40.6553787,
+        "longitude": -73.9686421,
+        "date": "2024-02-21",
+        "taxonomic_order": 4798
+    },
+    {
+        "common_name": "Red-throated Loon",
+        "latitude": 40.786003,
+        "longitude": -73.96196,
+        "date": "2024-03-03",
+        "taxonomic_order": 6768
+    },
+    {
+        "common_name": "Common Loon",
+        "latitude": 40.786003,
+        "longitude": -73.96196,
+        "date": "2024-03-03",
+        "taxonomic_order": 6774
+    },
+    {
+        "common_name": "Peregrine Falcon",
+        "latitude": 40.786003,
+        "longitude": -73.96196,
+        "date": "2024-03-03",
+        "taxonomic_order": 11875
+    },
+    {
+        "common_name": "Eastern Screech-Owl",
+        "latitude": 40.8717025,
+        "longitude": -73.9256904,
+        "date": "2024-03-03",
+        "taxonomic_order": 8664
+    },
+    {
+        "common_name": "Rock Pigeon (Feral Pigeon)",
+        "latitude": 40.7245046,
+        "longitude": -73.9433616,
+        "date": "2024-03-08",
+        "taxonomic_order": 1889
+    },
+    {
+        "common_name": "Lesser Scaup",
+        "latitude": 37.29,
+        "longitude": -80.6155,
+        "date": "2024-03-15",
+        "taxonomic_order": 661
+    },
+    {
+        "common_name": "Winter Wren",
+        "latitude": 37.3391148,
+        "longitude": -80.7573982,
+        "date": "2024-03-16",
+        "taxonomic_order": 26844
+    },
+    {
+        "common_name": "Purple Finch",
+        "latitude": 38.0412163,
+        "longitude": -81.0679206,
+        "date": "2024-03-18",
+        "taxonomic_order": 31804
+    },
+    {
+        "common_name": "American Woodcock",
+        "latitude": 37.967261,
+        "longitude": -81.086233,
+        "date": "2024-03-19",
+        "taxonomic_order": 6031
+    },
+    {
+        "common_name": "Virginia Rail",
+        "latitude": 40.7536729,
+        "longitude": -73.9832322,
+        "date": "2024-04-03",
+        "taxonomic_order": 5268
+    },
+    {
+        "common_name": "Green-winged Teal",
+        "latitude": 40.795062,
+        "longitude": -73.960611,
+        "date": "2024-04-04",
+        "taxonomic_order": 574
+    },
+    {
+        "common_name": "American Kestrel",
+        "latitude": 42.365118,
+        "longitude": -76.506674,
+        "date": "2024-04-06",
+        "taxonomic_order": 11791
+    },
+    {
+        "common_name": "Swamp Sparrow",
+        "latitude": 42.4787599,
+        "longitude": -76.4529133,
+        "date": "2024-04-07",
+        "taxonomic_order": 32786
+    },
+    {
+        "common_name": "Trumpeter Swan",
+        "latitude": 43.0755965,
+        "longitude": -76.6778755,
+        "date": "2024-04-08",
+        "taxonomic_order": 363
+    },
+    {
+        "common_name": "American Wigeon",
+        "latitude": 43.0755965,
+        "longitude": -76.6778755,
+        "date": "2024-04-08",
+        "taxonomic_order": 487
+    },
+    {
+        "common_name": "Ring-necked Duck",
+        "latitude": 43.0755965,
+        "longitude": -76.6778755,
+        "date": "2024-04-08",
+        "taxonomic_order": 634
+    },
+    {
+        "common_name": "Northern Pintail",
+        "latitude": 43.0787739,
+        "longitude": -76.7080184,
+        "date": "2024-04-08",
+        "taxonomic_order": 558
+    },
+    {
+        "common_name": "Lesser Yellowlegs",
+        "latitude": 43.0787739,
+        "longitude": -76.7080184,
+        "date": "2024-04-08",
+        "taxonomic_order": 6109
+    },
+    {
+        "common_name": "Louisiana Waterthrush",
+        "latitude": 40.7776167,
+        "longitude": -73.9728892,
+        "date": "2024-04-09",
+        "taxonomic_order": 33425
+    },
+    {
+        "common_name": "Green Heron",
+        "latitude": 40.6553787,
+        "longitude": -73.9686421,
+        "date": "2024-04-14",
+        "taxonomic_order": 7469
+    },
+    {
+        "common_name": "Savannah Sparrow",
+        "latitude": 40.6523083,
+        "longitude": -73.9904281,
+        "date": "2024-04-15",
+        "taxonomic_order": 32715
+    },
+    {
+        "common_name": "Blue Grosbeak",
+        "latitude": 40.6523083,
+        "longitude": -73.9904281,
+        "date": "2024-04-15",
+        "taxonomic_order": 34051
+    },
+    {
+        "common_name": "Prothonotary Warbler",
+        "latitude": 40.6553787,
+        "longitude": -73.9686421,
+        "date": "2024-04-15",
+        "taxonomic_order": 33436
+    },
+    {
+        "common_name": "Merlin",
+        "latitude": 40.7715482,
+        "longitude": -73.9724819,
+        "date": "2024-04-16",
+        "taxonomic_order": 11825
+    },
+    {
+        "common_name": "Rusty Blackbird",
+        "latitude": 40.7779667,
+        "longitude": -73.9697165,
+        "date": "2024-04-16",
+        "taxonomic_order": 33322
+    },
+    {
+        "common_name": "Red-cockaded Woodpecker",
+        "latitude": 32.9932945,
+        "longitude": -87.3045053,
+        "date": "2024-04-18",
+        "taxonomic_order": 11201
+    },
+    {
+        "common_name": "Nashville Warbler",
+        "latitude": 33.558598,
+        "longitude": -86.6889954,
+        "date": "2024-04-20",
+        "taxonomic_order": 33454
+    },
+    {
+        "common_name": "Kentucky Warbler",
+        "latitude": 33.558598,
+        "longitude": -86.6889954,
+        "date": "2024-04-20",
+        "taxonomic_order": 33484
+    },
+    {
+        "common_name": "Tennessee Warbler",
+        "latitude": 33.558598,
+        "longitude": -86.6889954,
+        "date": "2024-04-22",
+        "taxonomic_order": 33445
+    },
+    {
+        "common_name": "Black-throated Green Warbler",
+        "latitude": 40.7198951,
+        "longitude": -73.9512669,
+        "date": "2024-04-24",
+        "taxonomic_order": 33675
+    },
+    {
+        "common_name": "Willet",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-04-28",
+        "taxonomic_order": 6111
+    },
+    {
+        "common_name": "Forster's Tern",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-04-28",
+        "taxonomic_order": 6670
+    },
+    {
+        "common_name": "Yellow-crowned Night Heron",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-04-28",
+        "taxonomic_order": 7364
+    },
+    {
+        "common_name": "Least Flycatcher",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-04-28",
+        "taxonomic_order": 16654
+    },
+    {
+        "common_name": "Solitary Sandpiper",
+        "latitude": 40.6602841,
+        "longitude": -73.9689534,
+        "date": "2024-04-29",
+        "taxonomic_order": 6094
+    },
+    {
+        "common_name": "Warbling Vireo",
+        "latitude": 40.6602841,
+        "longitude": -73.9689534,
+        "date": "2024-04-29",
+        "taxonomic_order": 18890
+    },
+    {
+        "common_name": "Cinnamon Hummingbird",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 5067
+    },
+    {
+        "common_name": "Neotropic Cormorant",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 7260
+    },
+    {
+        "common_name": "Snail Kite",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 7917
+    },
+    {
+        "common_name": "Black-headed Trogon",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 9324
+    },
+    {
+        "common_name": "American Pygmy Kingfisher",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 10029
+    },
+    {
+        "common_name": "Ruddy Woodcreeper",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 14372
+    },
+    {
+        "common_name": "Tawny-winged Woodcreeper",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 14377
+    },
+    {
+        "common_name": "Ivory-billed Woodcreeper",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 14562
+    },
+    {
+        "common_name": "Tropical Royal Flycatcher (Northern)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 15804
+    },
+    {
+        "common_name": "Lesser Greenlet (Northern)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 18788
+    },
+    {
+        "common_name": "Yellow-throated Euphonia",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 31508
+    },
+    {
+        "common_name": "Green-backed Sparrow",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 32448
+    },
+    {
+        "common_name": "Yellow-billed Cacique (Prevost's)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 33082
+    },
+    {
+        "common_name": "Hooded Oriole (igneus)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 33164
+    },
+    {
+        "common_name": "Red-throated Ant-Tanager (Salvin's)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 33934
+    },
+    {
+        "common_name": "Gray-headed Tanager",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-01",
+        "taxonomic_order": 34188
+    },
+    {
+        "common_name": "Vaux's Swift",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 3875
+    },
+    {
+        "common_name": "White-bellied Emerald",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 5160
+    },
+    {
+        "common_name": "Gartered Trogon",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 9333
+    },
+    {
+        "common_name": "Olive-throated Parakeet (Aztec)",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 12846
+    },
+    {
+        "common_name": "Olivaceous Woodcreeper (Grayish)",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 14332
+    },
+    {
+        "common_name": "Northern Bentbill",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 16024
+    },
+    {
+        "common_name": "Yellow-olive Flatbill (Gray-headed)",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 16171
+    },
+    {
+        "common_name": "Lesser Greenlet",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 18787
+    },
+    {
+        "common_name": "White-browed Gnatcatcher",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 26663
+    },
+    {
+        "common_name": "Spot-breasted Wren",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 27036
+    },
+    {
+        "common_name": "Rose-throated Tanager",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 33862
+    },
+    {
+        "common_name": "Red-crowned Ant-Tanager (Northern)",
+        "latitude": 20.318125,
+        "longitude": -87.5269,
+        "date": "2024-05-01",
+        "taxonomic_order": 33913
+    },
+    {
+        "common_name": "Eurasian Collared-Dove",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 2051
+    },
+    {
+        "common_name": "White-tipped Dove",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 2340
+    },
+    {
+        "common_name": "Squirrel Cuckoo",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 3211
+    },
+    {
+        "common_name": "Wedge-tailed Sabrewing (Wedge-tailed)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 4896
+    },
+    {
+        "common_name": "Turquoise-browed Motmot",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 9618
+    },
+    {
+        "common_name": "Collared Aracari (Collared)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 10670
+    },
+    {
+        "common_name": "Keel-billed Toucan",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 10718
+    },
+    {
+        "common_name": "Golden-fronted Woodpecker",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 10963
+    },
+    {
+        "common_name": "Lineated Woodpecker (Lineated)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 11520
+    },
+    {
+        "common_name": "Yellow-lored Parrot",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 12704
+    },
+    {
+        "common_name": "Olive-throated Parakeet",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 12845
+    },
+    {
+        "common_name": "Rose-throated Becard",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 15776
+    },
+    {
+        "common_name": "Eye-ringed Flatbill",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 16150
+    },
+    {
+        "common_name": "Yellow-olive Flatbill",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 16170
+    },
+    {
+        "common_name": "Northern Beardless-Tyrannulet",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 16246
+    },
+    {
+        "common_name": "Boat-billed Flycatcher (Northern)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 17067
+    },
+    {
+        "common_name": "Social Flycatcher",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 17079
+    },
+    {
+        "common_name": "Sulphur-bellied Flycatcher",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 17125
+    },
+    {
+        "common_name": "Piratic Flycatcher",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 17127
+    },
+    {
+        "common_name": "Couch's Kingbird",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 17144
+    },
+    {
+        "common_name": "Tawny-crowned Greenlet",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 18774
+    },
+    {
+        "common_name": "Yellow-green Vireo",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 18928
+    },
+    {
+        "common_name": "Brown Jay",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 20828
+    },
+    {
+        "common_name": "Green Jay",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 20837
+    },
+    {
+        "common_name": "Long-billed Gnatwren (rufiventris Group)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 26621
+    },
+    {
+        "common_name": "White-bellied Wren",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 27130
+    },
+    {
+        "common_name": "White-bellied Wren (Middle America)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 27131
+    },
+    {
+        "common_name": "Black Catbird",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 27538
+    },
+    {
+        "common_name": "Swainson's Thrush",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 27857
+    },
+    {
+        "common_name": "Clay-colored Thrush",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 28042
+    },
+    {
+        "common_name": "Black-cowled Oriole",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33150
+    },
+    {
+        "common_name": "Hooded Oriole",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33156
+    },
+    {
+        "common_name": "Yellow-tailed Oriole",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33173
+    },
+    {
+        "common_name": "Orange Oriole",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33213
+    },
+    {
+        "common_name": "Altamira Oriole",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33226
+    },
+    {
+        "common_name": "Melodious Blackbird",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33317
+    },
+    {
+        "common_name": "Yellow Warbler (Northern)",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33558
+    },
+    {
+        "common_name": "Red-throated Ant-Tanager",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 33933
+    },
+    {
+        "common_name": "Morelet's Seedeater",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 35016
+    },
+    {
+        "common_name": "Black-headed Saltator",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 35232
+    },
+    {
+        "common_name": "Cinnamon-bellied Saltator",
+        "latitude": 20.0785613,
+        "longitude": -87.6110959,
+        "date": "2024-05-02",
+        "taxonomic_order": 35246
+    },
+    {
+        "common_name": "Wood Stork",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2024-05-03",
+        "taxonomic_order": 7138
+    },
+    {
+        "common_name": "Bare-throated Tiger-Heron",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2024-05-03",
+        "taxonomic_order": 7315
+    },
+    {
+        "common_name": "Long-billed Gnatwren",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2024-05-03",
+        "taxonomic_order": 26620
+    },
+    {
+        "common_name": "Red-billed Pigeon",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 1977
+    },
+    {
+        "common_name": "Groove-billed Ani",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 3026
+    },
+    {
+        "common_name": "Common Black Hawk",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 8213
+    },
+    {
+        "common_name": "Roadside Hawk",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 8235
+    },
+    {
+        "common_name": "Ferruginous Pygmy-Owl",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 8830
+    },
+    {
+        "common_name": "Black-crowned Tityra",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 15663
+    },
+    {
+        "common_name": "Rufous-browed Peppershrike",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 18704
+    },
+    {
+        "common_name": "Yellow-billed Cacique",
+        "latitude": 18.601536,
+        "longitude": -87.770781,
+        "date": "2024-05-04",
+        "taxonomic_order": 33081
+    },
+    {
+        "common_name": "Common Nighthawk",
+        "latitude": 18.729205,
+        "longitude": -87.698958,
+        "date": "2024-05-04",
+        "taxonomic_order": 3508
+    },
+    {
+        "common_name": "Mangrove Swallow",
+        "latitude": 19.245281,
+        "longitude": -87.595769,
+        "date": "2024-05-05",
+        "taxonomic_order": 23655
+    },
+    {
+        "common_name": "White-winged Dove",
+        "latitude": 19.32113,
+        "longitude": -87.462301,
+        "date": "2024-05-08",
+        "taxonomic_order": 2404
+    },
+    {
+        "common_name": "Clapper Rail",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-05-11",
+        "taxonomic_order": 5247
+    },
+    {
+        "common_name": "Least Sandpiper",
+        "latitude": 40.599946,
+        "longitude": -73.9243268,
+        "date": "2024-05-11",
+        "taxonomic_order": 6187
+    },
+    {
+        "common_name": "Cape May Warbler",
+        "latitude": 40.7832,
+        "longitude": -73.9700467,
+        "date": "2024-05-13",
+        "taxonomic_order": 33531
+    },
+    {
+        "common_name": "Barred Owl",
+        "latitude": 41.6054676,
+        "longitude": -73.5995852,
+        "date": "2024-05-17",
+        "taxonomic_order": 9011
+    },
+    {
+        "common_name": "Bobolink",
+        "latitude": 41.6054676,
+        "longitude": -73.5995852,
+        "date": "2024-05-17",
+        "taxonomic_order": 33040
+    },
+    {
+        "common_name": "Common Tern",
+        "latitude": 40.6885372,
+        "longitude": -74.0189759,
+        "date": "2024-05-25",
+        "taxonomic_order": 6686
+    },
+    {
+        "common_name": "Mourning Warbler",
+        "latitude": 40.7536729,
+        "longitude": -73.9832322,
+        "date": "2024-06-07",
+        "taxonomic_order": 33479
+    },
+    {
+        "common_name": "Least Tern",
+        "latitude": 40.615764,
+        "longitude": -73.7906823,
+        "date": "2024-06-07",
+        "taxonomic_order": 6638
+    },
+    {
+        "common_name": "Bank Swallow",
+        "latitude": 41.3466667,
+        "longitude": -70.8383333,
+        "date": "2024-06-09",
+        "taxonomic_order": 23636
+    },
+    {
+        "common_name": "Northern Rough-winged Swallow",
+        "latitude": 41.3466667,
+        "longitude": -70.8383333,
+        "date": "2024-06-09",
+        "taxonomic_order": 23691
+    },
+    {
+        "common_name": "Piping Plover",
+        "latitude": 41.471147,
+        "longitude": -70.625062,
+        "date": "2024-06-10",
+        "taxonomic_order": 5807
+    },
+    {
+        "common_name": "crow sp.",
+        "latitude": 40.6258911,
+        "longitude": -73.8972616,
+        "date": "2024-06-22",
+        "taxonomic_order": 21231
+    },
+    {
+        "common_name": "Glaucous-winged Gull",
+        "latitude": 48.6481508,
+        "longitude": -122.4870497,
+        "date": "2024-07-10",
+        "taxonomic_order": 6543
+    },
+    {
+        "common_name": "Western Flycatcher",
+        "latitude": 48.6481508,
+        "longitude": -122.4870497,
+        "date": "2024-07-10",
+        "taxonomic_order": 16666
+    },
+    {
+        "common_name": "Violet-green Swallow",
+        "latitude": 48.6481508,
+        "longitude": -122.4870497,
+        "date": "2024-07-10",
+        "taxonomic_order": 23659
+    },
+    {
+        "common_name": "Red-breasted Nuthatch",
+        "latitude": 48.6481508,
+        "longitude": -122.4870497,
+        "date": "2024-07-10",
+        "taxonomic_order": 26484
+    },
+    {
+        "common_name": "White-crowned Sparrow",
+        "latitude": 48.6481508,
+        "longitude": -122.4870497,
+        "date": "2024-07-10",
+        "taxonomic_order": 32658
+    },
+    {
+        "common_name": "Black Oystercatcher",
+        "latitude": 48.683195,
+        "longitude": -122.501534,
+        "date": "2024-07-11",
+        "taxonomic_order": 5777
+    },
+    {
+        "common_name": "Pigeon Guillemot",
+        "latitude": 48.683195,
+        "longitude": -122.501534,
+        "date": "2024-07-11",
+        "taxonomic_order": 6364
+    },
+    {
+        "common_name": "Allen's Hummingbird",
+        "latitude": 34.094311,
+        "longitude": -118.305921,
+        "date": "2024-07-12",
+        "taxonomic_order": 4803
+    },
+    {
+        "common_name": "Black Phoebe",
+        "latitude": 34.094311,
+        "longitude": -118.305921,
+        "date": "2024-07-12",
+        "taxonomic_order": 16688
+    },
+    {
+        "common_name": "California Towhee",
+        "latitude": 34.094311,
+        "longitude": -118.305921,
+        "date": "2024-07-12",
+        "taxonomic_order": 32821
+    },
+    {
+        "common_name": "Whimbrel",
+        "latitude": 33.9610802,
+        "longitude": -118.4507315,
+        "date": "2024-07-14",
+        "taxonomic_order": 5978
+    },
+    {
+        "common_name": "Marbled Godwit",
+        "latitude": 33.9610802,
+        "longitude": -118.4507315,
+        "date": "2024-07-14",
+        "taxonomic_order": 6018
+    },
+    {
+        "common_name": "Short-billed/Long-billed Dowitcher",
+        "latitude": 33.9610802,
+        "longitude": -118.4507315,
+        "date": "2024-07-14",
+        "taxonomic_order": 6029
+    },
+    {
+        "common_name": "Western Sandpiper",
+        "latitude": 33.9610802,
+        "longitude": -118.4507315,
+        "date": "2024-07-14",
+        "taxonomic_order": 6192
+    },
+    {
+        "common_name": "Short-billed Dowitcher",
+        "latitude": 34.0333857,
+        "longitude": -118.6822987,
+        "date": "2024-07-14",
+        "taxonomic_order": 6024
+    },
+    {
+        "common_name": "Lesser/Greater Yellowlegs",
+        "latitude": 34.0333857,
+        "longitude": -118.6822987,
+        "date": "2024-07-14",
+        "taxonomic_order": 6119
+    },
+    {
+        "common_name": "Heermann's Gull",
+        "latitude": 34.0333857,
+        "longitude": -118.6822987,
+        "date": "2024-07-14",
+        "taxonomic_order": 6470
+    },
+    {
+        "common_name": "Bushtit",
+        "latitude": 34.094311,
+        "longitude": -118.305921,
+        "date": "2024-07-14",
+        "taxonomic_order": 24829
+    },
+    {
+        "common_name": "Cinnamon Teal",
+        "latitude": 33.9701285,
+        "longitude": -118.4305573,
+        "date": "2024-07-14",
+        "taxonomic_order": 461
+    },
+    {
+        "common_name": "Acorn Woodpecker",
+        "latitude": 34.1349978,
+        "longitude": -118.288132,
+        "date": "2024-07-15",
+        "taxonomic_order": 10927
+    },
+    {
+        "common_name": "Nuttall's Woodpecker",
+        "latitude": 34.1349978,
+        "longitude": -118.288132,
+        "date": "2024-07-15",
+        "taxonomic_order": 11185
+    },
+    {
+        "common_name": "Bewick's Wren",
+        "latitude": 34.1349978,
+        "longitude": -118.288132,
+        "date": "2024-07-15",
+        "taxonomic_order": 26911
+    },
+    {
+        "common_name": "Western Bluebird",
+        "latitude": 34.1349978,
+        "longitude": -118.288132,
+        "date": "2024-07-15",
+        "taxonomic_order": 27672
+    },
+    {
+        "common_name": "Black-headed Grosbeak",
+        "latitude": 34.1349978,
+        "longitude": -118.288132,
+        "date": "2024-07-15",
+        "taxonomic_order": 34011
+    },
+    {
+        "common_name": "Ash-throated Flycatcher",
+        "latitude": 34.1285738,
+        "longitude": -118.3055878,
+        "date": "2024-07-16",
+        "taxonomic_order": 17012
+    },
+    {
+        "common_name": "Wrentit",
+        "latitude": 34.1285738,
+        "longitude": -118.3055878,
+        "date": "2024-07-16",
+        "taxonomic_order": 25004
+    },
+    {
+        "common_name": "Western Wood-Pewee",
+        "latitude": 34.2661573,
+        "longitude": -118.1440936,
+        "date": "2024-07-17",
+        "taxonomic_order": 16603
+    },
+    {
+        "common_name": "Hutton's Vireo",
+        "latitude": 34.2661573,
+        "longitude": -118.1440936,
+        "date": "2024-07-17",
+        "taxonomic_order": 18851
+    },
+    {
+        "common_name": "Cassin's Vireo",
+        "latitude": 34.2661573,
+        "longitude": -118.1440936,
+        "date": "2024-07-17",
+        "taxonomic_order": 18870
+    },
+    {
+        "common_name": "Steller's Jay",
+        "latitude": 34.2661573,
+        "longitude": -118.1440936,
+        "date": "2024-07-17",
+        "taxonomic_order": 20879
+    },
+    {
+        "common_name": "Tropical Parula",
+        "latitude": 34.2661573,
+        "longitude": -118.1440936,
+        "date": "2024-07-17",
+        "taxonomic_order": 33537
+    },
+    {
+        "common_name": "Swainson's Hawk",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 8308
+    },
+    {
+        "common_name": "Burrowing Owl",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 8926
+    },
+    {
+        "common_name": "Western Kingbird",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 17152
+    },
+    {
+        "common_name": "Horned Lark",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 22182
+    },
+    {
+        "common_name": "Grasshopper Sparrow",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 32413
+    },
+    {
+        "common_name": "Western Meadowlark",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 33041
+    },
+    {
+        "common_name": "Bullock's Oriole",
+        "latitude": 39.8209707,
+        "longitude": -104.8680639,
+        "date": "2024-07-18",
+        "taxonomic_order": 33210
+    },
+    {
+        "common_name": "Broad-tailed Hummingbird",
+        "latitude": 39.9245727,
+        "longitude": -105.3979211,
+        "date": "2024-07-19",
+        "taxonomic_order": 4809
+    },
+    {
+        "common_name": "Pine Siskin",
+        "latitude": 39.9022304,
+        "longitude": -105.6475353,
+        "date": "2024-07-20",
+        "taxonomic_order": 32073
+    },
+    {
+        "common_name": "Mountain Chickadee",
+        "latitude": 39.920089,
+        "longitude": -105.390408,
+        "date": "2024-07-20",
+        "taxonomic_order": 21688
+    },
+    {
+        "common_name": "Pygmy Nuthatch",
+        "latitude": 39.920089,
+        "longitude": -105.390408,
+        "date": "2024-07-20",
+        "taxonomic_order": 26471
+    },
+    {
+        "common_name": "Rock Wren",
+        "latitude": 39.920089,
+        "longitude": -105.390408,
+        "date": "2024-07-20",
+        "taxonomic_order": 26696
+    },
+    {
+        "common_name": "American Three-toed Woodpecker",
+        "latitude": 39.920089,
+        "longitude": -105.390408,
+        "date": "2024-07-20",
+        "taxonomic_order": 10996
+    },
+    {
+        "common_name": "Clark's Nutcracker",
+        "latitude": 39.9022304,
+        "longitude": -105.6475353,
+        "date": "2024-07-20",
+        "taxonomic_order": 21093
+    },
+    {
+        "common_name": "Greater Yellowlegs",
+        "latitude": 40.5863535,
+        "longitude": -73.8851488,
+        "date": "2024-07-28",
+        "taxonomic_order": 6118
+    },
+    {
+        "common_name": "Semipalmated Plover",
+        "latitude": 40.6036408,
+        "longitude": -73.8871765,
+        "date": "2024-07-28",
+        "taxonomic_order": 5805
+    },
+    {
+        "common_name": "Black Skimmer",
+        "latitude": 40.6036408,
+        "longitude": -73.8871765,
+        "date": "2024-07-28",
+        "taxonomic_order": 6567
+    },
+    {
+        "common_name": "Ruddy Turnstone",
+        "latitude": 40.5823284,
+        "longitude": -73.9153746,
+        "date": "2024-08-11",
+        "taxonomic_order": 6125
+    },
+    {
+        "common_name": "Semipalmated Sandpiper",
+        "latitude": 40.5823284,
+        "longitude": -73.9153746,
+        "date": "2024-08-11",
+        "taxonomic_order": 6193
+    },
+    {
+        "common_name": "Golden-winged Warbler",
+        "latitude": 40.737578,
+        "longitude": -74.006812,
+        "date": "2024-08-12",
+        "taxonomic_order": 33429
+    },
+    {
+        "common_name": "Olive-sided Flycatcher",
+        "latitude": 40.6523083,
+        "longitude": -73.9904281,
+        "date": "2024-08-26",
+        "taxonomic_order": 16581
+    },
+    {
+        "common_name": "Louisiana/Northern Waterthrush",
+        "latitude": 40.6523083,
+        "longitude": -73.9904281,
+        "date": "2024-08-26",
+        "taxonomic_order": 33427
+    },
+    {
+        "common_name": "Empidonax sp.",
+        "latitude": 40.7245046,
+        "longitude": -73.9433616,
+        "date": "2024-08-28",
+        "taxonomic_order": 16687
+    },
+    {
+        "common_name": "passerine sp.",
+        "latitude": 40.7245046,
+        "longitude": -73.9433616,
+        "date": "2024-08-28",
+        "taxonomic_order": 35292
+    },
+    {
+        "common_name": "Red-necked Phalarope",
+        "latitude": 40.6226854,
+        "longitude": -73.8220096,
+        "date": "2024-08-28",
+        "taxonomic_order": 6086
+    },
+    {
+        "common_name": "Caspian Tern",
+        "latitude": 40.6226854,
+        "longitude": -73.8220096,
+        "date": "2024-08-28",
+        "taxonomic_order": 6657
+    },
+    {
+        "common_name": "gull sp.",
+        "latitude": 40.638525,
+        "longitude": -73.8325786,
+        "date": "2024-08-28",
+        "taxonomic_order": 6564
+    },
+    {
+        "common_name": "thrush sp.",
+        "latitude": 40.796089,
+        "longitude": -73.9558947,
+        "date": "2024-08-29",
+        "taxonomic_order": 28290
+    },
+    {
+        "common_name": "Royal Tern",
+        "latitude": 40.5823284,
+        "longitude": -73.9153746,
+        "date": "2024-08-30",
+        "taxonomic_order": 6725
+    },
+    {
+        "common_name": "Yellow-bellied Flycatcher",
+        "latitude": 40.5823284,
+        "longitude": -73.9153746,
+        "date": "2024-08-30",
+        "taxonomic_order": 16640
+    },
+    {
+        "common_name": "Sora",
+        "latitude": 40.6170296,
+        "longitude": -73.8244561,
+        "date": "2024-09-01",
+        "taxonomic_order": 5428
+    },
+    {
+        "common_name": "Red Knot",
+        "latitude": 40.6170296,
+        "longitude": -73.8244561,
+        "date": "2024-09-01",
+        "taxonomic_order": 6130
+    },
+    {
+        "common_name": "American White Pelican",
+        "latitude": 40.6170296,
+        "longitude": -73.8244561,
+        "date": "2024-09-01",
+        "taxonomic_order": 7288
+    },
+    {
+        "common_name": "Marsh Wren",
+        "latitude": 40.7536729,
+        "longitude": -73.9832322,
+        "date": "2024-09-04",
+        "taxonomic_order": 26878
+    },
+    {
+        "common_name": "Yellow-breasted Chat",
+        "latitude": 40.7536729,
+        "longitude": -73.9832322,
+        "date": "2024-09-04",
+        "taxonomic_order": 33035
+    },
+    {
+        "common_name": "Yellow-billed Cuckoo",
+        "latitude": 40.7245046,
+        "longitude": -73.9433616,
+        "date": "2024-09-10",
+        "taxonomic_order": 3230
+    },
+    {
+        "common_name": "Bay-breasted/Blackpoll Warbler",
+        "latitude": 40.6523083,
+        "longitude": -73.9904281,
+        "date": "2024-09-13",
+        "taxonomic_order": 33603
+    },
+    {
+        "common_name": "Common Pauraque",
+        "latitude": 10.4368996,
+        "longitude": -84.72261,
+        "date": "2024-09-14",
+        "taxonomic_order": 3553
+    },
+    {
+        "common_name": "Common Tody-Flycatcher",
+        "latitude": 9.994887,
+        "longitude": -84.241658,
+        "date": "2024-09-14",
+        "taxonomic_order": 16126
+    },
+    {
+        "common_name": "Rufous-naped Wren",
+        "latitude": 9.994887,
+        "longitude": -84.241658,
+        "date": "2024-09-14",
+        "taxonomic_order": 26945
+    },
+    {
+        "common_name": "Stripe-throated Hermit",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 4285
+    },
+    {
+        "common_name": "Variable Seedeater",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 35001
+    },
+    {
+        "common_name": "Scarlet-rumped Tanager",
+        "latitude": 10.4368996,
+        "longitude": -84.72261,
+        "date": "2024-09-15",
+        "taxonomic_order": 34247
+    },
+    {
+        "common_name": "Crested Guan",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 867
+    },
+    {
+        "common_name": "Great Curassow",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 912
+    },
+    {
+        "common_name": "Green Hermit",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 4235
+    },
+    {
+        "common_name": "Black-crested Coquette",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 4430
+    },
+    {
+        "common_name": "Violet-headed Hummingbird",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 4899
+    },
+    {
+        "common_name": "Scaly-breasted Hummingbird",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 4988
+    },
+    {
+        "common_name": "Short-tailed Hawk",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 8304
+    },
+    {
+        "common_name": "Yellow-throated Toucan",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 10708
+    },
+    {
+        "common_name": "Smoky-brown Woodpecker",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 11230
+    },
+    {
+        "common_name": "Wedge-billed Woodcreeper",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 14400
+    },
+    {
+        "common_name": "White-ruffed Manakin",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 15421
+    },
+    {
+        "common_name": "Cinnamon Becard",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 15739
+    },
+    {
+        "common_name": "Dusky-capped Flycatcher",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 16973
+    },
+    {
+        "common_name": "Boat-billed Flycatcher",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 17066
+    },
+    {
+        "common_name": "Stripe-breasted Wren",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 27076
+    },
+    {
+        "common_name": "Yellow-crowned Euphonia",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 31496
+    },
+    {
+        "common_name": "Tawny-capped Euphonia",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 31527
+    },
+    {
+        "common_name": "Orange-billed Sparrow",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 32522
+    },
+    {
+        "common_name": "Chestnut-headed Oropendola",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 33103
+    },
+    {
+        "common_name": "Montezuma Oropendola",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 33106
+    },
+    {
+        "common_name": "Buff-rumped Warbler",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 33762
+    },
+    {
+        "common_name": "Palm Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34402
+    },
+    {
+        "common_name": "Golden-hooded Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34467
+    },
+    {
+        "common_name": "Emerald Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34572
+    },
+    {
+        "common_name": "Scarlet-thighed Dacnis",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34595
+    },
+    {
+        "common_name": "Shining Honeycreeper",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34611
+    },
+    {
+        "common_name": "Red-legged Honeycreeper",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34620
+    },
+    {
+        "common_name": "Black-and-yellow Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34675
+    },
+    {
+        "common_name": "Crested Owl",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 8687
+    },
+    {
+        "common_name": "Broad-billed Motmot",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 9608
+    },
+    {
+        "common_name": "Orange-chinned Parakeet",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 12593
+    },
+    {
+        "common_name": "Russet Antshrike",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 13360
+    },
+    {
+        "common_name": "Dusky Antbird",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 13645
+    },
+    {
+        "common_name": "Spotted Antbird",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 13837
+    },
+    {
+        "common_name": "Spotted Woodcreeper",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 14575
+    },
+    {
+        "common_name": "Streak-headed Woodcreeper",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 14636
+    },
+    {
+        "common_name": "Fawn-throated Foliage-gleaner",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 14972
+    },
+    {
+        "common_name": "White-collared Manakin",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 15467
+    },
+    {
+        "common_name": "Sulphur-rumped Flycatcher",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 15826
+    },
+    {
+        "common_name": "Tawny-faced Gnatwren",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 26615
+    },
+    {
+        "common_name": "Golden-crowned Warbler",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 33704
+    },
+    {
+        "common_name": "Carmiol's Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 33946
+    },
+    {
+        "common_name": "White-throated Shrike-Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 34235
+    },
+    {
+        "common_name": "Buff-throated Saltator",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-15",
+        "taxonomic_order": 35223
+    },
+    {
+        "common_name": "Lesser Swallow-tailed Swift",
+        "latitude": 10.4846048,
+        "longitude": -84.7293091,
+        "date": "2024-09-16",
+        "taxonomic_order": 4145
+    },
+    {
+        "common_name": "Gray Hawk",
+        "latitude": 10.4846048,
+        "longitude": -84.7293091,
+        "date": "2024-09-16",
+        "taxonomic_order": 8278
+    },
+    {
+        "common_name": "Rufous-tailed Jacamar",
+        "latitude": 10.4846048,
+        "longitude": -84.7293091,
+        "date": "2024-09-16",
+        "taxonomic_order": 10285
+    },
+    {
+        "common_name": "Olive-backed Euphonia",
+        "latitude": 10.4846048,
+        "longitude": -84.7293091,
+        "date": "2024-09-16",
+        "taxonomic_order": 31520
+    },
+    {
+        "common_name": "Long-billed Starthroat",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 4700
+    },
+    {
+        "common_name": "Bronze-tailed Plumeleteer",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 4931
+    },
+    {
+        "common_name": "Crowned Woodnymph",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 4944
+    },
+    {
+        "common_name": "Collared Aracari",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 10669
+    },
+    {
+        "common_name": "Rufous-winged Woodpecker",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 11600
+    },
+    {
+        "common_name": "parrot sp.",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 12966
+    },
+    {
+        "common_name": "Northern Tropical Pewee",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 16608
+    },
+    {
+        "common_name": "Gray-capped Flycatcher",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 17090
+    },
+    {
+        "common_name": "Black-striped Sparrow",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 32452
+    },
+    {
+        "common_name": "Hepatic Tanager",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 33866
+    },
+    {
+        "common_name": "Green Kingfisher",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-16",
+        "taxonomic_order": 10032
+    },
+    {
+        "common_name": "Short-billed Pigeon",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 2019
+    },
+    {
+        "common_name": "swift sp.",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 4175
+    },
+    {
+        "common_name": "King Vulture",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 7619
+    },
+    {
+        "common_name": "Ringed Kingfisher",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 10017
+    },
+    {
+        "common_name": "Amazon Kingfisher",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 10028
+    },
+    {
+        "common_name": "Ochre-bellied Flycatcher",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 15916
+    },
+    {
+        "common_name": "Scale-crested Pygmy-Tyrant",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 16005
+    },
+    {
+        "common_name": "Western/Eastern Wood-Pewee",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 16617
+    },
+    {
+        "common_name": "Southern Rough-winged Swallow",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 23701
+    },
+    {
+        "common_name": "Black-throated Wren",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 27054
+    },
+    {
+        "common_name": "Bay Wren",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 27086
+    },
+    {
+        "common_name": "Bronzed Cowbird",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 33300
+    },
+    {
+        "common_name": "White-shouldered Tanager",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 34211
+    },
+    {
+        "common_name": "Crimson-collared Tanager",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 34240
+    },
+    {
+        "common_name": "Rufous-winged Tanager",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 34529
+    },
+    {
+        "common_name": "Blue-black Grassquit",
+        "latitude": 10.4656949,
+        "longitude": -84.7550561,
+        "date": "2024-09-16",
+        "taxonomic_order": 34951
+    },
+    {
+        "common_name": "Canivet's Emerald",
+        "latitude": 10.300539,
+        "longitude": -84.80134,
+        "date": "2024-09-17",
+        "taxonomic_order": 4853
+    },
+    {
+        "common_name": "Cabanis's Wren",
+        "latitude": 10.300539,
+        "longitude": -84.80134,
+        "date": "2024-09-17",
+        "taxonomic_order": 27080
+    },
+    {
+        "common_name": "Long-billed Hermit",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 4248
+    },
+    {
+        "common_name": "Black-cheeked Woodpecker",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 10940
+    },
+    {
+        "common_name": "White Hawk",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 8268
+    },
+    {
+        "common_name": "Slaty Antwren",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 13485
+    },
+    {
+        "common_name": "White-breasted Wood-Wren",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 27139
+    },
+    {
+        "common_name": "Slate-colored Grosbeak",
+        "latitude": 10.4369842,
+        "longitude": -84.7096768,
+        "date": "2024-09-17",
+        "taxonomic_order": 35286
+    },
+    {
+        "common_name": "Muscovy Duck",
+        "latitude": 10.418261,
+        "longitude": -84.904236,
+        "date": "2024-09-17",
+        "taxonomic_order": 423
+    },
+    {
+        "common_name": "Lesser Violetear",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4334
+    },
+    {
+        "common_name": "Green-crowned Brilliant",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4681
+    },
+    {
+        "common_name": "Purple-throated Mountain-gem",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4732
+    },
+    {
+        "common_name": "Magenta-throated Woodstar",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4768
+    },
+    {
+        "common_name": "Violet Sabrewing",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4920
+    },
+    {
+        "common_name": "Stripe-tailed Hummingbird",
+        "latitude": 10.3024372,
+        "longitude": -84.7961095,
+        "date": "2024-09-18",
+        "taxonomic_order": 4983
+    },
+    {
+        "common_name": "Common Chlorospingus",
+        "latitude": 10.3026404,
+        "longitude": -84.7956911,
+        "date": "2024-09-18",
+        "taxonomic_order": 32338
+    },
+    {
+        "common_name": "Coppery-headed Emerald",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 4976
+    },
+    {
+        "common_name": "Blue-vented Hummingbird",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 5024
+    },
+    {
+        "common_name": "Lesson's Motmot",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 9575
+    },
+    {
+        "common_name": "Hoffmann's Woodpecker",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 10961
+    },
+    {
+        "common_name": "Brown-hooded Parrot",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 12618
+    },
+    {
+        "common_name": "Mistletoe Tyrannulet",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 16491
+    },
+    {
+        "common_name": "Golden-browed Chlorophonia",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 31478
+    },
+    {
+        "common_name": "White-eared Ground-Sparrow",
+        "latitude": 10.30708,
+        "longitude": -84.81162,
+        "date": "2024-09-18",
+        "taxonomic_order": 32830
+    },
+    {
+        "common_name": "Black Guan",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 893
+    },
+    {
+        "common_name": "Northern Emerald-Toucanet",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 10620
+    },
+    {
+        "common_name": "White-fronted Parrot",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 12700
+    },
+    {
+        "common_name": "Plain Antvireo",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 13373
+    },
+    {
+        "common_name": "Gray-throated Leaftosser",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 14278
+    },
+    {
+        "common_name": "Olivaceous Woodcreeper",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 14331
+    },
+    {
+        "common_name": "Red-faced Spinetail",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 15223
+    },
+    {
+        "common_name": "Olive-streaked Flycatcher",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 15908
+    },
+    {
+        "common_name": "Slaty-capped Flycatcher",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 15941
+    },
+    {
+        "common_name": "Tufted Flycatcher",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 16574
+    },
+    {
+        "common_name": "Yellowish Flycatcher",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 16675
+    },
+    {
+        "common_name": "Azure-hooded Jay",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 20805
+    },
+    {
+        "common_name": "Rufous-and-white Wren",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 27068
+    },
+    {
+        "common_name": "Black-faced Solitaire",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 27716
+    },
+    {
+        "common_name": "Mountain Thrush",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 27984
+    },
+    {
+        "common_name": "White-throated Thrush",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 28016
+    },
+    {
+        "common_name": "Chestnut-capped Brushfinch",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 32553
+    },
+    {
+        "common_name": "White-naped Brushfinch",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 32909
+    },
+    {
+        "common_name": "Chestnut-capped Warbler",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 33688
+    },
+    {
+        "common_name": "Slate-throated Redstart",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 33813
+    },
+    {
+        "common_name": "Spangle-cheeked Tanager",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 34491
+    },
+    {
+        "common_name": "Silver-throated Tanager",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 34575
+    },
+    {
+        "common_name": "Yellow-faced Grassquit",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-18",
+        "taxonomic_order": 35133
+    },
+    {
+        "common_name": "Collared Trogon",
+        "latitude": 10.322354,
+        "longitude": -84.824585,
+        "date": "2024-09-19",
+        "taxonomic_order": 9369
+    },
+    {
+        "common_name": "White-throated Magpie-Jay",
+        "latitude": 10.322354,
+        "longitude": -84.824585,
+        "date": "2024-09-19",
+        "taxonomic_order": 20822
+    },
+    {
+        "common_name": "Gray-crowned Yellowthroat",
+        "latitude": 10.322354,
+        "longitude": -84.824585,
+        "date": "2024-09-19",
+        "taxonomic_order": 33465
+    },
+    {
+        "common_name": "Costa Rican Warbler",
+        "latitude": 10.322354,
+        "longitude": -84.824585,
+        "date": "2024-09-19",
+        "taxonomic_order": 33722
+    },
+    {
+        "common_name": "Black-breasted Wood-Quail",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 1117
+    },
+    {
+        "common_name": "Prong-billed Barbet",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 10615
+    },
+    {
+        "common_name": "Zeledon's Antbird",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 13789
+    },
+    {
+        "common_name": "Bicolored Antbird",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 13810
+    },
+    {
+        "common_name": "Spotted Barbtail",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 15004
+    },
+    {
+        "common_name": "Ruddy Treerunner",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 15017
+    },
+    {
+        "common_name": "Barred Becard",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 15731
+    },
+    {
+        "common_name": "Gray-breasted Wood-Wren",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 27157
+    },
+    {
+        "common_name": "Slaty-backed Nightingale-Thrush",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 27813
+    },
+    {
+        "common_name": "Collared Redstart",
+        "latitude": 10.3436,
+        "longitude": -84.79629,
+        "date": "2024-09-19",
+        "taxonomic_order": 33835
+    },
+    {
+        "common_name": "tern sp.",
+        "latitude": 9.9206938,
+        "longitude": -84.7125485,
+        "date": "2024-09-20",
+        "taxonomic_order": 6738
+    },
+    {
+        "common_name": "Scarlet Macaw",
+        "latitude": 9.913267,
+        "longitude": -84.672972,
+        "date": "2024-09-20",
+        "taxonomic_order": 12902
+    },
+    {
+        "common_name": "Inca Dove",
+        "latitude": 9.7583834,
+        "longitude": -84.6277357,
+        "date": "2024-09-20",
+        "taxonomic_order": 2261
+    },
+    {
+        "common_name": "Yellow-headed Caracara",
+        "latitude": 9.7632395,
+        "longitude": -84.604024,
+        "date": "2024-09-20",
+        "taxonomic_order": 11731
+    },
+    {
+        "common_name": "Pale-billed Woodpecker",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-20",
+        "taxonomic_order": 11333
+    },
+    {
+        "common_name": "Turdus sp.",
+        "latitude": 10.3078434,
+        "longitude": -84.8051376,
+        "date": "2024-09-20",
+        "taxonomic_order": 28289
+    },
+    {
+        "common_name": "new world warbler sp.",
+        "latitude": 10.3278283,
+        "longitude": -84.8384549,
+        "date": "2024-09-20",
+        "taxonomic_order": 33850
+    },
+    {
+        "common_name": "Black-necked Stilt",
+        "latitude": 30.1338076,
+        "longitude": -89.8732915,
+        "date": "2024-09-27",
+        "taxonomic_order": 5741
+    },
+    {
+        "common_name": "Anhinga",
+        "latitude": 30.1338076,
+        "longitude": -89.8732915,
+        "date": "2024-09-27",
+        "taxonomic_order": 7195
+    },
+    {
+        "common_name": "Glossy/White-faced Ibis",
+        "latitude": 30.1338076,
+        "longitude": -89.8732915,
+        "date": "2024-09-27",
+        "taxonomic_order": 7554
+    }
+]
