@@ -1,11 +1,10 @@
 import os
 import pandas as pd
 from dataclasses import dataclass
-import os
 import json
 
 # Define the file path
-csv_file_path = os.getenv("CSV_FILE_PATH", "data.csv")  # Replace with your CSV file path
+csv_file_path = os.getenv("CSV_FILE_PATH", "scripts/MyEBirdData.csv")  # Replace with your CSV file path
 
 # Verify that the file exists
 if not os.path.exists(csv_file_path):
@@ -47,7 +46,7 @@ class Observation:
     ml_catalog_numbers: str
 
 # Parse the CSV file
-def parse_csv(file_path):
+def parse_csv(file_path) -> list[Observation]:
     df = pd.read_csv(file_path)
     # Check that the headers match the expected headers
     if list(df.columns) != expected_headers:
@@ -95,8 +94,17 @@ def get_lifers(observations):
             lifers[obs.scientific_name] = obs
     return list(lifers.values())
 
+@dataclass
+class Lifer:
+    common_name: str
+    latitude: float
+    longitude: float
+    date: str
+    taxonomic_order: int
+    
+
 # Output lifers to JSON
-def output_lifers_to_json(lifers, output_file_path):
+def output_lifers_to_json(lifers, output_file_path, print_to_file=False) -> list[Lifer]:
     lifers_data = [
         {
             "common_name": lifer.common_name,
@@ -107,28 +115,23 @@ def output_lifers_to_json(lifers, output_file_path):
         }
         for lifer in lifers
     ]
-    with open(output_file_path, 'w', encoding='utf-8') as json_file:
-        json.dump(lifers_data, json_file, ensure_ascii=False, indent=4)
+    if print_to_file:
+        with open(output_file_path, 'w', encoding='utf-8') as json_file:
+            json.dump(lifers_data, json_file, ensure_ascii=False, indent=4)
+            print(f"\nLifers data has been written to '{output_file_path}'")
 
-# Example usage
-try:
+
+    return lifers_data
+
+
+def lifers_to_json():
     observations = parse_csv(csv_file_path)
-    # Printing a sample entry from the observations
-    if observations:
-        print("Sample entry:", observations[0])
-        
-        # Get and print lifers
-        lifers = get_lifers(observations)
-        print("\nList of lifers:")
-        for lifer in lifers:
-            print(lifer)
-        
-        # Output lifers to JSON
-        output_file_path = "lifers.json"
-        output_lifers_to_json(lifers, output_file_path)
-        print(f"\nLifers data has been written to '{output_file_path}'")
-    else:
-        print("The CSV file is empty.")
-      
-except Exception as e:
-    print("Error:", e)
+    
+    # Get and print lifers
+    lifers = get_lifers(observations)
+    
+    # Output lifers to JSON
+    output_file_path = "lifers.json"
+    lifers_json = output_lifers_to_json(lifers, output_file_path)
+
+    return lifers_json
