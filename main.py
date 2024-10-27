@@ -26,7 +26,7 @@ app = FastAPI()
 phoebe_client = Phoebe(
     api_key=os.environ.get("EBIRD_API_KEY"),
 )
-
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # todo: dont do this
