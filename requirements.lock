@@ -54,6 +54,8 @@ markupsafe==2.1.5
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
+nodeenv==1.9.1
+    # via pyright
 numpy==2.1.1
     # via pandas
 pandas==2.2.3
@@ -67,6 +69,8 @@ pydantic-core==2.23.4
     # via pydantic
 pygments==2.18.0
     # via rich
+pyright==1.1.383
+    # via cloaca
 python-dateutil==2.9.0.post0
     # via pandas
 python-dotenv==1.0.1
@@ -96,6 +100,7 @@ typing-extensions==4.12.2
     # via phoebe-bird
     # via pydantic
     # via pydantic-core
+    # via pyright
     # via typer
 tzdata==2024.2
     # via pandas

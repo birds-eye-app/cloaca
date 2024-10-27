@@ -101,17 +101,32 @@ class Lifer:
     longitude: float
     date: str
     taxonomic_order: int
+    location: str
+    location_id: str
+
+@dataclass
+class Location: 
+    location_name: str
+    latitude: float
+    longitude: float
+    location_id: str
+
+class LocationToLifers:
+    location: Location
+    lifers: list[Lifer]
     
 
 # Output lifers to JSON
-def output_lifers_to_json(lifers, output_file_path, print_to_file=False) -> list[Lifer]:
+def output_lifers_to_json(lifers: list[Observation], output_file_path, print_to_file=False):
     lifers_data = [
         {
             "common_name": lifer.common_name,
             "latitude": lifer.latitude,
             "longitude": lifer.longitude,
             "date": lifer.date,
-            "taxonomic_order": lifer.taxonomic_order
+            "taxonomic_order": lifer.taxonomic_order,
+            "location": lifer.location,
+            "location_id": lifer.location_id
         }
         for lifer in lifers
     ]
@@ -121,17 +136,33 @@ def output_lifers_to_json(lifers, output_file_path, print_to_file=False) -> list
             print(f"\nLifers data has been written to '{output_file_path}'")
 
 
-    return lifers_data
+def observations_to_lifers(observations: list[Observation]) -> list[Lifer]: 
+    return [
+        Lifer(
+            common_name=obs.common_name,
+            latitude=obs.latitude,
+            longitude=obs.longitude,
+            date=obs.date,
+            taxonomic_order=obs.taxonomic_order,
+            location=obs.location,
+            location_id=obs.location_id
+        )
+        for obs in observations
+    ]
 
-
-def lifers_to_json():
+def parse_csv_to_json():
     observations = parse_csv(csv_file_path)
     
-    # Get and print lifers
     lifers = get_lifers(observations)
     
     # Output lifers to JSON
     output_file_path = "lifers.json"
-    lifers_json = output_lifers_to_json(lifers, output_file_path)
+    output_lifers_to_json(lifers, output_file_path)
 
-    return lifers_json
+
+def parse_csv_to_lifers():
+    observations = parse_csv(csv_file_path)
+    
+    lifers = get_lifers(observations)
+    
+    return observations_to_lifers(lifers)
