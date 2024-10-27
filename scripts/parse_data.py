@@ -4,7 +4,9 @@ from dataclasses import dataclass
 import json
 
 # Define the file path
-csv_file_path = os.getenv("CSV_FILE_PATH", "scripts/MyEBirdData.csv")  # Replace with your CSV file path
+csv_file_path = os.getenv(
+    "CSV_FILE_PATH", "scripts/MyEBirdData.csv"
+)  # Replace with your CSV file path
 
 # Verify that the file exists
 if not os.path.exists(csv_file_path):
@@ -12,11 +14,31 @@ if not os.path.exists(csv_file_path):
 
 # Define the CSV headers
 expected_headers = [
-    "Submission ID", "Common Name", "Scientific Name", "Taxonomic Order", "Count", "State/Province",
-    "County", "Location ID", "Location", "Latitude", "Longitude", "Date", "Time", "Protocol",
-    "Duration (Min)", "All Obs Reported", "Distance Traveled (km)", "Area Covered (ha)",
-    "Number of Observers", "Breeding Code", "Observation Details", "Checklist Comments", "ML Catalog Numbers"
+    "Submission ID",
+    "Common Name",
+    "Scientific Name",
+    "Taxonomic Order",
+    "Count",
+    "State/Province",
+    "County",
+    "Location ID",
+    "Location",
+    "Latitude",
+    "Longitude",
+    "Date",
+    "Time",
+    "Protocol",
+    "Duration (Min)",
+    "All Obs Reported",
+    "Distance Traveled (km)",
+    "Area Covered (ha)",
+    "Number of Observers",
+    "Breeding Code",
+    "Observation Details",
+    "Checklist Comments",
+    "ML Catalog Numbers",
 ]
+
 
 # Define a data class for each row
 @dataclass
@@ -45,16 +67,17 @@ class Observation:
     checklist_comments: str
     ml_catalog_numbers: str
 
+
 # Parse the CSV file
 def parse_csv(file_path) -> list[Observation]:
     df = pd.read_csv(file_path)
     # Check that the headers match the expected headers
     if list(df.columns) != expected_headers:
         raise ValueError("The CSV headers do not match the expected headers.")
-    
+
     # Sort the dataframe by Date and Time columns
     df.sort_values(by=["Date", "Time"], inplace=True)
-    
+
     # Convert each row into an Observation data class
     observations = [
         Observation(
@@ -80,11 +103,12 @@ def parse_csv(file_path) -> list[Observation]:
             breeding_code=row["Breeding Code"],
             observation_details=row["Observation Details"],
             checklist_comments=row["Checklist Comments"],
-            ml_catalog_numbers=row["ML Catalog Numbers"]
+            ml_catalog_numbers=row["ML Catalog Numbers"],
         )
         for _, row in df.iterrows()
     ]
     return observations
+
 
 # Get lifers (first observation of each species)
 def get_lifers(observations):
@@ -93,6 +117,7 @@ def get_lifers(observations):
         if obs.scientific_name not in lifers:
             lifers[obs.scientific_name] = obs
     return list(lifers.values())
+
 
 @dataclass
 class Lifer:
@@ -104,20 +129,24 @@ class Lifer:
     location: str
     location_id: str
 
+
 @dataclass
-class Location: 
+class Location:
     location_name: str
     latitude: float
     longitude: float
     location_id: str
 
+
 class LocationToLifers:
     location: Location
     lifers: list[Lifer]
-    
+
 
 # Output lifers to JSON
-def output_lifers_to_json(lifers: list[Observation], output_file_path, print_to_file=False):
+def output_lifers_to_json(
+    lifers: list[Observation], output_file_path, print_to_file=False
+):
     lifers_data = [
         {
             "common_name": lifer.common_name,
@@ -126,17 +155,17 @@ def output_lifers_to_json(lifers: list[Observation], output_file_path, print_to_
             "date": lifer.date,
             "taxonomic_order": lifer.taxonomic_order,
             "location": lifer.location,
-            "location_id": lifer.location_id
+            "location_id": lifer.location_id,
         }
         for lifer in lifers
     ]
     if print_to_file:
-        with open(output_file_path, 'w', encoding='utf-8') as json_file:
+        with open(output_file_path, "w", encoding="utf-8") as json_file:
             json.dump(lifers_data, json_file, ensure_ascii=False, indent=4)
             print(f"\nLifers data has been written to '{output_file_path}'")
 
 
-def observations_to_lifers(observations: list[Observation]) -> list[Lifer]: 
+def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
     return [
         Lifer(
             common_name=obs.common_name,
@@ -145,16 +174,17 @@ def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
             date=obs.date,
             taxonomic_order=obs.taxonomic_order,
             location=obs.location,
-            location_id=obs.location_id
+            location_id=obs.location_id,
         )
         for obs in observations
     ]
 
+
 def parse_csv_to_json():
     observations = parse_csv(csv_file_path)
-    
+
     lifers = get_lifers(observations)
-    
+
     # Output lifers to JSON
     output_file_path = "lifers.json"
     output_lifers_to_json(lifers, output_file_path)
@@ -162,7 +192,7 @@ def parse_csv_to_json():
 
 def parse_csv_to_lifers():
     observations = parse_csv(csv_file_path)
-    
+
     lifers = get_lifers(observations)
-    
+
     return observations_to_lifers(lifers)

@@ -1,5 +1,12 @@
 from typing import Dict
 
+from scripts.parse_data import (
+    Lifer,
+    Location,
+    LocationToLifers,
+    parse_csv_to_lifers,
+)
+
 from fastapi import FastAPI
 import os
 from phoebe_bird import Phoebe
@@ -11,15 +18,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
-
-
-from scripts.parse_data import (
-    Lifer,
-    Location,
-    LocationToLifers,
-    parse_csv_to_lifers,
-)
-
 INITIAL_CENTER = {"lng": -74.0242, "lat": 40.6941}
 
 
