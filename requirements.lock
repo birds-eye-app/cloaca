@@ -104,7 +104,8 @@ typing-extensions==4.12.2
     # via typer
 tzdata==2024.2
     # via pandas
-uvicorn==0.31.0
+uvicorn==0.32.0
+    # via cloaca
     # via fastapi
     # via fastapi-cli
 uvloop==0.20.0
