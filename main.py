@@ -27,8 +27,6 @@ phoebe_client = Phoebe(
     api_key=os.environ.get("EBIRD_API_KEY"),
 )
 
-origins = ["http://localhost", "http://localhost:8000", "http://localhost:8000/"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # todo: dont do this
