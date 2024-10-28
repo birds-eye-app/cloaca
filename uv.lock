@@ -61,6 +61,7 @@ dependencies = [
     { name = "pandas" },
     { name = "phoebe-bird" },
     { name = "pyright" },
+    { name = "python-multipart" },
     { name = "uvicorn" },
 ]
 
@@ -70,6 +71,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "phoebe-bird", specifier = ">=0.1.0a2" },
     { name = "pyright", specifier = ">=1.1.383" },
+    { name = "python-multipart", specifier = ">=0.0.16" },
     { name = "uvicorn", specifier = ">=0.32.0" },
 ]
 

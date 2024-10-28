@@ -1,4 +1,5 @@
 import os
+from fastapi import UploadFile
 import pandas as pd
 from dataclasses import dataclass
 import json
@@ -71,12 +72,33 @@ class Observation:
 # Parse the CSV file
 def parse_csv(file_path) -> list[Observation]:
     df = pd.read_csv(file_path)
+
+    return parse_csv_data_frame(df)
+
+
+def parse_csv_from_file(file: UploadFile) -> list[Observation]:
+    df = pd.read_csv(file.file)
+
+    return parse_csv_data_frame(df)
+
+
+def parse_csv_from_file_to_lifers(file: UploadFile):
+    df = pd.read_csv(file.file)
+
+    observations = parse_csv_data_frame(df)
+
+    lifers = get_lifers(observations)
+
+    return observations_to_lifers(lifers)
+
+
+def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
     # Check that the headers match the expected headers
-    if list(df.columns) != expected_headers:
+    if list(data_frame.columns) != expected_headers:
         raise ValueError("The CSV headers do not match the expected headers.")
 
     # Sort the dataframe by Date and Time columns
-    df.sort_values(by=["Date", "Time"], inplace=True)
+    data_frame.sort_values(by=["Date", "Time"], inplace=True)
 
     # Convert each row into an Observation data class
     observations = [
@@ -105,7 +127,7 @@ def parse_csv(file_path) -> list[Observation]:
             checklist_comments=row["Checklist Comments"],
             ml_catalog_numbers=row["ML Catalog Numbers"],
         )
-        for _, row in df.iterrows()
+        for _, row in data_frame.iterrows()
     ]
     return observations
 

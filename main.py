@@ -1,10 +1,11 @@
 from typing import Dict
+from uuid import uuid4
 
 from scripts.parse_data import (
     Lifer,
     Location,
     LocationToLifers,
-    parse_csv_to_lifers,
+    parse_csv_from_file_to_lifers,
 )
 
 from fastapi import FastAPI
@@ -15,6 +16,8 @@ from phoebe_bird.types.data.observations.geo.recent_list_response import (
     RecentListResponse,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, UploadFile
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,7 +29,7 @@ app = FastAPI()
 phoebe_client = Phoebe(
     api_key=os.environ.get("EBIRD_API_KEY"),
 )
-    
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # todo: dont do this
@@ -116,12 +119,12 @@ def group_lifers_by_location(lifers: list[Lifer]) -> Dict[str, LocationToLifers]
 
 
 @app.get("/v1/nearby_observations")
-def get_nearby_observations(latitude: float, longitude: float):
+def get_nearby_observations(latitude: float, longitude: float, file_id: str):
     nearby_observations = fetch_nearby_observations_from_ebird_with_cache(
         round(latitude, 2), round(longitude, 2)
     )
 
-    lifers_from_csv = parse_csv_to_lifers()
+    lifers_from_csv = get_lifers_from_cache(file_id)
 
     unseen_observations = filter_lifers_from_nearby_observations(
         nearby_observations, lifers_from_csv
@@ -133,13 +136,38 @@ def get_nearby_observations(latitude: float, longitude: float):
 
 
 @app.get("/v1/lifers_by_location")
-def get_lifers(latitude: float, longitude: float):
-    lifers_from_csv = parse_csv_to_lifers()
-
-    print(f"lifers from csv {lifers_from_csv[0]}")
+def get_lifers(latitude: float, longitude: float, file_id: str):
+    lifers_from_csv = get_lifers_from_cache(file_id)
 
     lifers_by_location = group_lifers_by_location(lifers_from_csv)
 
     print(lifers_by_location)
 
     return lifers_by_location
+
+
+csv_upload_cache: Dict[str, list[Lifer]] = {}
+
+
+def get_lifers_from_cache(key: str) -> list[Lifer]:
+    observations = csv_upload_cache.get(key, None)
+
+    if not observations:
+        raise Exception("No observations found for key", key)
+
+    return observations
+
+
+@app.post("/v1/upload_lifers_csv")
+def upload_lifers_csv(file: UploadFile):
+    print("Uploading file", file.filename)
+
+    # turn the file into a pandas dataframe
+    csv = parse_csv_from_file_to_lifers(file)
+    uuid4_str = str(uuid4())
+
+    csv_upload_cache[uuid4_str] = csv
+
+    print(f"parsed csv with key {uuid4_str} and length {len(csv)}")
+
+    return {"key": uuid4_str}
