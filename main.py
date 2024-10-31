@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Dict
 from uuid import uuid4
 
@@ -38,7 +39,7 @@ app.add_middleware(
 )
 
 
-@app.get("/health")
+@app.get("/v1/health")
 def health_check():
     return {"status": "SQUAWK"}
 
