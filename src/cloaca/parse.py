@@ -1,3 +1,4 @@
+import re
 from fastapi import UploadFile
 import pandas as pd
 from dataclasses import dataclass
@@ -126,6 +127,12 @@ def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
 def get_lifers(observations):
     lifers = {}
     for obs in observations:
+        scientific_name = obs.scientific_name
+        # don't include `.sp` observations (eg `gull sp.`)
+        if ".sp" in scientific_name or ".sp" in obs.common_name:
+            print(f"Skipping spuh: {scientific_name}")
+            continue
+
         if obs.scientific_name not in lifers:
             lifers[obs.scientific_name] = obs
     return list(lifers.values())
@@ -140,6 +147,7 @@ class Lifer:
     taxonomic_order: int
     location: str
     location_id: str
+    species_code: str
 
 
 @dataclass
@@ -187,6 +195,7 @@ def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
             taxonomic_order=obs.taxonomic_order,
             location=obs.location,
             location_id=obs.location_id,
+            species_code=obs.scientific_name,
         )
         for obs in observations
     ]

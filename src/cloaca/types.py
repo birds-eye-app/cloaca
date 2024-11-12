@@ -55,6 +55,7 @@ def phoebe_observation_to_lifer(
         taxonomic_order=0,
         location=ebird_observation.loc_name or "",
         location_id=ebird_observation.loc_id or "",
+        species_code=ebird_observation.species_code or "",
     )
 
 
