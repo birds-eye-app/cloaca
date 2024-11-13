@@ -1,3 +1,4 @@
+from enum import unique
 from fastapi.testclient import TestClient
 import pandas as pd
 from cloaca.parse import Lifer, get_lifers, parse_csv_data_frame
@@ -55,3 +56,7 @@ def test_observations_to_lifers():
     spuhs = [lifer for lifer in lifers if "sp." in lifer.scientific_name]
 
     assert len(spuhs) == 0
+
+    unique_lifers = list(set([lifer.scientific_name for lifer in lifers]))
+
+    assert len(unique_lifers) == 607
