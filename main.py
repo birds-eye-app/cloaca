@@ -149,7 +149,9 @@ async def get_nearby_observations(latitude: float, longitude: float, file_id: st
     async def fetch_task(species_code):
         unseen_observations_for_species = await (
             fetch_nearby_observations_of_species_from_ebird_with_cache(
-                species_code, latitude, longitude
+                species_code,
+                round_to_nearest_half(latitude),
+                round_to_nearest_half(longitude),
             )
         )
 

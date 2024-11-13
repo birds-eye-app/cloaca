@@ -1,4 +1,3 @@
-from enum import unique
 from fastapi.testclient import TestClient
 import pandas as pd
 from cloaca.parse import Lifer, get_lifers, parse_csv_data_frame
