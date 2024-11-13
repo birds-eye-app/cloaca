@@ -1,3 +1,3 @@
 # cloaca
 
-Describe your project here.
+run with: `uv run fastapi dev`
