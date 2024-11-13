@@ -114,13 +114,34 @@ def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
     return observations
 
 
+# remove:
+# spuh (eg `gull sp.`)
+# combo species (eg `long-billed/short-billed dowitcher`)
+# hybrid species (eg `Mallard x American Black Duck`)
+def is_singular_bird_species(observation: Observation) -> bool:
+    scientific_name = observation.scientific_name
+    common_name = observation.common_name
+
+    if "sp." in scientific_name or "sp." in common_name:
+        return False
+
+    if "/" in scientific_name or "/" in common_name:
+        return False
+
+    if " x " in scientific_name or " x " in common_name:
+        return False
+
+    return True
+
+
 # Get lifers (first observation of each species)
 def get_lifers(observations):
     lifers: dict[str, Observation] = {}
     for obs in observations:
-        scientific_name = obs.scientific_name
-        # don't include spuh observations (eg `gull sp.`)
-        if "sp." in scientific_name or "sp." in obs.common_name:
+        if not is_singular_bird_species(obs):
+            print(
+                f"removing unwanted observation {obs.common_name}({obs.scientific_name})"
+            )
             continue
 
         if obs.scientific_name not in lifers:

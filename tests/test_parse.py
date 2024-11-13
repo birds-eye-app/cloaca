@@ -4,6 +4,8 @@ from cloaca.parse import Lifer, get_lifers, parse_csv_data_frame
 from cloaca.types import get_lifers_from_cache
 from main import app
 
+expected_singular_results = 596
+
 
 def test_parse_csv_from_file_route():
     client = TestClient(app)
@@ -21,7 +23,7 @@ def test_parse_csv_from_file_route():
     cache_results = get_lifers_from_cache(key)
 
     assert cache_results
-    assert len(cache_results) == 607
+    assert len(cache_results) == 596
 
     first_lifer = cache_results[0]
 
@@ -44,13 +46,13 @@ def test_parse_csv_from_file_route():
 def test_observations_to_lifers():
     df = pd.read_csv("tests/test_data/MyEBirdData.csv")
 
-    observations = parse_csv_data_frame(df)
+    all_observations = parse_csv_data_frame(df)
 
-    assert len(observations) == 4663
+    assert len(all_observations) == 4663
 
-    lifers = get_lifers(observations)
+    lifers = get_lifers(all_observations)
 
-    assert len(lifers) == 607
+    assert len(lifers) == 596
 
     spuhs = [lifer for lifer in lifers if "sp." in lifer.scientific_name]
 
@@ -58,4 +60,37 @@ def test_observations_to_lifers():
 
     unique_lifers = list(set([lifer.scientific_name for lifer in lifers]))
 
-    assert len(unique_lifers) == 607
+    assert len(unique_lifers) == 596
+
+    species_not_in_lifers = set(
+        [
+            obs.common_name
+            for obs in all_observations
+            if obs.scientific_name not in unique_lifers
+        ]
+    )
+
+    assert species_not_in_lifers == {
+        "tern sp.",
+        "Louisiana/Northern Waterthrush",
+        "passerine sp.",
+        "Turdus sp.",
+        "Glossy/White-faced Ibis",
+        "Western/Eastern Wood-Pewee",
+        "swift sp.",
+        "Tropical Royal Flycatcher (Northern)",
+        "Lesser/Greater Yellowlegs",
+        "Short-billed/Long-billed Dowitcher",
+        "thrush sp.",
+        "hawk sp.",
+        "Downy/Hairy Woodpecker",
+        "parrot sp.",
+        "Empidonax sp.",
+        "Olive-throated Parakeet (Aztec)",
+        "Lesser Greenlet (Northern)",
+        "Bay-breasted/Blackpoll Warbler",
+        "new world warbler sp.",
+        "crow sp.",
+        "Yellow-billed Cacique (Prevost's)",
+        "gull sp.",
+    }
