@@ -13,7 +13,7 @@ from cloaca.types import (
 )
 
 import os
-from phoebe_bird import Phoebe, AsyncPhoebe
+from phoebe_bird import AsyncPhoebe
 from phoebe_bird.types.data.observation import Observation as PhoebeObservation
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, UploadFile

@@ -1,8 +1,6 @@
-import re
 from fastapi import UploadFile
 import pandas as pd
 from dataclasses import dataclass
-import json
 
 # Define the CSV headers
 expected_headers = [
@@ -58,13 +56,6 @@ class Observation:
     observation_details: str
     checklist_comments: str
     ml_catalog_numbers: str
-
-
-# Parse the CSV file
-def parse_csv(file_path) -> list[Observation]:
-    df = pd.read_csv(file_path)
-
-    return parse_csv_data_frame(df)
 
 
 def parse_csv_from_file(file: UploadFile) -> list[Observation]:
@@ -125,12 +116,11 @@ def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
 
 # Get lifers (first observation of each species)
 def get_lifers(observations):
-    lifers = {}
+    lifers: dict[str, Observation] = {}
     for obs in observations:
         scientific_name = obs.scientific_name
-        # don't include `.sp` observations (eg `gull sp.`)
-        if ".sp" in scientific_name or ".sp" in obs.common_name:
-            print(f"Skipping spuh: {scientific_name}")
+        # don't include spuh observations (eg `gull sp.`)
+        if "sp." in scientific_name or "sp." in obs.common_name:
             continue
 
         if obs.scientific_name not in lifers:
@@ -161,28 +151,6 @@ class Location:
 class LocationToLifers:
     location: Location
     lifers: list[Lifer]
-
-
-# Output lifers to JSON
-def output_lifers_to_json(
-    lifers: list[Observation], output_file_path, print_to_file=False
-):
-    lifers_data = [
-        {
-            "common_name": lifer.common_name,
-            "latitude": lifer.latitude,
-            "longitude": lifer.longitude,
-            "date": lifer.date,
-            "taxonomic_order": lifer.taxonomic_order,
-            "location": lifer.location,
-            "location_id": lifer.location_id,
-        }
-        for lifer in lifers
-    ]
-    if print_to_file:
-        with open(output_file_path, "w", encoding="utf-8") as json_file:
-            json.dump(lifers_data, json_file, ensure_ascii=False, indent=4)
-            print(f"\nLifers data has been written to '{output_file_path}'")
 
 
 def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
