@@ -3,7 +3,8 @@ import time
 from typing import Dict, List
 from uuid import uuid4
 
-from cloaca.parse import Lifer, parse_csv_from_file_to_lifers
+from cloaca.parsing.parse_ebird_personal_export import parse_csv_from_file_to_lifers
+from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import (
     filter_lifers_from_nearby_observations,
     get_lifers_from_cache,

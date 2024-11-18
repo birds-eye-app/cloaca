@@ -1,5 +1,5 @@
 from typing import Dict
-from cloaca.parse import Lifer, Location, LocationToLifers
+from cloaca.parsing.parsing_helpers import Lifer, Location, LocationToLifers
 from phoebe_bird.types.data.observation import Observation as PhoebeObservation
 from phoebe_bird.types.data.observations.geo.recent_list_response import (
     RecentListResponse,

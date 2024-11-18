@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 import pandas as pd
-from cloaca.parse import Lifer, get_lifers, parse_csv_data_frame
+from cloaca.parsing.parse_ebird_personal_export import parse_csv_data_frame
+from cloaca.parsing.parsing_helpers import Lifer, get_lifers
 from cloaca.types import get_lifers_from_cache
 from main import app
 
