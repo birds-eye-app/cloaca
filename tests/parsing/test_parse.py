@@ -8,6 +8,20 @@ from cloaca.main import Cloaca_App
 expected_singular_results = 596
 
 
+def upload_test_csv():
+    client = TestClient(Cloaca_App)
+    files = {"file": open("tests/test_data/MyEBirdData.csv", "rb")}
+    response = client.post("/v1/upload_lifers_csv", files=files)
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    key = data["key"]
+
+    return key
+
+
 def test_parse_csv_from_file_route():
     client = TestClient(Cloaca_App)
     files = {"file": open("tests/test_data/MyEBirdData.csv", "rb")}

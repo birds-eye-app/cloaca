@@ -7,7 +7,11 @@ from cloaca.parsing.parse_ebird_regional_list import (
 )
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.phoebe_wrapper import get_phoebe_client
-from cloaca.types import phoebe_observation_to_lifer
+from cloaca.types import (
+    filter_lifers_from_lifers,
+    get_lifers_from_cache,
+    phoebe_observation_to_lifer,
+)
 from phoebe_bird.types.data.observation import Observation as PhoebeObservation
 
 
@@ -73,3 +77,18 @@ async def get_regional_lifers() -> list[Lifer]:
     return [
         lifer for region in regional_mapping.values() for lifer in region.observations
     ]
+
+
+# truly the naming is getting horrendous
+async def get_filtered_lifers_for_region(
+    latitude: float, longitude: float, file_id: str
+) -> list[Lifer]:
+    lifers_from_csv = get_lifers_from_cache(file_id)
+
+    regional_lifers = await get_regional_lifers()
+
+    filtered = filter_lifers_from_lifers(regional_lifers, lifers_from_csv)
+
+    print("got regional lifers", len(filtered))
+
+    return filtered

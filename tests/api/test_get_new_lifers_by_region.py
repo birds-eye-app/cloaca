@@ -2,9 +2,11 @@ from fastapi.testclient import TestClient
 import pytest
 from cloaca.api.get_new_lifers_by_region import (
     fetch_observations_for_regions_from_phoebe,
+    get_filtered_lifers_for_region,
     get_lifers_for_region,
     get_regional_mapping,
 )
+from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import set_lifers_to_cache
 from cloaca.main import Cloaca_App
 
@@ -29,13 +31,28 @@ async def test_fetch_observations_for_regions_from_phoebe():
     assert first_obs.species_code == "bkcchi"
 
 
-# @pytest.mark.asyncio
-# @pytest.mark.vcr
-# async def test_regional_lifers():
-#     client = TestClient(Cloaca_App)
-#     set_lifers_to_cache("test-key", [])
-#     response = client.get("/v1/regional_new_potential_lifers")
+@pytest.mark.asyncio
+@pytest.mark.vcr
+async def test_regional_lifers():
+    set_lifers_to_cache(
+        "key",
+        [
+            Lifer(
+                common_name="Northern Harrier",
+                latitude=29.819019,
+                longitude=-89.61216,
+                date="2022-11-21",
+                taxonomic_order=8228,
+                location="Hopedale",
+                location_id="L21909958",
+                species_code="norhar2",
+            )
+        ],
+    )
 
-#     assert response.status_code == 200
+    lifers = await get_filtered_lifers_for_region(72, 71, "key")
 
-#     data = response.json()
+    assert len(lifers) == 11311
+
+    # make sure the lifer is not in the list
+    assert all(lifer.species_code != "norhar2" for lifer in lifers)
