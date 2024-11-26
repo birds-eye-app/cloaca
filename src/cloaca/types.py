@@ -21,6 +21,22 @@ def get_lifers_from_cache(key: str) -> list[Lifer]:
     return observations
 
 
+def filter_lifers_from_lifers(
+    nearby_observations: list[Lifer], lifers: list[Lifer]
+) -> list[Lifer]:
+    lifer_commons_names = [lifer.species_code for lifer in lifers]
+
+    unseen_observations: list[Lifer] = list()
+    already_seen_observations: list[Lifer] = list()
+    for observation in nearby_observations:
+        if observation.species_code in lifer_commons_names:
+            already_seen_observations.append(observation)
+        else:
+            unseen_observations.append(observation)
+
+    return unseen_observations
+
+
 def filter_lifers_from_nearby_observations(
     nearby_observations: RecentListResponse, lifers: list[Lifer]
 ) -> list[Lifer]:

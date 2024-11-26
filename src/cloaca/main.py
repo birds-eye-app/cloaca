@@ -3,9 +3,11 @@ import time
 from typing import Dict, List
 from uuid import uuid4
 
+from cloaca.api.get_new_lifers_by_region import get_regional_lifers
 from cloaca.parsing.parse_ebird_personal_export import parse_csv_from_file_to_lifers
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import (
+    filter_lifers_from_lifers,
     filter_lifers_from_nearby_observations,
     get_lifers_from_cache,
     group_lifers_by_location,
@@ -25,13 +27,13 @@ load_dotenv()
 INITIAL_CENTER = {"lng": -74.0242, "lat": 40.6941}
 
 
-app = FastAPI()
+Cloaca_App = FastAPI()
 
 phoebe_client = AsyncPhoebe(
     api_key=os.environ.get("EBIRD_API_KEY"),
 )
 
-app.add_middleware(
+Cloaca_App.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # todo: dont do this
     allow_credentials=True,
@@ -40,7 +42,7 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
+@Cloaca_App.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
@@ -52,7 +54,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/v1/health")
+@Cloaca_App.get("/v1/health")
 def health_check():
     return {"status": "SQUAWK"}
 
@@ -125,7 +127,7 @@ def round_to_nearest_half(num):
     return round(num * 2) / 2
 
 
-@app.get("/v1/nearby_observations")
+@Cloaca_App.get("/v1/nearby_observations")
 async def get_nearby_observations(latitude: float, longitude: float, file_id: str):
     request_start_time = time.time()
     nearby_observations = await fetch_nearby_observations_from_ebird_with_cache(
@@ -175,7 +177,7 @@ async def get_nearby_observations(latitude: float, longitude: float, file_id: st
     return lifers_by_location
 
 
-@app.get("/v1/lifers_by_location")
+@Cloaca_App.get("/v1/lifers_by_location")
 def get_lifers(latitude: float, longitude: float, file_id: str):
     lifers_from_csv = get_lifers_from_cache(file_id)
 
@@ -184,7 +186,7 @@ def get_lifers(latitude: float, longitude: float, file_id: str):
     return lifers_by_location
 
 
-@app.post("/v1/upload_lifers_csv")
+@Cloaca_App.post("/v1/upload_lifers_csv")
 def upload_lifers_csv(file: UploadFile):
     print("Uploading file", file.filename)
 
@@ -197,3 +199,18 @@ def upload_lifers_csv(file: UploadFile):
     print(f"parsed csv with key {uuid4_str} and length {len(csv)}")
 
     return {"key": uuid4_str}
+
+
+@Cloaca_App.get("/v1/regional_new_potential_lifers")
+async def regional_lifers(
+    latitude: float, longitude: float, file_id: str
+) -> list[Lifer]:
+    lifers_from_csv = get_lifers_from_cache(file_id)
+
+    regional_lifers = await get_regional_lifers()
+
+    filter_lifers_from_lifers(regional_lifers, lifers_from_csv)
+
+    print("got regional lifers", len(regional_lifers))
+
+    return regional_lifers

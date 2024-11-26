@@ -1,0 +1,622 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - api.ebird.org
+      user-agent:
+      - AsyncPhoebe/Python 0.1.0-alpha.2
+      x-ebirdapitoken:
+      - v37441odb61v
+      x-stainless-arch:
+      - arm64
+      x-stainless-async:
+      - async:asyncio
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.1.0-alpha.2
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.12.3
+    method: GET
+    uri: https://api.ebird.org/v2/data/obs/US-NY/recent?back=30&cat=species&hotspot=true
+  response:
+    body:
+      string: "[{\"speciesCode\":\"bkcchi\",\"comName\":\"Black-capped Chickadee\",\"sciName\":\"Poecile
+        atricapillus\",\"locId\":\"L17261107\",\"locName\":\"Alley Pond Park--Alley
+        Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":2,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"daejun\",\"comName\":\"Dark-eyed
+        Junco\",\"sciName\":\"Junco hyemalis\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":9,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"amerob\",\"comName\":\"American
+        Robin\",\"sciName\":\"Turdus migratorius\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":11,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"eursta\",\"comName\":\"European
+        Starling\",\"sciName\":\"Sturnus vulgaris\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":12,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"whtspa\",\"comName\":\"White-throated
+        Sparrow\",\"sciName\":\"Zonotrichia albicollis\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":14,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"blujay\",\"comName\":\"Blue
+        Jay\",\"sciName\":\"Cyanocitta cristata\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":1,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"houfin\",\"comName\":\"House
+        Finch\",\"sciName\":\"Haemorhous mexicanus\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":1,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"norcar\",\"comName\":\"Northern
+        Cardinal\",\"sciName\":\"Cardinalis cardinalis\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":1,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"moudov\",\"comName\":\"Mourning
+        Dove\",\"sciName\":\"Zenaida macroura\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":14,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"dowwoo\",\"comName\":\"Downy
+        Woodpecker\",\"sciName\":\"Dryobates pubescens\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":1,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\"},{\"speciesCode\":\"rocpig\",\"comName\":\"Rock
+        Pigeon\",\"sciName\":\"Columba livia\",\"locId\":\"L17261107\",\"locName\":\"Alley
+        Pond Park--Alley Athletic Fields\",\"obsDt\":\"2024-11-25 12:35\",\"howMany\":6,\"lat\":40.739852,\"lng\":-73.73623,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597241\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"ribgul\",\"comName\":\"Ring-billed
+        Gull\",\"sciName\":\"Larus delawarensis\",\"locId\":\"L925562\",\"locName\":\"Tupper
+        Lake Municipal Park\",\"obsDt\":\"2024-11-25 12:33\",\"howMany\":14,\"lat\":44.2285033,\"lng\":-74.4643342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595937\"},{\"speciesCode\":\"mallar3\",\"comName\":\"Mallard\",\"sciName\":\"Anas
+        platyrhynchos\",\"locId\":\"L925562\",\"locName\":\"Tupper Lake Municipal
+        Park\",\"obsDt\":\"2024-11-25 12:33\",\"howMany\":45,\"lat\":44.2285033,\"lng\":-74.4643342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595937\"},{\"speciesCode\":\"lessca\",\"comName\":\"Lesser
+        Scaup\",\"sciName\":\"Aythya affinis\",\"locId\":\"L925562\",\"locName\":\"Tupper
+        Lake Municipal Park\",\"obsDt\":\"2024-11-25 12:33\",\"howMany\":1,\"lat\":44.2285033,\"lng\":-74.4643342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595937\"},{\"speciesCode\":\"ambduc\",\"comName\":\"American
+        Black Duck\",\"sciName\":\"Anas rubripes\",\"locId\":\"L925562\",\"locName\":\"Tupper
+        Lake Municipal Park\",\"obsDt\":\"2024-11-25 12:33\",\"howMany\":1,\"lat\":44.2285033,\"lng\":-74.4643342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595937\"},{\"speciesCode\":\"amhgul1\",\"comName\":\"American
+        Herring Gull\",\"sciName\":\"Larus smithsonianus\",\"locId\":\"L925562\",\"locName\":\"Tupper
+        Lake Municipal Park\",\"obsDt\":\"2024-11-25 12:33\",\"howMany\":3,\"lat\":44.2285033,\"lng\":-74.4643342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595937\"},{\"speciesCode\":\"cangoo\",\"comName\":\"Canada
+        Goose\",\"sciName\":\"Branta canadensis\",\"locId\":\"L6686851\",\"locName\":\"Harlem
+        River, 107th-125th St.\",\"obsDt\":\"2024-11-25 12:32\",\"howMany\":9,\"lat\":40.7938705,\"lng\":-73.9307877,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595452\"},{\"speciesCode\":\"sonspa\",\"comName\":\"Song
+        Sparrow\",\"sciName\":\"Melospiza melodia\",\"locId\":\"L5770141\",\"locName\":\"West
+        Seneca Wetlands, Meyer Rd.\",\"obsDt\":\"2024-11-25 12:27\",\"howMany\":1,\"lat\":42.8469652,\"lng\":-78.7724981,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595646\"},{\"speciesCode\":\"rethaw\",\"comName\":\"Red-tailed
+        Hawk\",\"sciName\":\"Buteo jamaicensis\",\"locId\":\"L5770141\",\"locName\":\"West
+        Seneca Wetlands, Meyer Rd.\",\"obsDt\":\"2024-11-25 12:27\",\"howMany\":1,\"lat\":42.8469652,\"lng\":-78.7724981,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595646\"},{\"speciesCode\":\"carwre\",\"comName\":\"Carolina
+        Wren\",\"sciName\":\"Thryothorus ludovicianus\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":2,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"amegfi\",\"comName\":\"American
+        Goldfinch\",\"sciName\":\"Spinus tristis\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"rebwoo\",\"comName\":\"Red-bellied
+        Woodpecker\",\"sciName\":\"Melanerpes carolinus\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"winwre3\",\"comName\":\"Winter
+        Wren\",\"sciName\":\"Troglodytes hiemalis\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"grycat\",\"comName\":\"Gray
+        Catbird\",\"sciName\":\"Dumetella carolinensis\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"turvul\",\"comName\":\"Turkey
+        Vulture\",\"sciName\":\"Cathartes aura\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"tuftit\",\"comName\":\"Tufted
+        Titmouse\",\"sciName\":\"Baeolophus bicolor\",\"locId\":\"L890042\",\"locName\":\"Mission
+        of Immaculate Virgin, Mt. Loretto\",\"obsDt\":\"2024-11-25 12:20\",\"howMany\":1,\"lat\":40.511334,\"lng\":-74.2196149,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595688\"},{\"speciesCode\":\"amecro\",\"comName\":\"American
+        Crow\",\"sciName\":\"Corvus brachyrhynchos\",\"locId\":\"L1772918\",\"locName\":\"Sapsucker
+        Woods--Parking lot area\",\"obsDt\":\"2024-11-25 12:16\",\"howMany\":6,\"lat\":42.4805408,\"lng\":-76.4493689,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593542\"},{\"speciesCode\":\"easblu\",\"comName\":\"Eastern
+        Bluebird\",\"sciName\":\"Sialia sialis\",\"locId\":\"L2036462\",\"locName\":\"Dunkirk
+        Airport (DKK)\",\"obsDt\":\"2024-11-25 12:05\",\"howMany\":1,\"lat\":42.4926018,\"lng\":-79.2730884,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594003\"},{\"speciesCode\":\"amtspa\",\"comName\":\"American
+        Tree Sparrow\",\"sciName\":\"Spizelloides arborea\",\"locId\":\"L2036462\",\"locName\":\"Dunkirk
+        Airport (DKK)\",\"obsDt\":\"2024-11-25 12:05\",\"howMany\":2,\"lat\":42.4926018,\"lng\":-79.2730884,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594003\"},{\"speciesCode\":\"hoomer\",\"comName\":\"Hooded
+        Merganser\",\"sciName\":\"Lophodytes cucullatus\",\"locId\":\"L8154784\",\"locName\":\"Alcott's
+        Pond\",\"obsDt\":\"2024-11-25 12:04\",\"howMany\":7,\"lat\":40.8369005,\"lng\":-72.5892517,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593312\"},{\"speciesCode\":\"bcnher\",\"comName\":\"Black-crowned
+        Night Heron\",\"sciName\":\"Nycticorax nycticorax\",\"locId\":\"L8154784\",\"locName\":\"Alcott's
+        Pond\",\"obsDt\":\"2024-11-25 12:04\",\"howMany\":1,\"lat\":40.8369005,\"lng\":-72.5892517,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593312\"},{\"speciesCode\":\"whbnut\",\"comName\":\"White-breasted
+        Nuthatch\",\"sciName\":\"Sitta carolinensis\",\"locId\":\"L1498729\",\"locName\":\"Sapsucker
+        Woods--Wilson Trail\",\"obsDt\":\"2024-11-25 12:03\",\"howMany\":1,\"lat\":42.4795201,\"lng\":-76.4551642,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595792\"},{\"speciesCode\":\"belkin1\",\"comName\":\"Belted
+        Kingfisher\",\"sciName\":\"Megaceryle alcyon\",\"locId\":\"L1498729\",\"locName\":\"Sapsucker
+        Woods--Wilson Trail\",\"obsDt\":\"2024-11-25 12:03\",\"howMany\":1,\"lat\":42.4795201,\"lng\":-76.4551642,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595792\"},{\"speciesCode\":\"wooduc\",\"comName\":\"Wood
+        Duck\",\"sciName\":\"Aix sponsa\",\"locId\":\"L1498729\",\"locName\":\"Sapsucker
+        Woods--Wilson Trail\",\"obsDt\":\"2024-11-25 12:03\",\"howMany\":2,\"lat\":42.4795201,\"lng\":-76.4551642,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595792\"},{\"speciesCode\":\"grbher3\",\"comName\":\"Great
+        Blue Heron\",\"sciName\":\"Ardea herodias\",\"locId\":\"L515384\",\"locName\":\"Collins
+        Lake, Scotia\",\"obsDt\":\"2024-11-25 12:02\",\"howMany\":2,\"lat\":42.8267613,\"lng\":-73.9537597,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596068\"},{\"speciesCode\":\"comrav\",\"comName\":\"Common
+        Raven\",\"sciName\":\"Corvus corax\",\"locId\":\"L1209523\",\"locName\":\"Cemetery
+        of the Resurrection\",\"obsDt\":\"2024-11-25 12:02\",\"howMany\":1,\"lat\":40.5175185,\"lng\":-74.212743,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203592981\"},{\"speciesCode\":\"gockin\",\"comName\":\"Golden-crowned
+        Kinglet\",\"sciName\":\"Regulus satrapa\",\"locId\":\"L515384\",\"locName\":\"Collins
+        Lake, Scotia\",\"obsDt\":\"2024-11-25 12:02\",\"howMany\":1,\"lat\":42.8267613,\"lng\":-73.9537597,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596068\"},{\"speciesCode\":\"gnwtea\",\"comName\":\"Green-winged
+        Teal\",\"sciName\":\"Anas crecca\",\"locId\":\"L1209523\",\"locName\":\"Cemetery
+        of the Resurrection\",\"obsDt\":\"2024-11-25 12:02\",\"howMany\":2,\"lat\":40.5175185,\"lng\":-74.212743,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203592981\"},{\"speciesCode\":\"gadwal\",\"comName\":\"Gadwall\",\"sciName\":\"Mareca
+        strepera\",\"locId\":\"L1209523\",\"locName\":\"Cemetery of the Resurrection\",\"obsDt\":\"2024-11-25
+        12:02\",\"howMany\":5,\"lat\":40.5175185,\"lng\":-74.212743,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203592981\"},{\"speciesCode\":\"commer\",\"comName\":\"Common
+        Merganser\",\"sciName\":\"Mergus merganser\",\"locId\":\"L515384\",\"locName\":\"Collins
+        Lake, Scotia\",\"obsDt\":\"2024-11-25 12:02\",\"howMany\":325,\"lat\":42.8267613,\"lng\":-73.9537597,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596068\"},{\"speciesCode\":\"rewbla\",\"comName\":\"Red-winged
+        Blackbird\",\"sciName\":\"Agelaius phoeniceus\",\"locId\":\"L609644\",\"locName\":\"Canarsie
+        Beach Park\",\"obsDt\":\"2024-11-25 11:59\",\"howMany\":1,\"lat\":40.6258911,\"lng\":-73.8972616,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596166\"},{\"speciesCode\":\"amewig\",\"comName\":\"American
+        Wigeon\",\"sciName\":\"Mareca americana\",\"locId\":\"L505437\",\"locName\":\"Boland
+        Pond\",\"obsDt\":\"2024-11-25 11:59\",\"howMany\":1,\"lat\":42.1781776,\"lng\":-75.8815169,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203591906\"},{\"speciesCode\":\"normoc\",\"comName\":\"Northern
+        Mockingbird\",\"sciName\":\"Mimus polyglottos\",\"locId\":\"L609644\",\"locName\":\"Canarsie
+        Beach Park\",\"obsDt\":\"2024-11-25 11:59\",\"howMany\":1,\"lat\":40.6258911,\"lng\":-73.8972616,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596166\"},{\"speciesCode\":\"snogoo\",\"comName\":\"Snow
+        Goose\",\"sciName\":\"Anser caerulescens\",\"locId\":\"L391319\",\"locName\":\"Miller
+        Field\",\"obsDt\":\"2024-11-25 11:53\",\"howMany\":1,\"lat\":40.5674723,\"lng\":-74.0990352,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593393\"},{\"speciesCode\":\"baleag\",\"comName\":\"Bald
+        Eagle\",\"sciName\":\"Haliaeetus leucocephalus\",\"locId\":\"L1829902\",\"locName\":\"Wappinger
+        Lake\",\"obsDt\":\"2024-11-25 11:52\",\"howMany\":1,\"lat\":41.6070847,\"lng\":-73.9159704,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594005\"},{\"speciesCode\":\"mutswa\",\"comName\":\"Mute
+        Swan\",\"sciName\":\"Cygnus olor\",\"locId\":\"L1829902\",\"locName\":\"Wappinger
+        Lake\",\"obsDt\":\"2024-11-25 11:52\",\"howMany\":4,\"lat\":41.6070847,\"lng\":-73.9159704,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594005\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"monpar\",\"comName\":\"Monk
+        Parakeet\",\"sciName\":\"Myiopsitta monachus\",\"locId\":\"L623005\",\"locName\":\"Argyle
+        Lake\",\"obsDt\":\"2024-11-25 11:48\",\"howMany\":1,\"lat\":40.6965832,\"lng\":-73.329277,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593314\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"houspa\",\"comName\":\"House
+        Sparrow\",\"sciName\":\"Passer domesticus\",\"locId\":\"L1831941\",\"locName\":\"Newburgh
+        Waterfront, Hudson River\",\"obsDt\":\"2024-11-25 11:48\",\"howMany\":6,\"lat\":41.5048408,\"lng\":-74.0047183,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203591037\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"gbbgul\",\"comName\":\"Great
+        Black-backed Gull\",\"sciName\":\"Larus marinus\",\"locId\":\"L623005\",\"locName\":\"Argyle
+        Lake\",\"obsDt\":\"2024-11-25 11:48\",\"howMany\":6,\"lat\":40.6965832,\"lng\":-73.329277,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593314\"},{\"speciesCode\":\"fiscro\",\"comName\":\"Fish
+        Crow\",\"sciName\":\"Corvus ossifragus\",\"locId\":\"L623005\",\"locName\":\"Argyle
+        Lake\",\"obsDt\":\"2024-11-25 11:48\",\"howMany\":5,\"lat\":40.6965832,\"lng\":-73.329277,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593314\"},{\"speciesCode\":\"perfal\",\"comName\":\"Peregrine
+        Falcon\",\"sciName\":\"Falco peregrinus\",\"locId\":\"L623005\",\"locName\":\"Argyle
+        Lake\",\"obsDt\":\"2024-11-25 11:48\",\"howMany\":1,\"lat\":40.6965832,\"lng\":-73.329277,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593314\"},{\"speciesCode\":\"cacgoo1\",\"comName\":\"Cackling
+        Goose\",\"sciName\":\"Branta hutchinsii\",\"locId\":\"L3586927\",\"locName\":\"North
+        Ponds Park\",\"obsDt\":\"2024-11-25 11:42\",\"howMany\":1,\"lat\":43.2188554,\"lng\":-77.4429465,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590253\"},{\"speciesCode\":\"haiwoo\",\"comName\":\"Hairy
+        Woodpecker\",\"sciName\":\"Dryobates villosus\",\"locId\":\"L3586927\",\"locName\":\"North
+        Ponds Park\",\"obsDt\":\"2024-11-25 11:42\",\"howMany\":1,\"lat\":43.2188554,\"lng\":-77.4429465,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590253\"},{\"speciesCode\":\"buffle\",\"comName\":\"Bufflehead\",\"sciName\":\"Bucephala
+        albeola\",\"locId\":\"L1396506\",\"locName\":\"Alley Pond Park--Restoration
+        Pond\",\"obsDt\":\"2024-11-25 11:41\",\"howMany\":6,\"lat\":40.7531752,\"lng\":-73.7424416,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593283\"},{\"speciesCode\":\"rinduc\",\"comName\":\"Ring-necked
+        Duck\",\"sciName\":\"Aythya collaris\",\"locId\":\"L1396506\",\"locName\":\"Alley
+        Pond Park--Restoration Pond\",\"obsDt\":\"2024-11-25 11:41\",\"howMany\":4,\"lat\":40.7531752,\"lng\":-73.7424416,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203593283\"},{\"speciesCode\":\"norfli\",\"comName\":\"Northern
+        Flicker\",\"sciName\":\"Colaptes auratus\",\"locId\":\"L190998\",\"locName\":\"Sampson
+        SP--Lakeshore Trail\",\"obsDt\":\"2024-11-25 11:37\",\"howMany\":4,\"lat\":42.6921448,\"lng\":-76.8898981,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594558\"},{\"speciesCode\":\"comgra\",\"comName\":\"Common
+        Grackle\",\"sciName\":\"Quiscalus quiscula\",\"locId\":\"L275331\",\"locName\":\"Piermont
+        Pier\",\"obsDt\":\"2024-11-25 11:27\",\"howMany\":5,\"lat\":41.0427778,\"lng\":-73.8975,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589701\"},{\"speciesCode\":\"pilwoo\",\"comName\":\"Pileated
+        Woodpecker\",\"sciName\":\"Dryocopus pileatus\",\"locId\":\"L2693079\",\"locName\":\"Rondout
+        Reservoir (Sullivan Co.)\",\"obsDt\":\"2024-11-25 11:25\",\"howMany\":1,\"lat\":41.8604243,\"lng\":-74.5100577,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590166\"},{\"speciesCode\":\"coohaw\",\"comName\":\"Cooper's
+        Hawk\",\"sciName\":\"Astur cooperii\",\"locId\":\"L305381\",\"locName\":\"Roy
+        H. Park Preserve (FLLT)--south\",\"obsDt\":\"2024-11-25 11:20\",\"howMany\":1,\"lat\":42.4259195,\"lng\":-76.3357544,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594913\"},{\"speciesCode\":\"brncre\",\"comName\":\"Brown
+        Creeper\",\"sciName\":\"Certhia americana\",\"locId\":\"L305381\",\"locName\":\"Roy
+        H. Park Preserve (FLLT)--south\",\"obsDt\":\"2024-11-25 11:20\",\"howMany\":1,\"lat\":42.4259195,\"lng\":-76.3357544,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594913\"},{\"speciesCode\":\"doccor\",\"comName\":\"Double-crested
+        Cormorant\",\"sciName\":\"Nannopterum auritum\",\"locId\":\"L1958285\",\"locName\":\"Robert
+        Moses SP--parking field 5\",\"obsDt\":\"2024-11-25 11:20\",\"howMany\":1,\"lat\":40.6274382,\"lng\":-73.2361507,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594169\"},{\"speciesCode\":\"herthr\",\"comName\":\"Hermit
+        Thrush\",\"sciName\":\"Catharus guttatus\",\"locId\":\"L305381\",\"locName\":\"Roy
+        H. Park Preserve (FLLT)--south\",\"obsDt\":\"2024-11-25 11:20\",\"howMany\":1,\"lat\":42.4259195,\"lng\":-76.3357544,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594913\"},{\"speciesCode\":\"horlar\",\"comName\":\"Horned
+        Lark\",\"sciName\":\"Eremophila alpestris\",\"locId\":\"L1958285\",\"locName\":\"Robert
+        Moses SP--parking field 5\",\"obsDt\":\"2024-11-25 11:20\",\"howMany\":1,\"lat\":40.6274382,\"lng\":-73.2361507,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203594169\"},{\"speciesCode\":\"rudduc\",\"comName\":\"Ruddy
+        Duck\",\"sciName\":\"Oxyura jamaicensis\",\"locId\":\"L1034653\",\"locName\":\"Sylvan
+        Lake\",\"obsDt\":\"2024-11-25 11:18\",\"howMany\":108,\"lat\":41.6086902,\"lng\":-73.7405241,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590389\"},{\"speciesCode\":\"rinphe1\",\"comName\":\"Ring-necked
+        Pheasant\",\"sciName\":\"Phasianus colchicus\",\"locId\":\"L508631\",\"locName\":\"Ditch
+        Bank Rd., east of Gee Rd.\",\"obsDt\":\"2024-11-25 11:15\",\"howMany\":1,\"lat\":43.1049309,\"lng\":-75.7929611,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595607\",\"exoticCategory\":\"N\"},{\"speciesCode\":\"swaspa\",\"comName\":\"Swamp
+        Sparrow\",\"sciName\":\"Melospiza georgiana\",\"locId\":\"L508631\",\"locName\":\"Ditch
+        Bank Rd., east of Gee Rd.\",\"obsDt\":\"2024-11-25 11:15\",\"howMany\":1,\"lat\":43.1049309,\"lng\":-75.7929611,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203595607\"},{\"speciesCode\":\"comloo\",\"comName\":\"Common
+        Loon\",\"sciName\":\"Gavia immer\",\"locId\":\"L286192\",\"locName\":\"Ladoga
+        Park\",\"obsDt\":\"2024-11-25 11:11\",\"howMany\":1,\"lat\":42.5353445,\"lng\":-76.5396472,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203591939\"},{\"speciesCode\":\"merlin\",\"comName\":\"Merlin\",\"sciName\":\"Falco
+        columbarius\",\"locId\":\"L286192\",\"locName\":\"Ladoga Park\",\"obsDt\":\"2024-11-25
+        11:11\",\"howMany\":1,\"lat\":42.5353445,\"lng\":-76.5396472,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203591939\"},{\"speciesCode\":\"yebsap\",\"comName\":\"Yellow-bellied
+        Sapsucker\",\"sciName\":\"Sphyrapicus varius\",\"locId\":\"L13512159\",\"locName\":\"Central
+        Park--North Woods\",\"obsDt\":\"2024-11-25 11:11\",\"howMany\":1,\"lat\":40.7978829,\"lng\":-73.9561404,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587930\"},{\"speciesCode\":\"snobun\",\"comName\":\"Snow
+        Bunting\",\"sciName\":\"Plectrophenax nivalis\",\"locId\":\"L469963\",\"locName\":\"Lock
+        7 State Canal Park, Niskayuna\",\"obsDt\":\"2024-11-25 11:04\",\"howMany\":1,\"lat\":42.803871,\"lng\":-73.847909,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203588307\"},{\"speciesCode\":\"comgol\",\"comName\":\"Common
+        Goldeneye\",\"sciName\":\"Bucephala clangula\",\"locId\":\"L1985531\",\"locName\":\"Bird
+        Island Pier\",\"obsDt\":\"2024-11-25 10:53\",\"howMany\":2,\"lat\":42.9063684,\"lng\":-78.9027357,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596830\"},{\"speciesCode\":\"rebmer\",\"comName\":\"Red-breasted
+        Merganser\",\"sciName\":\"Mergus serrator\",\"locId\":\"L1985531\",\"locName\":\"Bird
+        Island Pier\",\"obsDt\":\"2024-11-25 10:53\",\"howMany\":58,\"lat\":42.9063684,\"lng\":-78.9027357,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596830\"},{\"speciesCode\":\"horgre\",\"comName\":\"Horned
+        Grebe\",\"sciName\":\"Podiceps auritus\",\"locId\":\"L142261\",\"locName\":\"Dunkirk
+        Harbor\",\"obsDt\":\"2024-11-25 10:52\",\"howMany\":20,\"lat\":42.490799,\"lng\":-79.3367996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589231\"},{\"speciesCode\":\"gresca\",\"comName\":\"Greater
+        Scaup\",\"sciName\":\"Aythya marila\",\"locId\":\"L142261\",\"locName\":\"Dunkirk
+        Harbor\",\"obsDt\":\"2024-11-25 10:52\",\"howMany\":100,\"lat\":42.490799,\"lng\":-79.3367996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589231\"},{\"speciesCode\":\"redhea\",\"comName\":\"Redhead\",\"sciName\":\"Aythya
+        americana\",\"locId\":\"L142261\",\"locName\":\"Dunkirk Harbor\",\"obsDt\":\"2024-11-25
+        10:52\",\"howMany\":5,\"lat\":42.490799,\"lng\":-79.3367996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589231\"},{\"speciesCode\":\"snoowl1\",\"comName\":\"Snowy
+        Owl\",\"sciName\":\"Bubo scandiacus\",\"locId\":\"L142261\",\"locName\":\"Dunkirk
+        Harbor\",\"obsDt\":\"2024-11-25 10:52\",\"howMany\":1,\"lat\":42.490799,\"lng\":-79.3367996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589231\"},{\"speciesCode\":\"canvas\",\"comName\":\"Canvasback\",\"sciName\":\"Aythya
+        valisineria\",\"locId\":\"L142261\",\"locName\":\"Dunkirk Harbor\",\"obsDt\":\"2024-11-25
+        10:52\",\"howMany\":1,\"lat\":42.490799,\"lng\":-79.3367996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589231\"},{\"speciesCode\":\"pibgre\",\"comName\":\"Pied-billed
+        Grebe\",\"sciName\":\"Podilymbus podiceps\",\"locId\":\"L267814\",\"locName\":\"Montezuma
+        NWR--Wildlife Drive\",\"obsDt\":\"2024-11-25 10:42\",\"howMany\":20,\"lat\":42.9817483,\"lng\":-76.7353284,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590737\"},{\"speciesCode\":\"norhar2\",\"comName\":\"Northern
+        Harrier\",\"sciName\":\"Circus hudsonius\",\"locId\":\"L267814\",\"locName\":\"Montezuma
+        NWR--Wildlife Drive\",\"obsDt\":\"2024-11-25 10:42\",\"howMany\":1,\"lat\":42.9817483,\"lng\":-76.7353284,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590737\"},{\"speciesCode\":\"y00475\",\"comName\":\"American
+        Coot\",\"sciName\":\"Fulica americana\",\"locId\":\"L267814\",\"locName\":\"Montezuma
+        NWR--Wildlife Drive\",\"obsDt\":\"2024-11-25 10:42\",\"howMany\":30,\"lat\":42.9817483,\"lng\":-76.7353284,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590737\"},{\"speciesCode\":\"norsho\",\"comName\":\"Northern
+        Shoveler\",\"sciName\":\"Spatula clypeata\",\"locId\":\"L267814\",\"locName\":\"Montezuma
+        NWR--Wildlife Drive\",\"obsDt\":\"2024-11-25 10:42\",\"howMany\":1,\"lat\":42.9817483,\"lng\":-76.7353284,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590737\"},{\"speciesCode\":\"cedwax\",\"comName\":\"Cedar
+        Waxwing\",\"sciName\":\"Bombycilla cedrorum\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":2,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"sander\",\"comName\":\"Sanderling\",\"sciName\":\"Calidris
+        alba\",\"locId\":\"L621111\",\"locName\":\"Smith Point County Park\",\"obsDt\":\"2024-11-25
+        10:41\",\"howMany\":6,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"whwsco2\",\"comName\":\"White-winged
+        Scoter\",\"sciName\":\"Melanitta deglandi\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":175,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"purfin\",\"comName\":\"Purple
+        Finch\",\"sciName\":\"Haemorhous purpureus\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":1,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"retloo\",\"comName\":\"Red-throated
+        Loon\",\"sciName\":\"Gavia stellata\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":2,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"amekes\",\"comName\":\"American
+        Kestrel\",\"sciName\":\"Falco sparverius\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":2,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"yerwar\",\"comName\":\"Yellow-rumped
+        Warbler\",\"sciName\":\"Setophaga coronata\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-25 10:41\",\"howMany\":15,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203597307\"},{\"speciesCode\":\"savspa\",\"comName\":\"Savannah
+        Sparrow\",\"sciName\":\"Passerculus sandwichensis\",\"locId\":\"L509108\",\"locName\":\"Croton
+        Point Park\",\"obsDt\":\"2024-11-25 10:40\",\"howMany\":1,\"lat\":41.1871668,\"lng\":-73.8891219,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596918\"},{\"speciesCode\":\"amepip\",\"comName\":\"American
+        Pipit\",\"sciName\":\"Anthus rubescens\",\"locId\":\"L509108\",\"locName\":\"Croton
+        Point Park\",\"obsDt\":\"2024-11-25 10:40\",\"howMany\":1,\"lat\":41.1871668,\"lng\":-73.8891219,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596918\"},{\"speciesCode\":\"bongul\",\"comName\":\"Bonaparte's
+        Gull\",\"sciName\":\"Chroicocephalus philadelphia\",\"locId\":\"L2036486\",\"locName\":\"Unity
+        Island--North End\",\"obsDt\":\"2024-11-25 10:26\",\"howMany\":11,\"lat\":42.9321075,\"lng\":-78.9062977,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203584291\"},{\"speciesCode\":\"laugul\",\"comName\":\"Laughing
+        Gull\",\"sciName\":\"Leucophaeus atricilla\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-25 10:26\",\"howMany\":7,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596147\"},{\"speciesCode\":\"lbbgul\",\"comName\":\"Lesser
+        Black-backed Gull\",\"sciName\":\"Larus fuscus\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-25 10:26\",\"howMany\":3,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596147\"},{\"speciesCode\":\"treswa\",\"comName\":\"Tree
+        Swallow\",\"sciName\":\"Tachycineta bicolor\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-25 10:26\",\"howMany\":4,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596147\"},{\"speciesCode\":\"blkvul\",\"comName\":\"Black
+        Vulture\",\"sciName\":\"Coragyps atratus\",\"locId\":\"L283611\",\"locName\":\"Rockland
+        Lake SP\",\"obsDt\":\"2024-11-25 10:14\",\"howMany\":1,\"lat\":41.1468757,\"lng\":-73.9234741,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203590140\"},{\"speciesCode\":\"tunswa\",\"comName\":\"Tundra
+        Swan\",\"sciName\":\"Cygnus columbianus\",\"locId\":\"L11338148\",\"locName\":\"Montezuma
+        NWR--Seneca Trail\",\"obsDt\":\"2024-11-25 10:12\",\"howMany\":400,\"lat\":42.9681927,\"lng\":-76.7377416,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203583748\"},{\"speciesCode\":\"ruckin\",\"comName\":\"Ruby-crowned
+        Kinglet\",\"sciName\":\"Corthylio calendula\",\"locId\":\"L6329229\",\"locName\":\"Oakwood
+        Beach--Delwit Ave. marsh\",\"obsDt\":\"2024-11-25 09:58\",\"howMany\":1,\"lat\":40.5532081,\"lng\":-74.118756,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203580903\"},{\"speciesCode\":\"foxspa\",\"comName\":\"Fox
+        Sparrow\",\"sciName\":\"Passerella iliaca\",\"locId\":\"L191106\",\"locName\":\"Central
+        Park\",\"obsDt\":\"2024-11-25 09:55\",\"howMany\":1,\"lat\":40.7715482,\"lng\":-73.9724819,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203589974\"},{\"speciesCode\":\"lotduc\",\"comName\":\"Long-tailed
+        Duck\",\"sciName\":\"Clangula hyemalis\",\"locId\":\"L351758\",\"locName\":\"West
+        Side Rowing Club\",\"obsDt\":\"2024-11-25 09:37\",\"howMany\":8,\"lat\":42.9013797,\"lng\":-78.9020911,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203578363\"},{\"speciesCode\":\"sancra\",\"comName\":\"Sandhill
+        Crane\",\"sciName\":\"Antigone canadensis\",\"locId\":\"L462778\",\"locName\":\"Montezuma
+        NWR--Visitor Center area\",\"obsDt\":\"2024-11-25 09:36\",\"howMany\":120,\"lat\":42.9669441,\"lng\":-76.7409772,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203580113\"},{\"speciesCode\":\"rolhaw\",\"comName\":\"Rough-legged
+        Hawk\",\"sciName\":\"Buteo lagopus\",\"locId\":\"L13798887\",\"locName\":\"Kent
+        Switch Road, South Dayton\",\"obsDt\":\"2024-11-25 09:32\",\"howMany\":1,\"lat\":42.3356928,\"lng\":-79.0717423,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587953\"},{\"speciesCode\":\"whcspa\",\"comName\":\"White-crowned
+        Sparrow\",\"sciName\":\"Zonotrichia leucophrys\",\"locId\":\"L13798887\",\"locName\":\"Kent
+        Switch Road, South Dayton\",\"obsDt\":\"2024-11-25 09:32\",\"howMany\":1,\"lat\":42.3356928,\"lng\":-79.0717423,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587953\"},{\"speciesCode\":\"brant\",\"comName\":\"Brant\",\"sciName\":\"Branta
+        bernicla\",\"locId\":\"L13116728\",\"locName\":\"Jones Beach SP--West End
+        2\",\"obsDt\":\"2024-11-25 09:28\",\"howMany\":4,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587412\"},{\"speciesCode\":\"redpol1\",\"comName\":\"Redpoll\",\"sciName\":\"Acanthis
+        flammea\",\"locId\":\"L572189\",\"locName\":\"Edgemere Drive (1710)\",\"obsDt\":\"2024-11-25
+        09:19\",\"howMany\":1,\"lat\":43.2872722,\"lng\":-77.6685781,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203574940\"},{\"speciesCode\":\"shshaw\",\"comName\":\"Sharp-shinned
+        Hawk\",\"sciName\":\"Accipiter striatus\",\"locId\":\"L1958285\",\"locName\":\"Robert
+        Moses SP--parking field 5\",\"obsDt\":\"2024-11-25 09:02\",\"howMany\":2,\"lat\":40.6274382,\"lng\":-73.2361507,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203578203\"},{\"speciesCode\":\"wiltur\",\"comName\":\"Wild
+        Turkey\",\"sciName\":\"Meleagris gallopavo\",\"locId\":\"L5674881\",\"locName\":\"Wentworth
+        Road, South Dayton\",\"obsDt\":\"2024-11-25 09:01\",\"howMany\":1,\"lat\":42.3735267,\"lng\":-79.1593695,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587942\"},{\"speciesCode\":\"grecor\",\"comName\":\"Great
+        Cormorant\",\"sciName\":\"Phalacrocorax carbo\",\"locId\":\"L1293732\",\"locName\":\"Randalls
+        Island\",\"obsDt\":\"2024-11-25 08:55\",\"howMany\":1,\"lat\":40.7887808,\"lng\":-73.9219681,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203591625\"},{\"speciesCode\":\"norgan\",\"comName\":\"Northern
+        Gannet\",\"sciName\":\"Morus bassanus\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":2,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"sursco\",\"comName\":\"Surf
+        Scoter\",\"sciName\":\"Melanitta perspicillata\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":4,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"comeid\",\"comName\":\"Common
+        Eider\",\"sciName\":\"Somateria mollissima\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":8,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"bnhcow\",\"comName\":\"Brown-headed
+        Cowbird\",\"sciName\":\"Molothrus ater\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":19,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"pinsis\",\"comName\":\"Pine
+        Siskin\",\"sciName\":\"Spinus pinus\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":35,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"blksco2\",\"comName\":\"Black
+        Scoter\",\"sciName\":\"Melanitta americana\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":90,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"rusbla\",\"comName\":\"Rusty
+        Blackbird\",\"sciName\":\"Euphagus carolinus\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-25 08:40\",\"howMany\":5,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203582650\"},{\"speciesCode\":\"norpin\",\"comName\":\"Northern
+        Pintail\",\"sciName\":\"Anas acuta\",\"locId\":\"L164983\",\"locName\":\"Buckhorn
+        Island SP\",\"obsDt\":\"2024-11-25 08:24\",\"howMany\":1,\"lat\":43.0606218,\"lng\":-78.9882132,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203573137\"},{\"speciesCode\":\"greyel\",\"comName\":\"Greater
+        Yellowlegs\",\"sciName\":\"Tringa melanoleuca\",\"locId\":\"L4960826\",\"locName\":\"New
+        Creek Watershed, Olympia Blvd. bridge & marsh\",\"obsDt\":\"2024-11-25 08:23\",\"howMany\":5,\"lat\":40.5782158,\"lng\":-74.088079,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203588947\"},{\"speciesCode\":\"orcwar\",\"comName\":\"Orange-crowned
+        Warbler\",\"sciName\":\"Leiothlypis celata\",\"locId\":\"L4960826\",\"locName\":\"New
+        Creek Watershed, Olympia Blvd. bridge & marsh\",\"obsDt\":\"2024-11-25 08:23\",\"howMany\":2,\"lat\":40.5782158,\"lng\":-74.088079,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203588947\"},{\"speciesCode\":\"eastow\",\"comName\":\"Eastern
+        Towhee\",\"sciName\":\"Pipilo erythrophthalmus\",\"locId\":\"L1799570\",\"locName\":\"Washington
+        Square Village and Silver Towers Complex\",\"obsDt\":\"2024-11-25 08:05\",\"howMany\":1,\"lat\":40.7274787,\"lng\":-73.997783,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203568679\"},{\"speciesCode\":\"fiespa\",\"comName\":\"Field
+        Sparrow\",\"sciName\":\"Spizella pusilla\",\"locId\":\"L2808445\",\"locName\":\"Brookhaven
+        National Laboratory (restricted access)\",\"obsDt\":\"2024-11-25 08:00\",\"howMany\":1,\"lat\":40.8710034,\"lng\":-72.880066,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203568566\"},{\"speciesCode\":\"rengre\",\"comName\":\"Red-necked
+        Grebe\",\"sciName\":\"Podiceps grisegena\",\"locId\":\"L139811\",\"locName\":\"Hamlin
+        Beach SP--Parking Lot No. 4 (Primary Lakewatch site)\",\"obsDt\":\"2024-11-25
+        07:50\",\"howMany\":61,\"lat\":43.3670756,\"lng\":-77.9631686,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203572650\"},{\"speciesCode\":\"comyel\",\"comName\":\"Common
+        Yellowthroat\",\"sciName\":\"Geothlypis trichas\",\"locId\":\"L109516\",\"locName\":\"Prospect
+        Park\",\"obsDt\":\"2024-11-25 07:43\",\"howMany\":1,\"lat\":40.6602841,\"lng\":-73.9689534,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203587935\"},{\"speciesCode\":\"chispa\",\"comName\":\"Chipping
+        Sparrow\",\"sciName\":\"Spizella passerina\",\"locId\":\"L491873\",\"locName\":\"Kissena
+        Park\",\"obsDt\":\"2024-11-25 07:30\",\"howMany\":1,\"lat\":40.7462409,\"lng\":-73.8080852,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203572040\"},{\"speciesCode\":\"palwar\",\"comName\":\"Palm
+        Warbler\",\"sciName\":\"Setophaga palmarum\",\"locId\":\"L491873\",\"locName\":\"Kissena
+        Park\",\"obsDt\":\"2024-11-25 07:30\",\"howMany\":1,\"lat\":40.7462409,\"lng\":-73.8080852,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203572040\"},{\"speciesCode\":\"laplon\",\"comName\":\"Lapland
+        Longspur\",\"sciName\":\"Calcarius lapponicus\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-25 07:20\",\"howMany\":1,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203580897\"},{\"speciesCode\":\"rebnut\",\"comName\":\"Red-breasted
+        Nuthatch\",\"sciName\":\"Sitta canadensis\",\"locId\":\"L140436\",\"locName\":\"Highland
+        Park, Rochester\",\"obsDt\":\"2024-11-25 06:45\",\"howMany\":1,\"lat\":43.1305366,\"lng\":-77.6064171,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203596670\"},{\"speciesCode\":\"reshaw\",\"comName\":\"Red-shouldered
+        Hawk\",\"sciName\":\"Buteo lineatus\",\"locId\":\"L1140871\",\"locName\":\"Hilltop
+        Hanover Farm and Environmental Center\",\"obsDt\":\"2024-11-25 06:20\",\"howMany\":1,\"lat\":41.2523408,\"lng\":-73.7741316,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203564166\"},{\"speciesCode\":\"grhowl\",\"comName\":\"Great
+        Horned Owl\",\"sciName\":\"Bubo virginianus\",\"locId\":\"L1140871\",\"locName\":\"Hilltop
+        Hanover Farm and Environmental Center\",\"obsDt\":\"2024-11-25 06:20\",\"howMany\":1,\"lat\":41.2523408,\"lng\":-73.7741316,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203564166\"},{\"speciesCode\":\"killde\",\"comName\":\"Killdeer\",\"sciName\":\"Charadrius
+        vociferus\",\"locId\":\"L6705638\",\"locName\":\"Brookfield Park\",\"obsDt\":\"2024-11-24
+        18:18\",\"lat\":40.5618248,\"lng\":-74.1601933,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203526285\"},{\"speciesCode\":\"easowl1\",\"comName\":\"Eastern
+        Screech-Owl\",\"sciName\":\"Megascops asio\",\"locId\":\"L299350\",\"locName\":\"Rockefeller
+        SP Preserve\",\"obsDt\":\"2024-11-24 17:00\",\"howMany\":2,\"lat\":41.10804,\"lng\":-73.8378825,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203557183\"},{\"speciesCode\":\"easmea\",\"comName\":\"Eastern
+        Meadowlark\",\"sciName\":\"Sturnella magna\",\"locId\":\"L299350\",\"locName\":\"Rockefeller
+        SP Preserve\",\"obsDt\":\"2024-11-24 17:00\",\"howMany\":2,\"lat\":41.10804,\"lng\":-73.8378825,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203557183\"},{\"speciesCode\":\"sheowl\",\"comName\":\"Short-eared
+        Owl\",\"sciName\":\"Asio flammeus\",\"locId\":\"L693939\",\"locName\":\"Mount
+        Pleasant, east hill\",\"obsDt\":\"2024-11-24 16:59\",\"howMany\":3,\"lat\":42.4591964,\"lng\":-76.3726723,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203519523\"},{\"speciesCode\":\"magwar\",\"comName\":\"Magnolia
+        Warbler\",\"sciName\":\"Setophaga magnolia\",\"locId\":\"L109518\",\"locName\":\"Central
+        Park--The Ramble\",\"obsDt\":\"2024-11-24 16:42\",\"howMany\":1,\"lat\":40.7779667,\"lng\":-73.9697165,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203517546\"},{\"speciesCode\":\"cavswa\",\"comName\":\"Cave
+        Swallow\",\"sciName\":\"Petrochelidon fulva\",\"locId\":\"L2693079\",\"locName\":\"Rondout
+        Reservoir (Sullivan Co.)\",\"obsDt\":\"2024-11-24 16:20\",\"howMany\":1,\"lat\":41.8604243,\"lng\":-74.5100577,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203517741\"},{\"speciesCode\":\"blkski\",\"comName\":\"Black
+        Skimmer\",\"sciName\":\"Rynchops niger\",\"locId\":\"L845817\",\"locName\":\"Coney
+        Island Beach & Boardwalk\",\"obsDt\":\"2024-11-24 15:44\",\"howMany\":10,\"lat\":40.5719793,\"lng\":-73.9778996,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203515468\"},{\"speciesCode\":\"harduc\",\"comName\":\"Harlequin
+        Duck\",\"sciName\":\"Histrionicus histrionicus\",\"locId\":\"L1985531\",\"locName\":\"Bird
+        Island Pier\",\"obsDt\":\"2024-11-24 15:12\",\"howMany\":2,\"lat\":42.9063684,\"lng\":-78.9027357,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203521745\"},{\"speciesCode\":\"pinwar\",\"comName\":\"Pine
+        Warbler\",\"sciName\":\"Setophaga pinus\",\"locId\":\"L3786091\",\"locName\":\"Round
+        Lake Preserve (Saratoga Co.)\",\"obsDt\":\"2024-11-24 15:04\",\"howMany\":1,\"lat\":42.9274492,\"lng\":-73.771002,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203512248\"},{\"speciesCode\":\"dunlin\",\"comName\":\"Dunlin\",\"sciName\":\"Calidris
+        alpina\",\"locId\":\"L1540547\",\"locName\":\"Jamaica Bay Wildlife Refuge--Terrapin
+        Point, Brooklyn\",\"obsDt\":\"2024-11-24 14:59\",\"howMany\":30,\"lat\":40.6157648,\"lng\":-73.8349968,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203518990\"},{\"speciesCode\":\"rudtur\",\"comName\":\"Ruddy
+        Turnstone\",\"sciName\":\"Arenaria interpres\",\"locId\":\"L109146\",\"locName\":\"Jones
+        Beach SP--Coast Guard Station\",\"obsDt\":\"2024-11-24 14:49\",\"howMany\":1,\"lat\":40.5888889,\"lng\":-73.5566667,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203508570\"},{\"speciesCode\":\"bkbplo\",\"comName\":\"Black-bellied
+        Plover\",\"sciName\":\"Pluvialis squatarola\",\"locId\":\"L109146\",\"locName\":\"Jones
+        Beach SP--Coast Guard Station\",\"obsDt\":\"2024-11-24 14:49\",\"howMany\":35,\"lat\":40.5888889,\"lng\":-73.5566667,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203508570\"},{\"speciesCode\":\"rehwoo\",\"comName\":\"Red-headed
+        Woodpecker\",\"sciName\":\"Melanerpes erythrocephalus\",\"locId\":\"L285884\",\"locName\":\"Green-Wood
+        Cemetery, Brooklyn\",\"obsDt\":\"2024-11-24 14:05\",\"howMany\":1,\"lat\":40.6523083,\"lng\":-73.9904281,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203512418\"},{\"speciesCode\":\"truswa\",\"comName\":\"Trumpeter
+        Swan\",\"sciName\":\"Cygnus buccinator\",\"locId\":\"L270474\",\"locName\":\"Upper
+        & Lower Lakes WMA--Observation Tower (Hwy. 15)\",\"obsDt\":\"2024-11-24 13:18\",\"howMany\":10,\"lat\":44.5796495,\"lng\":-75.3091865,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203509200\"},{\"speciesCode\":\"ameoys\",\"comName\":\"American
+        Oystercatcher\",\"sciName\":\"Haematopus palliatus\",\"locId\":\"L109146\",\"locName\":\"Jones
+        Beach SP--Coast Guard Station\",\"obsDt\":\"2024-11-24 13:02\",\"howMany\":21,\"lat\":40.5888889,\"lng\":-73.5566667,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203495292\"},{\"speciesCode\":\"norpar\",\"comName\":\"Northern
+        Parula\",\"sciName\":\"Setophaga americana\",\"locId\":\"L684740\",\"locName\":\"Inwood
+        Hill Park\",\"obsDt\":\"2024-11-24 12:55\",\"howMany\":1,\"lat\":40.8717025,\"lng\":-73.9256904,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203518771\"},{\"speciesCode\":\"musduc\",\"comName\":\"Muscovy
+        Duck\",\"sciName\":\"Cairina moschata\",\"locId\":\"L765570\",\"locName\":\"Central
+        Park--The Pond and Hallett Sanctuary\",\"obsDt\":\"2024-11-24 12:46\",\"howMany\":3,\"lat\":40.7662497,\"lng\":-73.9743751,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203516496\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"amewoo\",\"comName\":\"American
+        Woodcock\",\"sciName\":\"Scolopax minor\",\"locId\":\"L9737449\",\"locName\":\"Paerdegat
+        Basin Natural Area and Ecology Park\",\"obsDt\":\"2024-11-24 11:58\",\"howMany\":1,\"lat\":40.625003,\"lng\":-73.905994,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203490927\"},{\"speciesCode\":\"gwfgoo\",\"comName\":\"Greater
+        White-fronted Goose\",\"sciName\":\"Anser albifrons\",\"locId\":\"L391319\",\"locName\":\"Miller
+        Field\",\"obsDt\":\"2024-11-24 11:54\",\"howMany\":1,\"lat\":40.5674723,\"lng\":-74.0990352,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203483125\"},{\"speciesCode\":\"pursan\",\"comName\":\"Purple
+        Sandpiper\",\"sciName\":\"Calidris maritima\",\"locId\":\"L26660336\",\"locName\":\"Arverne
+        East Nature Preserve\",\"obsDt\":\"2024-11-24 11:39\",\"howMany\":1,\"lat\":40.591905,\"lng\":-73.7773538,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203477462\"},{\"speciesCode\":\"forter\",\"comName\":\"Forster's
+        Tern\",\"sciName\":\"Sterna forsteri\",\"locId\":\"L26660336\",\"locName\":\"Arverne
+        East Nature Preserve\",\"obsDt\":\"2024-11-24 11:19\",\"howMany\":25,\"lat\":40.591905,\"lng\":-73.7773538,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203497059\"},{\"speciesCode\":\"norshr4\",\"comName\":\"Northern
+        Shrike\",\"sciName\":\"Lanius borealis\",\"locId\":\"L390594\",\"locName\":\"Braddock
+        Bay--Burger Park\",\"obsDt\":\"2024-11-24 11:14\",\"howMany\":1,\"lat\":43.3099074,\"lng\":-77.7326596,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203481414\"},{\"speciesCode\":\"norwat\",\"comName\":\"Northern
+        Waterthrush\",\"sciName\":\"Parkesia noveboracensis\",\"locId\":\"L5394613\",\"locName\":\"Jackson
+        Heights (Queens Co.)\",\"obsDt\":\"2024-11-24 10:46\",\"howMany\":1,\"lat\":40.7568041,\"lng\":-73.8828635,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203486424\"},{\"speciesCode\":\"rufhum\",\"comName\":\"Rufous
+        Hummingbird\",\"sciName\":\"Selasphorus rufus\",\"locId\":\"L890086\",\"locName\":\"Snug
+        Harbor Cultural Center & Botanical Garden\",\"obsDt\":\"2024-11-24 10:45\",\"howMany\":1,\"lat\":40.6427668,\"lng\":-74.1033013,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203483924\"},{\"speciesCode\":\"greegr\",\"comName\":\"Great
+        Egret\",\"sciName\":\"Ardea alba\",\"locId\":\"L194386\",\"locName\":\"JFK
+        Memorial Wildlife Sanctuary\",\"obsDt\":\"2024-11-24 10:40\",\"howMany\":2,\"lat\":40.6105495,\"lng\":-73.4519033,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203478610\"},{\"speciesCode\":\"indbun\",\"comName\":\"Indigo
+        Bunting\",\"sciName\":\"Passerina cyanea\",\"locId\":\"L191106\",\"locName\":\"Central
+        Park\",\"obsDt\":\"2024-11-24 10:30\",\"howMany\":1,\"lat\":40.7715482,\"lng\":-73.9724819,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203476896\"},{\"speciesCode\":\"amwpel\",\"comName\":\"American
+        White Pelican\",\"sciName\":\"Pelecanus erythrorhynchos\",\"locId\":\"L1540547\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--Terrapin Point, Brooklyn\",\"obsDt\":\"2024-11-24 10:24\",\"howMany\":1,\"lat\":40.6157648,\"lng\":-73.8349968,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203466999\"},{\"speciesCode\":\"gryjay\",\"comName\":\"Canada
+        Jay\",\"sciName\":\"Perisoreus canadensis\",\"locId\":\"L212481\",\"locName\":\"Bloomingdale
+        Bog Trail\",\"obsDt\":\"2024-11-24 10:22\",\"howMany\":4,\"lat\":44.4128015,\"lng\":-74.121715,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203469287\"},{\"speciesCode\":\"buhvir\",\"comName\":\"Blue-headed
+        Vireo\",\"sciName\":\"Vireo solitarius\",\"locId\":\"L890086\",\"locName\":\"Snug
+        Harbor Cultural Center & Botanical Garden\",\"obsDt\":\"2024-11-24 09:45\",\"howMany\":1,\"lat\":40.6427668,\"lng\":-74.1033013,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203510551\"},{\"speciesCode\":\"rufgro\",\"comName\":\"Ruffed
+        Grouse\",\"sciName\":\"Bonasa umbellus\",\"locId\":\"L123189\",\"locName\":\"Boyer
+        Creek Farm, Caroline\",\"obsDt\":\"2024-11-24 09:37\",\"howMany\":1,\"lat\":42.3432727,\"lng\":-76.2994856,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203468019\"},{\"speciesCode\":\"goleag\",\"comName\":\"Golden
+        Eagle\",\"sciName\":\"Aquila chrysaetos\",\"locId\":\"L885144\",\"locName\":\"Lisle
+        Park & Keibel Rd.\",\"obsDt\":\"2024-11-24 09:08\",\"howMany\":1,\"lat\":42.350552,\"lng\":-75.9814239,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203479699\"},{\"speciesCode\":\"whwcro\",\"comName\":\"White-winged
+        Crossbill\",\"sciName\":\"Loxia leucoptera\",\"locId\":\"L300494\",\"locName\":\"Webster
+        Park--Campground area\",\"obsDt\":\"2024-11-24 08:40\",\"howMany\":1,\"lat\":43.2544474,\"lng\":-77.4600935,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203467817\"},{\"speciesCode\":\"wilsni1\",\"comName\":\"Wilson's
+        Snipe\",\"sciName\":\"Gallinago delicata\",\"locId\":\"L2404270\",\"locName\":\"Cincinnatus
+        Lake (Chenango Co.)\",\"obsDt\":\"2024-11-24 08:27\",\"howMany\":12,\"lat\":42.4306156,\"lng\":-75.8623123,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203469200\"},{\"speciesCode\":\"litgul\",\"comName\":\"Little
+        Gull\",\"sciName\":\"Hydrocoloeus minutus\",\"locId\":\"L22734903\",\"locName\":\"Lewiston
+        Marina and Boat Ramp\",\"obsDt\":\"2024-11-24 08:11\",\"howMany\":1,\"lat\":43.1741542,\"lng\":-79.0495562,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203470249\"},{\"speciesCode\":\"glagul\",\"comName\":\"Glaucous
+        Gull\",\"sciName\":\"Larus hyperboreus\",\"locId\":\"L22734903\",\"locName\":\"Lewiston
+        Marina and Boat Ramp\",\"obsDt\":\"2024-11-24 08:11\",\"howMany\":1,\"lat\":43.1741542,\"lng\":-79.0495562,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203470249\"},{\"speciesCode\":\"brdowl\",\"comName\":\"Barred
+        Owl\",\"sciName\":\"Strix varia\",\"locId\":\"L4630170\",\"locName\":\"Cattaraugus
+        SF\",\"obsDt\":\"2024-11-23 15:26\",\"howMany\":1,\"lat\":42.3144086,\"lng\":-78.8184454,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203400226\"},{\"speciesCode\":\"vesspa\",\"comName\":\"Vesper
+        Sparrow\",\"sciName\":\"Pooecetes gramineus\",\"locId\":\"L517497\",\"locName\":\"Planting
+        Fields Arboretum\",\"obsDt\":\"2024-11-23 14:01\",\"howMany\":1,\"lat\":40.8638744,\"lng\":-73.5580158,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203386944\"},{\"speciesCode\":\"dickci\",\"comName\":\"Dickcissel\",\"sciName\":\"Spiza
+        americana\",\"locId\":\"L852391\",\"locName\":\"Manhattan Beach Park\",\"obsDt\":\"2024-11-23
+        12:30\",\"howMany\":1,\"lat\":40.5762169,\"lng\":-73.9441681,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203374856\"},{\"speciesCode\":\"budger\",\"comName\":\"Budgerigar\",\"sciName\":\"Melopsittacus
+        undulatus\",\"locId\":\"L1373631\",\"locName\":\"Coney Island Beach--35th
+        St. Overlook\",\"obsDt\":\"2024-11-23 12:18\",\"howMany\":1,\"lat\":40.5717813,\"lng\":-74.0006958,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203376783\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"redcro\",\"comName\":\"Red
+        Crossbill\",\"sciName\":\"Loxia curvirostra\",\"locId\":\"L300494\",\"locName\":\"Webster
+        Park--Campground area\",\"obsDt\":\"2024-11-23 10:06\",\"howMany\":1,\"lat\":43.2544474,\"lng\":-77.4600935,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203349432\"},{\"speciesCode\":\"y00478\",\"comName\":\"Iceland
+        Gull\",\"sciName\":\"Larus glaucoides\",\"locId\":\"L152773\",\"locName\":\"Floyd
+        Bennett Field\",\"obsDt\":\"2024-11-23 09:49\",\"howMany\":2,\"lat\":40.5923453,\"lng\":-73.8914328,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203369520\"},{\"speciesCode\":\"easpho\",\"comName\":\"Eastern
+        Phoebe\",\"sciName\":\"Sayornis phoebe\",\"locId\":\"L213239\",\"locName\":\"Five
+        Rivers EEC\",\"obsDt\":\"2024-11-23 09:08\",\"howMany\":1,\"lat\":42.6099952,\"lng\":-73.8907678,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203356157\"},{\"speciesCode\":\"botgra\",\"comName\":\"Boat-tailed
+        Grackle\",\"sciName\":\"Quiscalus major\",\"locId\":\"L109144\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--East Pond\",\"obsDt\":\"2024-11-23 09:07\",\"howMany\":3,\"lat\":40.6226854,\"lng\":-73.8220096,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203371289\"},{\"speciesCode\":\"lesyel\",\"comName\":\"Lesser
+        Yellowlegs\",\"sciName\":\"Tringa flavipes\",\"locId\":\"L109144\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--East Pond\",\"obsDt\":\"2024-11-23 09:07\",\"howMany\":1,\"lat\":40.6226854,\"lng\":-73.8220096,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203371289\"},{\"speciesCode\":\"snoegr\",\"comName\":\"Snowy
+        Egret\",\"sciName\":\"Egretta thula\",\"locId\":\"L831645\",\"locName\":\"Shirley
+        Chisholm SP (Pennsylvania Ave. Landfill)\",\"obsDt\":\"2024-11-23 09:00\",\"howMany\":3,\"lat\":40.6392421,\"lng\":-73.8730258,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203363144\"},{\"speciesCode\":\"naswar\",\"comName\":\"Nashville
+        Warbler\",\"sciName\":\"Leiothlypis ruficapilla\",\"locId\":\"L285884\",\"locName\":\"Green-Wood
+        Cemetery, Brooklyn\",\"obsDt\":\"2024-11-23 08:17\",\"howMany\":1,\"lat\":40.6523083,\"lng\":-73.9904281,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203415644\"},{\"speciesCode\":\"royter1\",\"comName\":\"Royal
+        Tern\",\"sciName\":\"Thalasseus maximus\",\"locId\":\"L444485\",\"locName\":\"Plumb
+        Beach\",\"obsDt\":\"2024-11-23 08:15\",\"howMany\":2,\"lat\":40.5823284,\"lng\":-73.9153746,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203368188\"},{\"speciesCode\":\"nstspa\",\"comName\":\"Nelson's
+        Sparrow\",\"sciName\":\"Ammospiza nelsoni\",\"locId\":\"L385839\",\"locName\":\"Salt
+        Marsh Nature Center at Marine Park\",\"obsDt\":\"2024-11-23 06:40\",\"howMany\":3,\"lat\":40.599946,\"lng\":-73.9243268,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203364596\"},{\"speciesCode\":\"sagthr\",\"comName\":\"Sage
+        Thrasher\",\"sciName\":\"Oreoscoptes montanus\",\"locId\":\"L1958285\",\"locName\":\"Robert
+        Moses SP--parking field 5\",\"obsDt\":\"2024-11-22 15:49\",\"howMany\":1,\"lat\":40.6274382,\"lng\":-73.2361507,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203291184\"},{\"speciesCode\":\"greshe\",\"comName\":\"Great
+        Shearwater\",\"sciName\":\"Ardenna gravis\",\"locId\":\"L2451856\",\"locName\":\"Camp
+        Hero SP--bluffs (parking lot)\",\"obsDt\":\"2024-11-22 12:56\",\"howMany\":3,\"lat\":41.0651601,\"lng\":-71.8621481,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203277210\"},{\"speciesCode\":\"ovenbi1\",\"comName\":\"Ovenbird\",\"sciName\":\"Seiurus
+        aurocapilla\",\"locId\":\"L683555\",\"locName\":\"Bryant Park (5th-6th Ave.
+        btwn 40th-42nd St.)\",\"obsDt\":\"2024-11-22 11:30\",\"howMany\":1,\"lat\":40.7536729,\"lng\":-73.9832322,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203315199\"},{\"speciesCode\":\"razorb\",\"comName\":\"Razorbill\",\"sciName\":\"Alca
+        torda\",\"locId\":\"L296203\",\"locName\":\"Culloden Point\",\"obsDt\":\"2024-11-22
+        10:22\",\"howMany\":3,\"lat\":41.0712633,\"lng\":-71.9589043,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203265458\"},{\"speciesCode\":\"corshe1\",\"comName\":\"Cory's
+        Shearwater\",\"sciName\":\"Calonectris borealis\",\"locId\":\"L280126\",\"locName\":\"Lake
+        Montauk Inlet, east side\",\"obsDt\":\"2024-11-22 08:59\",\"howMany\":1,\"lat\":41.0778598,\"lng\":-71.9366662,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203249056\"},{\"speciesCode\":\"bklkit\",\"comName\":\"Black-legged
+        Kittiwake\",\"sciName\":\"Rissa tridactyla\",\"locId\":\"L140437\",\"locName\":\"Ontario
+        Beach and Charlotte Pier\",\"obsDt\":\"2024-11-22 08:35\",\"howMany\":1,\"lat\":43.2580188,\"lng\":-77.6071545,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203280482\"},{\"speciesCode\":\"sabgul\",\"comName\":\"Sabine's
+        Gull\",\"sciName\":\"Xema sabini\",\"locId\":\"L2138552\",\"locName\":\"Gallagher
+        Beach\",\"obsDt\":\"2024-11-21 15:18\",\"howMany\":1,\"lat\":42.8407505,\"lng\":-78.8598984,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203193056\"},{\"speciesCode\":\"manshe\",\"comName\":\"Manx
+        Shearwater\",\"sciName\":\"Puffinus puffinus\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-21 15:04\",\"howMany\":1,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203192118\"},{\"speciesCode\":\"marwre\",\"comName\":\"Marsh
+        Wren\",\"sciName\":\"Cistothorus palustris\",\"locId\":\"L505437\",\"locName\":\"Boland
+        Pond\",\"obsDt\":\"2024-11-21 14:58\",\"howMany\":1,\"lat\":42.1781776,\"lng\":-75.8815169,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203193271\"},{\"speciesCode\":\"parjae\",\"comName\":\"Parasitic
+        Jaeger\",\"sciName\":\"Stercorarius parasiticus\",\"locId\":\"L6582140\",\"locName\":\"Shagwong
+        Point\",\"obsDt\":\"2024-11-20 15:00\",\"howMany\":1,\"lat\":41.0857109,\"lng\":-71.9028455,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203135495\"},{\"speciesCode\":\"sedwre1\",\"comName\":\"Sedge
+        Wren\",\"sciName\":\"Cistothorus stellaris\",\"locId\":\"L213321\",\"locName\":\"Oceanside
+        Marine Nature Study Area\",\"obsDt\":\"2024-11-20 13:49\",\"howMany\":1,\"lat\":40.6233726,\"lng\":-73.6242225,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203109957\"},{\"speciesCode\":\"bargol\",\"comName\":\"Barrow's
+        Goldeneye\",\"sciName\":\"Bucephala islandica\",\"locId\":\"L2796798\",\"locName\":\"Cumberland
+        Bay SP\",\"obsDt\":\"2024-11-20 13:49\",\"howMany\":1,\"lat\":44.7231052,\"lng\":-73.4222853,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203110640\"},{\"speciesCode\":\"semplo\",\"comName\":\"Semipalmated
+        Plover\",\"sciName\":\"Charadrius semipalmatus\",\"locId\":\"L586165\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--East Pond, north end\",\"obsDt\":\"2024-11-20 12:17\",\"howMany\":1,\"lat\":40.6326819,\"lng\":-73.8234472,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203171143\"},{\"speciesCode\":\"whrsan\",\"comName\":\"White-rumped
+        Sandpiper\",\"sciName\":\"Calidris fuscicollis\",\"locId\":\"L586165\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--East Pond, north end\",\"obsDt\":\"2024-11-20 12:17\",\"howMany\":4,\"lat\":40.6326819,\"lng\":-73.8234472,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203171143\"},{\"speciesCode\":\"comgal1\",\"comName\":\"Common
+        Gallinule\",\"sciName\":\"Gallinula galeata\",\"locId\":\"L152119\",\"locName\":\"Iroquois
+        NWR--Cayuga Overlook\",\"obsDt\":\"2024-11-20 11:05\",\"howMany\":1,\"lat\":43.1189663,\"lng\":-78.4430695,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203099137\"},{\"speciesCode\":\"redkno\",\"comName\":\"Red
+        Knot\",\"sciName\":\"Calidris canutus\",\"locId\":\"L13249471\",\"locName\":\"Jones
+        Beach SP--West End beach and jetty\",\"obsDt\":\"2024-11-20 10:03\",\"howMany\":2,\"lat\":40.5744984,\"lng\":-73.5751528,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203115910\"},{\"speciesCode\":\"eurwig\",\"comName\":\"Eurasian
+        Wigeon\",\"sciName\":\"Mareca penelope\",\"locId\":\"L109145\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--West Pond\",\"obsDt\":\"2024-11-20 09:12\",\"howMany\":1,\"lat\":40.6188482,\"lng\":-73.8307995,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203104846\"},{\"speciesCode\":\"macwar\",\"comName\":\"MacGillivray's
+        Warbler\",\"sciName\":\"Geothlypis tolmiei\",\"locId\":\"L890086\",\"locName\":\"Snug
+        Harbor Cultural Center & Botanical Garden\",\"obsDt\":\"2024-11-20 08:15\",\"howMany\":1,\"lat\":40.6427668,\"lng\":-74.1033013,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203083566\"},{\"speciesCode\":\"balori\",\"comName\":\"Baltimore
+        Oriole\",\"sciName\":\"Icterus galbula\",\"locId\":\"L621111\",\"locName\":\"Smith
+        Point County Park\",\"obsDt\":\"2024-11-20 07:52\",\"howMany\":1,\"lat\":40.7352017,\"lng\":-72.8641286,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203118545\"},{\"speciesCode\":\"sora\",\"comName\":\"Sora\",\"sciName\":\"Porzana
+        carolina\",\"locId\":\"L890086\",\"locName\":\"Snug Harbor Cultural Center
+        & Botanical Garden\",\"obsDt\":\"2024-11-19 15:39\",\"howMany\":1,\"lat\":40.6427668,\"lng\":-74.1033013,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203037653\"},{\"speciesCode\":\"rosgoo\",\"comName\":\"Ross's
+        Goose\",\"sciName\":\"Anser rossii\",\"locId\":\"L153401\",\"locName\":\"Iroquois
+        NWR--Mallard Overlook\",\"obsDt\":\"2024-11-19 13:59\",\"howMany\":1,\"lat\":43.138336,\"lng\":-78.37112,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203027959\"},{\"speciesCode\":\"wesgre\",\"comName\":\"Western
+        Grebe\",\"sciName\":\"Aechmophorus occidentalis\",\"locId\":\"L2303580\",\"locName\":\"Fort
+        Ontario Park\",\"obsDt\":\"2024-11-19 12:48\",\"howMany\":1,\"lat\":43.4669069,\"lng\":-76.5069098,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203019613\"},{\"speciesCode\":\"margod\",\"comName\":\"Marbled
+        Godwit\",\"sciName\":\"Limosa fedoa\",\"locId\":\"L109146\",\"locName\":\"Jones
+        Beach SP--Coast Guard Station\",\"obsDt\":\"2024-11-19 12:09\",\"howMany\":3,\"lat\":40.5888889,\"lng\":-73.5566667,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203020416\"},{\"speciesCode\":\"wesfly\",\"comName\":\"Western
+        Flycatcher\",\"sciName\":\"Empidonax difficilis\",\"locId\":\"L1184284\",\"locName\":\"Angle
+        Fly Preserve\",\"obsDt\":\"2024-11-19 11:45\",\"howMany\":1,\"lat\":41.2947905,\"lng\":-73.7167871,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203024089\"},{\"speciesCode\":\"btnwar\",\"comName\":\"Black-throated
+        Green Warbler\",\"sciName\":\"Setophaga virens\",\"locId\":\"L385839\",\"locName\":\"Salt
+        Marsh Nature Center at Marine Park\",\"obsDt\":\"2024-11-19 07:30\",\"howMany\":1,\"lat\":40.599946,\"lng\":-73.9243268,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203010495\"},{\"speciesCode\":\"wlswar\",\"comName\":\"Wilson's
+        Warbler\",\"sciName\":\"Cardellina pusilla\",\"locId\":\"L109516\",\"locName\":\"Prospect
+        Park\",\"obsDt\":\"2024-11-19 07:18\",\"howMany\":1,\"lat\":40.6602841,\"lng\":-73.9689534,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203007652\"},{\"speciesCode\":\"houwre\",\"comName\":\"Northern
+        House Wren\",\"sciName\":\"Troglodytes aedon\",\"locId\":\"L3786091\",\"locName\":\"Round
+        Lake Preserve (Saratoga Co.)\",\"obsDt\":\"2024-11-19 06:59\",\"howMany\":1,\"lat\":42.9274492,\"lng\":-73.771002,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203004001\"},{\"speciesCode\":\"astfly\",\"comName\":\"Ash-throated
+        Flycatcher\",\"sciName\":\"Myiarchus cinerascens\",\"locId\":\"L616218\",\"locName\":\"Shore
+        Road Park\",\"obsDt\":\"2024-11-19\",\"howMany\":1,\"lat\":40.6220738,\"lng\":-74.0406629,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S203212692\"},{\"speciesCode\":\"gragoo\",\"comName\":\"Graylag
+        Goose\",\"sciName\":\"Anser anser\",\"locId\":\"L3930542\",\"locName\":\"Eaton
+        Brook\",\"obsDt\":\"2024-11-18 15:35\",\"howMany\":3,\"lat\":42.8553887,\"lng\":-75.662469,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202940639\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"lobdow\",\"comName\":\"Long-billed
+        Dowitcher\",\"sciName\":\"Limnodromus scolopaceus\",\"locId\":\"L267814\",\"locName\":\"Montezuma
+        NWR--Wildlife Drive\",\"obsDt\":\"2024-11-18 12:30\",\"lat\":42.9817483,\"lng\":-76.7353284,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203092257\"},{\"speciesCode\":\"osprey\",\"comName\":\"Osprey\",\"sciName\":\"Pandion
+        haliaetus\",\"locId\":\"L268000\",\"locName\":\"Robert Moses SP\",\"obsDt\":\"2024-11-18
+        10:25\",\"howMany\":1,\"lat\":40.6242696,\"lng\":-73.2622342,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203031053\"},{\"speciesCode\":\"norgos\",\"comName\":\"American
+        Goshawk\",\"sciName\":\"Astur atricapillus\",\"locId\":\"L385839\",\"locName\":\"Salt
+        Marsh Nature Center at Marine Park\",\"obsDt\":\"2024-11-18 10:05\",\"howMany\":1,\"lat\":40.599946,\"lng\":-73.9243268,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202933607\"},{\"speciesCode\":\"nswowl\",\"comName\":\"Northern
+        Saw-whet Owl\",\"sciName\":\"Aegolius acadicus\",\"locId\":\"L276050\",\"locName\":\"Summerhill
+        SF--Hoag Ave. (Lick to Salt)\",\"obsDt\":\"2024-11-17 18:30\",\"howMany\":1,\"lat\":42.666186,\"lng\":-76.3318223,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202862797\"},{\"speciesCode\":\"ameavo\",\"comName\":\"American
+        Avocet\",\"sciName\":\"Recurvirostra americana\",\"locId\":\"L1856987\",\"locName\":\"Georgica
+        Inlet, East Hampton\",\"obsDt\":\"2024-11-17 15:40\",\"howMany\":1,\"lat\":40.9320816,\"lng\":-72.2276141,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202890462\"},{\"speciesCode\":\"comter\",\"comName\":\"Common
+        Tern\",\"sciName\":\"Sterna hirundo\",\"locId\":\"L1849584\",\"locName\":\"Georgica
+        Pond, East Hampton\",\"obsDt\":\"2024-11-17 14:30\",\"howMany\":1,\"lat\":40.9389016,\"lng\":-72.2303249,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202859293\"},{\"speciesCode\":\"btbwar\",\"comName\":\"Black-throated
+        Blue Warbler\",\"sciName\":\"Setophaga caerulescens\",\"locId\":\"L1988607\",\"locName\":\"Roosevelt
+        Island--FDR Four Freedoms and Parks S of Cornell Tech\",\"obsDt\":\"2024-11-17
+        14:30\",\"howMany\":1,\"lat\":40.7531522,\"lng\":-73.9580469,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202833433\"},{\"speciesCode\":\"bkhgul\",\"comName\":\"Black-headed
+        Gull\",\"sciName\":\"Chroicocephalus ridibundus\",\"locId\":\"L2459310\",\"locName\":\"Oneida
+        Lake, South Bay\",\"obsDt\":\"2024-11-17 12:45\",\"howMany\":1,\"lat\":43.163416,\"lng\":-75.748103,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202853610\"},{\"speciesCode\":\"helgui\",\"comName\":\"Helmeted
+        Guineafowl\",\"sciName\":\"Numida meleagris\",\"locId\":\"L2415579\",\"locName\":\"Tonawanda
+        Island\",\"obsDt\":\"2024-11-17 12:33\",\"howMany\":1,\"lat\":43.0299707,\"lng\":-78.8848761,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202815112\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"evegro\",\"comName\":\"Evening
+        Grosbeak\",\"sciName\":\"Coccothraustes vespertinus\",\"locId\":\"L15626506\",\"locName\":\"Moxham
+        Mountain Trailhead to Peak\",\"obsDt\":\"2024-11-17 11:31\",\"howMany\":1,\"lat\":43.770461,\"lng\":-74.011999,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202825611\"},{\"speciesCode\":\"sooshe\",\"comName\":\"Sooty
+        Shearwater\",\"sciName\":\"Ardenna grisea\",\"locId\":\"L5575886\",\"locName\":\"Montauk
+        Point\",\"obsDt\":\"2024-11-17 06:06\",\"howMany\":1,\"lat\":41.0721872,\"lng\":-71.8572924,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202796804\"},{\"speciesCode\":\"brnthr\",\"comName\":\"Brown
+        Thrasher\",\"sciName\":\"Toxostoma rufum\",\"locId\":\"L1053005\",\"locName\":\"South
+        Fork Natural History Museum\",\"obsDt\":\"2024-11-16 15:39\",\"howMany\":1,\"lat\":40.9482533,\"lng\":-72.2979784,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202701402\"},{\"speciesCode\":\"leasan\",\"comName\":\"Least
+        Sandpiper\",\"sciName\":\"Calidris minutilla\",\"locId\":\"L109145\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge--West Pond\",\"obsDt\":\"2024-11-16 15:26\",\"howMany\":1,\"lat\":40.6188482,\"lng\":-73.8307995,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202728234\"},{\"speciesCode\":\"redpha1\",\"comName\":\"Red
+        Phalarope\",\"sciName\":\"Phalaropus fulicarius\",\"locId\":\"L2129820\",\"locName\":\"Hamburg
+        Town Park\",\"obsDt\":\"2024-11-16 14:37\",\"howMany\":1,\"lat\":42.7648945,\"lng\":-78.8763857,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202707889\"},{\"speciesCode\":\"clarai11\",\"comName\":\"Clapper
+        Rail\",\"sciName\":\"Rallus crepitans\",\"locId\":\"L444485\",\"locName\":\"Plumb
+        Beach\",\"obsDt\":\"2024-11-16 11:30\",\"howMany\":1,\"lat\":40.5823284,\"lng\":-73.9153746,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202719626\"},{\"speciesCode\":\"hudgod\",\"comName\":\"Hudsonian
+        Godwit\",\"sciName\":\"Limosa haemastica\",\"locId\":\"L500507\",\"locName\":\"Indian
+        Creek Nature Center--Tower\",\"obsDt\":\"2024-11-16 10:30\",\"howMany\":1,\"lat\":44.58805,\"lng\":-75.3020667,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202717914\"},{\"speciesCode\":\"willet1\",\"comName\":\"Willet\",\"sciName\":\"Tringa
+        semipalmata\",\"locId\":\"L834654\",\"locName\":\"Sodus Bay, Sodus Point\",\"obsDt\":\"2024-11-16
+        10:19\",\"howMany\":1,\"lat\":43.2748307,\"lng\":-76.9732189,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202719109\"},{\"speciesCode\":\"bawwar\",\"comName\":\"Black-and-white
+        Warbler\",\"sciName\":\"Mniotilta varia\",\"locId\":\"L109516\",\"locName\":\"Prospect
+        Park\",\"obsDt\":\"2024-11-15 13:04\",\"howMany\":1,\"lat\":40.6602841,\"lng\":-73.9689534,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202576305\"},{\"speciesCode\":\"blugrb1\",\"comName\":\"Blue
+        Grosbeak\",\"sciName\":\"Passerina caerulea\",\"locId\":\"L19487653\",\"locName\":\"Sisters
+        of St. Joseph, grounds\",\"obsDt\":\"2024-11-14 08:52\",\"howMany\":1,\"lat\":40.7717381,\"lng\":-73.2384391,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202467614\"},{\"speciesCode\":\"weskin\",\"comName\":\"Western
+        Kingbird\",\"sciName\":\"Tyrannus verticalis\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-13 13:47\",\"howMany\":1,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202395647\"},{\"speciesCode\":\"pecsan\",\"comName\":\"Pectoral
+        Sandpiper\",\"sciName\":\"Calidris melanotos\",\"locId\":\"L256061\",\"locName\":\"Braddock
+        Bay--East Spit\",\"obsDt\":\"2024-11-13 11:26\",\"howMany\":4,\"lat\":43.3107525,\"lng\":-77.7073288,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S203123335\"},{\"speciesCode\":\"bkpwar\",\"comName\":\"Blackpoll
+        Warbler\",\"sciName\":\"Setophaga striata\",\"locId\":\"L109516\",\"locName\":\"Prospect
+        Park\",\"obsDt\":\"2024-11-13 06:53\",\"howMany\":1,\"lat\":40.6602841,\"lng\":-73.9689534,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202375510\"},{\"speciesCode\":\"camwar\",\"comName\":\"Cape
+        May Warbler\",\"sciName\":\"Setophaga tigrina\",\"locId\":\"L191106\",\"locName\":\"Central
+        Park\",\"obsDt\":\"2024-11-12 13:30\",\"howMany\":1,\"lat\":40.7715482,\"lng\":-73.9724819,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202295210\"},{\"speciesCode\":\"reevir1\",\"comName\":\"Red-eyed
+        Vireo\",\"sciName\":\"Vireo olivaceus\",\"locId\":\"L268000\",\"locName\":\"Robert
+        Moses SP\",\"obsDt\":\"2024-11-12 10:48\",\"howMany\":1,\"lat\":40.6242696,\"lng\":-73.2622342,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202287174\"},{\"speciesCode\":\"buwtea\",\"comName\":\"Blue-winged
+        Teal\",\"sciName\":\"Spatula discors\",\"locId\":\"L283133\",\"locName\":\"Hook
+        Pond\",\"obsDt\":\"2024-11-11 14:30\",\"howMany\":1,\"lat\":40.9461611,\"lng\":-72.1907833,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202196004\"},{\"speciesCode\":\"categr1\",\"comName\":\"Western
+        Cattle-Egret\",\"sciName\":\"Ardea ibis\",\"locId\":\"L487011\",\"locName\":\"Croton
+        RR Station\",\"obsDt\":\"2024-11-11 12:15\",\"howMany\":1,\"lat\":41.1846423,\"lng\":-73.8795664,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202180953\"},{\"speciesCode\":\"kineid\",\"comName\":\"King
+        Eider\",\"sciName\":\"Somateria spectabilis\",\"locId\":\"L252740\",\"locName\":\"Sandy
+        Pond Outlet\",\"obsDt\":\"2024-11-10 13:21\",\"howMany\":1,\"lat\":43.6648397,\"lng\":-76.1961043,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S202068448\"},{\"speciesCode\":\"amgplo\",\"comName\":\"American
+        Golden-Plover\",\"sciName\":\"Pluvialis dominica\",\"locId\":\"L1896704\",\"locName\":\"Fire
+        Island--Old Inlet, Bellport Bay\",\"obsDt\":\"2024-11-10 09:09\",\"howMany\":1,\"lat\":40.7242585,\"lng\":-72.8973287,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202059593\"},{\"speciesCode\":\"amebit\",\"comName\":\"American
+        Bittern\",\"sciName\":\"Botaurus lentiginosus\",\"locId\":\"L1238320\",\"locName\":\"Wallkill
+        River NWR (NY)\",\"obsDt\":\"2024-11-10 08:00\",\"howMany\":1,\"lat\":41.2865783,\"lng\":-74.5264006,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202655134\"},{\"speciesCode\":\"bkbwoo\",\"comName\":\"Black-backed
+        Woodpecker\",\"sciName\":\"Picoides arcticus\",\"locId\":\"L9528006\",\"locName\":\"Madawaska
+        Flow--Madawaska Pond Trail from Blue Mtn Road\",\"obsDt\":\"2024-11-10 07:14\",\"howMany\":1,\"lat\":44.5013124,\"lng\":-74.4207583,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202021574\"},{\"speciesCode\":\"clcspa\",\"comName\":\"Clay-colored
+        Sparrow\",\"sciName\":\"Spizella pallida\",\"locId\":\"L1783185\",\"locName\":\"EECO
+        Farm (private), East Hampton\",\"obsDt\":\"2024-11-09 15:06\",\"howMany\":1,\"lat\":40.9695795,\"lng\":-72.2070771,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S202869211\"},{\"speciesCode\":\"woosto\",\"comName\":\"Wood
+        Stork\",\"sciName\":\"Mycteria americana\",\"locId\":\"L300535\",\"locName\":\"Blue
+        Heron Park\",\"obsDt\":\"2024-11-09 12:04\",\"howMany\":1,\"lat\":40.5303351,\"lng\":-74.1774023,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201911405\"},{\"speciesCode\":\"caster1\",\"comName\":\"Caspian
+        Tern\",\"sciName\":\"Hydroprogne caspia\",\"locId\":\"L2480018\",\"locName\":\"Buffalo
+        Harbor State Park\",\"obsDt\":\"2024-11-09 11:09\",\"howMany\":1,\"lat\":42.8458185,\"lng\":-78.8622071,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201891266\"},{\"speciesCode\":\"barswa\",\"comName\":\"Barn
+        Swallow\",\"sciName\":\"Hirundo rustica\",\"locId\":\"L1327280\",\"locName\":\"Fort
+        Tilden--Battery Harris Platform\",\"obsDt\":\"2024-11-09 10:33\",\"howMany\":2,\"lat\":40.5614181,\"lng\":-73.893336,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201985426\"},{\"speciesCode\":\"semsan\",\"comName\":\"Semipalmated
+        Sandpiper\",\"sciName\":\"Calidris pusilla\",\"locId\":\"L165143\",\"locName\":\"Jamaica
+        Bay Wildlife Refuge\",\"obsDt\":\"2024-11-09 09:49\",\"howMany\":1,\"lat\":40.6170296,\"lng\":-73.8244561,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S201923392\"},{\"speciesCode\":\"sposan\",\"comName\":\"Spotted
+        Sandpiper\",\"sciName\":\"Actitis macularius\",\"locId\":\"L462930\",\"locName\":\"Beaver
+        Island SP\",\"obsDt\":\"2024-11-09 09:46\",\"howMany\":1,\"lat\":42.9643762,\"lng\":-78.9500361,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201892728\"},{\"speciesCode\":\"buggna\",\"comName\":\"Blue-gray
+        Gnatcatcher\",\"sciName\":\"Polioptila caerulea\",\"locId\":\"L280707\",\"locName\":\"Fort
+        Tilden\",\"obsDt\":\"2024-11-09 07:57\",\"howMany\":1,\"lat\":40.5632807,\"lng\":-73.8833118,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201922216\"},{\"speciesCode\":\"scoshe1\",\"comName\":\"Scopoli's
+        Shearwater\",\"sciName\":\"Calonectris diomedea\",\"locId\":\"L5575886\",\"locName\":\"Montauk
+        Point\",\"obsDt\":\"2024-11-09 07:19\",\"howMany\":2,\"lat\":41.0721872,\"lng\":-71.8572924,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201941810\"},{\"speciesCode\":\"yebcha\",\"comName\":\"Yellow-breasted
+        Chat\",\"sciName\":\"Icteria virens\",\"locId\":\"L109516\",\"locName\":\"Prospect
+        Park\",\"obsDt\":\"2024-11-08 13:30\",\"howMany\":1,\"lat\":40.6602841,\"lng\":-73.9689534,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201822892\"},{\"speciesCode\":\"linspa\",\"comName\":\"Lincoln's
+        Sparrow\",\"sciName\":\"Melospiza lincolnii\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-08 09:00\",\"howMany\":1,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201806216\"},{\"speciesCode\":\"ycnher\",\"comName\":\"Yellow-crowned
+        Night Heron\",\"sciName\":\"Nyctanassa violacea\",\"locId\":\"L2697698\",\"locName\":\"Inwood
+        Hill Park--Muscota Marsh\",\"obsDt\":\"2024-11-08 08:42\",\"howMany\":1,\"lat\":40.8740092,\"lng\":-73.918705,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201811060\"},{\"speciesCode\":\"yehbla\",\"comName\":\"Yellow-headed
+        Blackbird\",\"sciName\":\"Xanthocephalus xanthocephalus\",\"locId\":\"L13116728\",\"locName\":\"Jones
+        Beach SP--West End 2\",\"obsDt\":\"2024-11-07 10:14\",\"howMany\":1,\"lat\":40.5844142,\"lng\":-73.5627208,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201683824\"},{\"speciesCode\":\"solsan\",\"comName\":\"Solitary
+        Sandpiper\",\"sciName\":\"Tringa solitaria\",\"locId\":\"L2218335\",\"locName\":\"Hanging
+        Bog WMA\",\"obsDt\":\"2024-11-07 07:33\",\"howMany\":1,\"lat\":42.3107156,\"lng\":-78.2319904,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201666568\"},{\"speciesCode\":\"yebcuc\",\"comName\":\"Yellow-billed
+        Cuckoo\",\"sciName\":\"Coccyzus americanus\",\"locId\":\"L6206084\",\"locName\":\"Onondaga
+        Lake Park--Marshy Spits Area\",\"obsDt\":\"2024-11-06 13:45\",\"howMany\":1,\"lat\":43.065508,\"lng\":-76.192503,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201602905\"},{\"speciesCode\":\"bulori\",\"comName\":\"Bullock's
+        Oriole\",\"sciName\":\"Icterus bullockii\",\"locId\":\"L525200\",\"locName\":\"Stillwell
+        Woods Park\",\"obsDt\":\"2024-11-06 10:00\",\"howMany\":1,\"lat\":40.8336002,\"lng\":-73.4754729,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201604696\"},{\"speciesCode\":\"bargoo\",\"comName\":\"Barnacle
+        Goose\",\"sciName\":\"Branta leucopsis\",\"locId\":\"L3190996\",\"locName\":\"Bradley
+        Brook Reservoir\",\"obsDt\":\"2024-11-05 16:00\",\"howMany\":1,\"lat\":42.8340826,\"lng\":-75.6621391,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201630002\"},{\"speciesCode\":\"towwar\",\"comName\":\"Townsend's
+        Warbler\",\"sciName\":\"Setophaga townsendi\",\"locId\":\"L37735188\",\"locName\":\"stakeout
+        Townsend's Warbler, Bay Ridge (2024)\",\"obsDt\":\"2024-11-05 14:41\",\"howMany\":1,\"lat\":40.625125,\"lng\":-74.0308909,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201524821\"},{\"speciesCode\":\"sstspa\",\"comName\":\"Saltmarsh
+        Sparrow\",\"sciName\":\"Ammospiza caudacuta\",\"locId\":\"L566310\",\"locName\":\"Cupsogue
+        Beach County Park\",\"obsDt\":\"2024-11-05 14:13\",\"howMany\":2,\"lat\":40.7713119,\"lng\":-72.7373457,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201527250\"},{\"speciesCode\":\"grnher\",\"comName\":\"Green
+        Heron\",\"sciName\":\"Butorides virescens\",\"locId\":\"L306143\",\"locName\":\"Six
+        and a Half Station Rd. Sanctuary\",\"obsDt\":\"2024-11-04 09:29\",\"howMany\":1,\"lat\":41.4025242,\"lng\":-74.3499176,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S201392239\"},{\"speciesCode\":\"peflov\",\"comName\":\"Rosy-faced
+        Lovebird\",\"sciName\":\"Agapornis roseicollis\",\"locId\":\"L385839\",\"locName\":\"Salt
+        Marsh Nature Center at Marine Park\",\"obsDt\":\"2024-11-03 15:37\",\"howMany\":1,\"lat\":40.599946,\"lng\":-73.9243268,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201324021\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"larspa\",\"comName\":\"Lark
+        Sparrow\",\"sciName\":\"Chondestes grammacus\",\"locId\":\"L109142\",\"locName\":\"Fire
+        Island--Hawk Watch\",\"obsDt\":\"2024-11-03 11:18\",\"howMany\":1,\"lat\":40.6305556,\"lng\":-73.2244444,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201280621\"},{\"speciesCode\":\"borchi2\",\"comName\":\"Boreal
+        Chickadee\",\"sciName\":\"Poecile hudsonicus\",\"locId\":\"L3893969\",\"locName\":\"Mt.
+        Jo\",\"obsDt\":\"2024-11-03 09:52\",\"howMany\":2,\"lat\":44.1893589,\"lng\":-73.9672405,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S201276568\"},{\"speciesCode\":\"brwhaw\",\"comName\":\"Broad-winged
+        Hawk\",\"sciName\":\"Buteo platypterus\",\"locId\":\"L476032\",\"locName\":\"Hempstead
+        Lake SP--south end\",\"obsDt\":\"2024-11-03 09:00\",\"howMany\":1,\"lat\":40.6724362,\"lng\":-73.6499405,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201307191\"},{\"speciesCode\":\"gloibi\",\"comName\":\"Glossy
+        Ibis\",\"sciName\":\"Plegadis falcinellus\",\"locId\":\"L99388\",\"locName\":\"Montezuma
+        NWR--Main Pool\",\"obsDt\":\"2024-11-02 13:24\",\"howMany\":1,\"lat\":42.9796604,\"lng\":-76.7437077,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201148218\"},{\"speciesCode\":\"swathr\",\"comName\":\"Swainson's
+        Thrush\",\"sciName\":\"Catharus ustulatus\",\"locId\":\"L1811535\",\"locName\":\"Freese
+        Rd., Liddell Lab and Ponds\",\"obsDt\":\"2024-11-02 12:19\",\"howMany\":1,\"lat\":42.4610388,\"lng\":-76.446138,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201196397\"},{\"speciesCode\":\"seaspa\",\"comName\":\"Seaside
+        Sparrow\",\"sciName\":\"Ammospiza maritima\",\"locId\":\"L566310\",\"locName\":\"Cupsogue
+        Beach County Park\",\"obsDt\":\"2024-11-02 11:16\",\"howMany\":1,\"lat\":40.7713119,\"lng\":-72.7373457,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201193655\"},{\"speciesCode\":\"rorpar\",\"comName\":\"Rose-ringed
+        Parakeet\",\"sciName\":\"Psittacula krameri\",\"locId\":\"L284148\",\"locName\":\"Norman
+        J. Levy Park and Preserve\",\"obsDt\":\"2024-11-02 08:32\",\"howMany\":1,\"lat\":40.6471523,\"lng\":-73.5630634,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201587753\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"robgro\",\"comName\":\"Rose-breasted
+        Grosbeak\",\"sciName\":\"Pheucticus ludovicianus\",\"locId\":\"L516986\",\"locName\":\"Carl
+        Schurz Park\",\"obsDt\":\"2024-11-02 08:00\",\"howMany\":1,\"lat\":40.7753776,\"lng\":-73.9436671,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201124372\"},{\"speciesCode\":\"scatan\",\"comName\":\"Scarlet
+        Tanager\",\"sciName\":\"Piranga olivacea\",\"locId\":\"L285884\",\"locName\":\"Green-Wood
+        Cemetery, Brooklyn\",\"obsDt\":\"2024-11-02 07:52\",\"howMany\":1,\"lat\":40.6523083,\"lng\":-73.9904281,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201158582\"},{\"speciesCode\":\"pomjae\",\"comName\":\"Pomarine
+        Jaeger\",\"sciName\":\"Stercorarius pomarinus\",\"locId\":\"L166701\",\"locName\":\"Derby
+        Hill Hawk Watch--North Lookout\",\"obsDt\":\"2024-11-01 08:20\",\"howMany\":1,\"lat\":43.527261,\"lng\":-76.2393397,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201039689\"},{\"speciesCode\":\"boboli\",\"comName\":\"Bobolink\",\"sciName\":\"Dolichonyx
+        oryzivorus\",\"locId\":\"L132037\",\"locName\":\"Shawangunk Grasslands NWR
+        \",\"obsDt\":\"2024-11-01 08:17\",\"howMany\":1,\"lat\":41.6341667,\"lng\":-74.2083282,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S201024037\"},{\"speciesCode\":\"tenwar\",\"comName\":\"Tennessee
+        Warbler\",\"sciName\":\"Leiothlypis peregrina\",\"locId\":\"L11356750\",\"locName\":\"Peggy\u2019s
+        Point Park\",\"obsDt\":\"2024-10-31 08:10\",\"howMany\":1,\"lat\":43.7451057,\"lng\":-73.4970301,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200905247\"},{\"speciesCode\":\"virrai\",\"comName\":\"Virginia
+        Rail\",\"sciName\":\"Rallus limicola\",\"locId\":\"L4598458\",\"locName\":\"Zim
+        Smith Trail--Coons Crossing to Round Lake\",\"obsDt\":\"2024-10-31 08:00\",\"howMany\":2,\"lat\":42.9171581,\"lng\":-73.7761131,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S201048987\"},{\"speciesCode\":\"woothr\",\"comName\":\"Wood
+        Thrush\",\"sciName\":\"Hylocichla mustelina\",\"locId\":\"L826628\",\"locName\":\"Central
+        Park--Arthur Ross Pinetum\",\"obsDt\":\"2024-10-30 12:30\",\"howMany\":1,\"lat\":40.7835168,\"lng\":-73.9667,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200823738\"},{\"speciesCode\":\"yetwar\",\"comName\":\"Yellow-throated
+        Warbler\",\"sciName\":\"Setophaga dominica\",\"locId\":\"L1094717\",\"locName\":\"Vanderbilt
+        Mansion National Historic Site\",\"obsDt\":\"2024-10-30 10:41\",\"howMany\":1,\"lat\":41.7975558,\"lng\":-73.9413866,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200808238\"},{\"speciesCode\":\"pipplo\",\"comName\":\"Piping
+        Plover\",\"sciName\":\"Charadrius melodus\",\"locId\":\"L13249471\",\"locName\":\"Jones
+        Beach SP--West End beach and jetty\",\"obsDt\":\"2024-10-29 17:08\",\"howMany\":1,\"lat\":40.5744984,\"lng\":-73.5751528,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S200749274\"},{\"speciesCode\":\"eawpew\",\"comName\":\"Eastern
+        Wood-Pewee\",\"sciName\":\"Contopus virens\",\"locId\":\"L285884\",\"locName\":\"Green-Wood
+        Cemetery, Brooklyn\",\"obsDt\":\"2024-10-29 08:47\",\"howMany\":1,\"lat\":40.6523083,\"lng\":-73.9904281,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200696276\"},{\"speciesCode\":\"amered\",\"comName\":\"American
+        Redstart\",\"sciName\":\"Setophaga ruticilla\",\"locId\":\"L1767018\",\"locName\":\"Forest
+        Park--Strack Pond\",\"obsDt\":\"2024-10-28 14:37\",\"howMany\":1,\"lat\":40.6995216,\"lng\":-73.855254,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200625730\"},{\"speciesCode\":\"veery\",\"comName\":\"Veery\",\"sciName\":\"Catharus
+        fuscescens\",\"locId\":\"L191106\",\"locName\":\"Central Park\",\"obsDt\":\"2024-10-27
+        17:30\",\"howMany\":1,\"lat\":40.7715482,\"lng\":-73.9724819,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200541900\"},{\"speciesCode\":\"stisan\",\"comName\":\"Stilt
+        Sandpiper\",\"sciName\":\"Calidris himantopus\",\"locId\":\"L12838514\",\"locName\":\"Montezuma
+        NWR--Seneca Flats\",\"obsDt\":\"2024-10-27 13:05\",\"howMany\":1,\"lat\":42.975087,\"lng\":-76.736608,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S200496939\"},{\"speciesCode\":\"prawar\",\"comName\":\"Prairie
+        Warbler\",\"sciName\":\"Setophaga discolor\",\"locId\":\"L109146\",\"locName\":\"Jones
+        Beach SP--Coast Guard Station\",\"obsDt\":\"2024-10-27 09:50\",\"howMany\":1,\"lat\":40.5888889,\"lng\":-73.5566667,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200514164\"},{\"speciesCode\":\"redjun\",\"comName\":\"Red
+        Junglefowl\",\"sciName\":\"Gallus gallus\",\"locId\":\"L5080580\",\"locName\":\"Lido
+        West Town Park\",\"obsDt\":\"2024-10-27 09:14\",\"howMany\":2,\"lat\":40.5867322,\"lng\":-73.6307488,\"obsValid\":true,\"obsReviewed\":true,\"locationPrivate\":false,\"subId\":\"S200445699\",\"exoticCategory\":\"X\"},{\"speciesCode\":\"phivir\",\"comName\":\"Philadelphia
+        Vireo\",\"sciName\":\"Vireo philadelphicus\",\"locId\":\"L5714641\",\"locName\":\"Dobbs
+        Ferry Waterfront Park\",\"obsDt\":\"2024-10-27 07:18\",\"howMany\":1,\"lat\":41.0142192,\"lng\":-73.8799247,\"obsValid\":true,\"obsReviewed\":false,\"locationPrivate\":false,\"subId\":\"S200550843\"}]"
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 26 Nov 2024 01:02:38 GMT
+      Expires:
+      - '0'
+      Pragma:
+      - no-cache
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

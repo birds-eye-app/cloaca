@@ -3,13 +3,13 @@ import pandas as pd
 from cloaca.parsing.parse_ebird_personal_export import parse_csv_data_frame
 from cloaca.parsing.parsing_helpers import Lifer, get_lifers
 from cloaca.types import get_lifers_from_cache
-from main import app
+from cloaca.main import Cloaca_App
 
 expected_singular_results = 596
 
 
 def test_parse_csv_from_file_route():
-    client = TestClient(app)
+    client = TestClient(Cloaca_App)
     files = {"file": open("tests/test_data/MyEBirdData.csv", "rb")}
     response = client.post("/v1/upload_lifers_csv", files=files)
 

@@ -9,4 +9,4 @@ COPY README.md .
 RUN uv sync --frozen
 
 COPY . .
-CMD ["uv", "run", "fastapi", "run"]
+CMD ["uv", "run", "fastapi", "run", "src/cloaca/main.py"]
