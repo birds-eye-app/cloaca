@@ -21,18 +21,27 @@ def get_lifers_from_cache(key: str) -> list[Lifer]:
     return observations
 
 
-def filter_lifers_from_lifers(
-    nearby_observations: list[Lifer], lifers: list[Lifer]
+def filter_lifers_from_observations(
+    observations: list[Lifer], lifers: list[Lifer]
 ) -> list[Lifer]:
-    lifer_commons_names = [lifer.species_code for lifer in lifers]
+    print(f"Filtering obs: {len(observations)}. Lifers: {len(lifers)}")
+
+    lifer_sci_names = [lifer.scientific_name for lifer in lifers]
+
+    print(f"sample lifer: {lifers[0]}")
+    print(f"sample obs: {observations[0]}")
 
     unseen_observations: list[Lifer] = list()
     already_seen_observations: list[Lifer] = list()
-    for observation in nearby_observations:
-        if observation.species_code in lifer_commons_names:
+    for observation in observations:
+        if observation.scientific_name in lifer_sci_names:
             already_seen_observations.append(observation)
         else:
             unseen_observations.append(observation)
+
+    print(
+        f"Already seen obs: {len(already_seen_observations)}. Unseen obs: {len(unseen_observations)}"
+    )
 
     return unseen_observations
 
@@ -71,7 +80,8 @@ def phoebe_observation_to_lifer(
         taxonomic_order=0,
         location=ebird_observation.loc_name or "",
         location_id=ebird_observation.loc_id or "",
-        species_code=ebird_observation.species_code or "",
+        scientific_name=ebird_observation.sci_name or "",
+        species_code=ebird_observation.species_code,
     )
 
 

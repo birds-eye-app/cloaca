@@ -8,7 +8,7 @@ from cloaca.parsing.parse_ebird_regional_list import (
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.phoebe_wrapper import get_phoebe_client
 from cloaca.types import (
-    filter_lifers_from_lifers,
+    filter_lifers_from_observations,
     get_lifers_from_cache,
     phoebe_observation_to_lifer,
 )
@@ -87,8 +87,10 @@ async def get_filtered_lifers_for_region(
 
     regional_lifers = await get_regional_lifers()
 
-    filtered = filter_lifers_from_lifers(regional_lifers, lifers_from_csv)
+    filtered = filter_lifers_from_observations(regional_lifers, lifers_from_csv)
 
-    print("got regional lifers", len(filtered))
+    print(
+        f"Returning {len(filtered)} regional lifers (started with {len(regional_lifers)})"
+    )
 
     return filtered

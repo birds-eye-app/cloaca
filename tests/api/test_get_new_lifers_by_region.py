@@ -1,4 +1,3 @@
-from fastapi.testclient import TestClient
 import pytest
 from cloaca.api.get_new_lifers_by_region import (
     fetch_observations_for_regions_from_phoebe,
@@ -8,7 +7,6 @@ from cloaca.api.get_new_lifers_by_region import (
 )
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import set_lifers_to_cache
-from cloaca.main import Cloaca_App
 
 
 @pytest.mark.asyncio
@@ -45,6 +43,7 @@ async def test_regional_lifers():
                 taxonomic_order=8228,
                 location="Hopedale",
                 location_id="L21909958",
+                scientific_name="Circus hudsonius",
                 species_code="norhar2",
             )
         ],

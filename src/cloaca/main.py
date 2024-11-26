@@ -4,13 +4,11 @@ from typing import Dict, List
 from uuid import uuid4
 
 from cloaca.api.get_new_lifers_by_region import (
-    get_lifers_for_region,
-    get_regional_lifers,
+    get_filtered_lifers_for_region,
 )
 from cloaca.parsing.parse_ebird_personal_export import parse_csv_from_file_to_lifers
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import (
-    filter_lifers_from_lifers,
     filter_lifers_from_nearby_observations,
     get_lifers_from_cache,
     group_lifers_by_location,
@@ -208,4 +206,8 @@ def upload_lifers_csv(file: UploadFile):
 async def regional_lifers(
     latitude: float, longitude: float, file_id: str
 ) -> list[Lifer]:
-    return await get_lifers_for_region(latitude, longitude, file_id)
+    regional_lifers = await get_filtered_lifers_for_region(latitude, longitude, file_id)
+
+    print("returning", len(regional_lifers), "regional lifers")
+
+    return regional_lifers

@@ -52,7 +52,7 @@ def test_parse_csv_from_file_route():
         taxonomic_order=8228,
         location="Hopedale",
         location_id="L21909958",
-        species_code="Circus hudsonius",
+        scientific_name="Circus hudsonius",
     )
 
     assert first_lifer == expected

@@ -72,7 +72,8 @@ class Lifer:
     taxonomic_order: int
     location: str
     location_id: str
-    species_code: str
+    scientific_name: str
+    species_code: str | None = None
 
 
 @dataclass
@@ -98,7 +99,7 @@ def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
             taxonomic_order=obs.taxonomic_order,
             location=obs.location,
             location_id=obs.location_id,
-            species_code=obs.scientific_name,
+            scientific_name=obs.scientific_name,
         )
         for obs in observations
     ]
