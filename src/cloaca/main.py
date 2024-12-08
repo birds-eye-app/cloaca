@@ -1,4 +1,5 @@
 import time
+from typing import Dict
 
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import get_nearby_observations
@@ -7,7 +8,7 @@ from cloaca.api.get_new_lifers_by_region import (
 )
 
 from cloaca.api.upload_lifers_csv import upload_lifers_csv
-from cloaca.parsing.parsing_helpers import Lifer
+from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, UploadFile
@@ -36,23 +37,27 @@ async def add_process_time_header(request: Request, call_next):
 
 
 @Cloaca_App.get("/v1/health")
-def health_check():
+def health_check() -> Dict[str, str]:
     return {"status": "SQUAWK"}
 
 
 @Cloaca_App.get("/v1/nearby_observations")
-async def get_nearby_observations_api(latitude: float, longitude: float, file_id: str):
-    return get_nearby_observations(latitude, longitude, file_id)
+async def get_nearby_observations_api(
+    latitude: float, longitude: float, file_id: str
+) -> Dict[str, LocationToLifers]:
+    return await get_nearby_observations(latitude, longitude, file_id)
 
 
 @Cloaca_App.get("/v1/lifers_by_location")
-async def get_lifers_by_location_api(latitude: float, longitude: float, file_id: str):
-    return get_lifers_by_location(latitude, longitude, file_id)
+async def get_lifers_by_location_api(
+    latitude: float, longitude: float, file_id: str
+) -> Dict[str, LocationToLifers]:
+    return await get_lifers_by_location(latitude, longitude, file_id)
 
 
 @Cloaca_App.post("/v1/upload_lifers_csv")
-async def upload_lifers_csv_api(file: UploadFile):
-    return upload_lifers_csv(file)
+async def upload_lifers_csv_api(file: UploadFile) -> Dict[str, str]:
+    return await upload_lifers_csv(file)
 
 
 @Cloaca_App.get("/v1/regional_new_potential_lifers")

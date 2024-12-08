@@ -8,7 +8,7 @@ from fastapi import UploadFile
 from uuid import uuid4
 
 
-def upload_lifers_csv(file: UploadFile):
+async def upload_lifers_csv(file: UploadFile):
     print("Uploading file", file.filename)
 
     # turn the file into a pandas dataframe

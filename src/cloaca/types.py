@@ -91,11 +91,12 @@ def group_lifers_by_location(lifers: list[Lifer]) -> Dict[str, LocationToLifers]
     for lifer in lifers:
         key = lifer.location_id
         if key not in lifers_by_location:
-            lifers_by_location[key] = LocationToLifers()
-            lifers_by_location[key].location = Location(
-                lifer.location, lifer.latitude, lifer.longitude, lifer.location_id
+            lifers_by_location[key] = LocationToLifers(
+                location=Location(
+                    lifer.location, lifer.latitude, lifer.longitude, lifer.location_id
+                ),
+                lifers=[lifer],
             )
-            lifers_by_location[key].lifers = [lifer]
         else:
             lifers_by_location[key].lifers.append(lifer)
 

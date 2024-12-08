@@ -84,6 +84,7 @@ class Location:
     location_id: str
 
 
+@dataclass
 class LocationToLifers:
     location: Location
     lifers: list[Lifer]
