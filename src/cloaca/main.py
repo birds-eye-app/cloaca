@@ -46,12 +46,12 @@ async def get_nearby_observations_api(latitude: float, longitude: float, file_id
 
 
 @Cloaca_App.get("/v1/lifers_by_location")
-def get_lifers_by_location_api(latitude: float, longitude: float, file_id: str):
+async def get_lifers_by_location_api(latitude: float, longitude: float, file_id: str):
     return get_lifers_by_location(latitude, longitude, file_id)
 
 
 @Cloaca_App.post("/v1/upload_lifers_csv")
-def upload_lifers_csv_api(file: UploadFile):
+async def upload_lifers_csv_api(file: UploadFile):
     return upload_lifers_csv(file)
 
 
