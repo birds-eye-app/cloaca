@@ -8,8 +8,9 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, TypeAdapter, field_validator
-from cloaca.phoebe_wrapper import get_phoebe_client
 import pandas as pd
+
+from cloaca.api.shared import get_phoebe_client
 
 
 class eBirdHistoricFullObservation(BaseModel):
