@@ -24,7 +24,7 @@ async def get_nearby_observations(latitude: float, longitude: float, file_id: st
 
     lifers_from_csv = get_lifers_from_cache(file_id)
 
-    unseen_species = filter_lifers_from_nearby_observations(
+    unseen_species = await filter_lifers_from_nearby_observations(
         nearby_observations, lifers_from_csv
     )
 
@@ -47,7 +47,7 @@ async def get_nearby_observations(latitude: float, longitude: float, file_id: st
         )
 
         for observation in unseen_observations_for_species:
-            unseen_lifers.append(phoebe_observation_to_lifer(observation))
+            unseen_lifers.append(await phoebe_observation_to_lifer(observation))
 
     fetch_tasks = [
         fetch_task(unseen_species_code) for unseen_species_code in unseen_species_codes

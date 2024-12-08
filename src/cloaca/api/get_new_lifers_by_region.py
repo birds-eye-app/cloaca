@@ -58,7 +58,7 @@ async def get_regional_mapping():
             f"Found {len(phoebe_observations)} observations for {sub_region.subnational1_name}"
         )
         lifers = [
-            phoebe_observation_to_lifer(observation)
+            await phoebe_observation_to_lifer(observation)
             for observation in phoebe_observations
         ]
 

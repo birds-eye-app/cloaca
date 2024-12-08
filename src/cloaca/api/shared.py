@@ -92,7 +92,7 @@ async def fetch_ebird_taxonomy_with_cache():
     if len(ebirdTaxonomy.keys()) == 0:
         taxonomy_items = await phoebe_client.ref.taxonomy.ebird.retrieve(fmt="json")
 
-        print(f"processing {taxonomy_items}")
+        print(f"Fetched {len(taxonomy_items)} taxonomy items")
 
         # loop through each taxonomy item and set the cache to its species code
         for taxonomy_item in taxonomy_items:
@@ -108,3 +108,7 @@ async def fetch_ebird_taxonomy_with_cache():
                 ebirdTaxonomy[taxonomy_item.species_code] = taxonomy_item
 
     return ebirdTaxonomy
+
+
+async def get_taxonomy_info_for_species_code(species_code: str) -> EbirdTaxonomyItem:
+    return (await fetch_ebird_taxonomy_with_cache())[species_code]

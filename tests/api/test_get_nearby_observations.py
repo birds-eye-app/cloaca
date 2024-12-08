@@ -53,7 +53,7 @@ async def test_get_nearby_observations():
     assert central_park.location == expected
     assert len(central_park.lifers) > 1
     example_house_sparrow = next(
-        (l for l in central_park.lifers if l.species_code == "houspa"),
+        (lifers for lifers in central_park.lifers if lifers.species_code == "houspa"),
         None,
     )
 
@@ -68,7 +68,7 @@ async def test_get_nearby_observations():
         location_id="L191106",
         scientific_name="Passer domesticus",
         species_code="houspa",
-        taxonomic_order=1,
+        taxonomic_order=31261,
     )
 
     assert example_house_sparrow == expected_observation

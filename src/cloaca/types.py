@@ -1,4 +1,5 @@
 from typing import Dict
+from cloaca.api.shared import get_taxonomy_info_for_species_code
 from cloaca.parsing.parsing_helpers import Lifer, Location, LocationToLifers
 from phoebe_bird.types.data.observation import Observation as PhoebeObservation
 from phoebe_bird.types.data.observations.geo.recent_list_response import (
@@ -46,13 +47,15 @@ def filter_lifers_from_observations(
     return unseen_observations
 
 
-def filter_lifers_from_nearby_observations(
+async def filter_lifers_from_nearby_observations(
     nearby_observations: RecentListResponse, lifers: list[Lifer]
 ) -> list[Lifer]:
     # map through response and convert to lifers
     nearby_observations_to_lifers: list[Lifer] = list()
     for observation in nearby_observations:
-        nearby_observations_to_lifers.append(phoebe_observation_to_lifer(observation))
+        nearby_observations_to_lifers.append(
+            await phoebe_observation_to_lifer(observation)
+        )
     lifer_commons_names = [lifer.common_name for lifer in lifers]
 
     unseen_observations: list[Lifer] = list()
@@ -69,15 +72,21 @@ def filter_lifers_from_nearby_observations(
     return unseen_observations
 
 
-def phoebe_observation_to_lifer(
+async def phoebe_observation_to_lifer(
     ebird_observation: PhoebeObservation,
 ) -> Lifer:
+    taxon_info = await get_taxonomy_info_for_species_code(
+        ebird_observation.species_code or ""
+    )
+    if taxon_info.taxon_order is None:
+        print(f"Warning: taxon order missing for {taxon_info.species_code}")
+
     return Lifer(
         common_name=ebird_observation.com_name or "",
         latitude=ebird_observation.lat or 0,
         longitude=ebird_observation.lng or 0,
         date=ebird_observation.obs_dt or "",
-        taxonomic_order=0,
+        taxonomic_order=taxon_info.taxon_order or 0,
         location=ebird_observation.loc_name or "",
         location_id=ebird_observation.loc_id or "",
         scientific_name=ebird_observation.sci_name or "",
