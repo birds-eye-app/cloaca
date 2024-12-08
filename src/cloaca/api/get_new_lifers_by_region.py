@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import Dict
 
+from cloaca.api.shared import get_phoebe_client
 from cloaca.parsing.parse_ebird_regional_list import (
     SubnationalRegion,
     parse_subnational1_file,
 )
 from cloaca.parsing.parsing_helpers import Lifer
-from cloaca.phoebe_wrapper import get_phoebe_client
 from cloaca.types import (
     filter_lifers_from_observations,
     get_lifers_from_cache,
@@ -58,7 +58,7 @@ async def get_regional_mapping():
             f"Found {len(phoebe_observations)} observations for {sub_region.subnational1_name}"
         )
         lifers = [
-            phoebe_observation_to_lifer(observation)
+            await phoebe_observation_to_lifer(observation)
             for observation in phoebe_observations
         ]
 
