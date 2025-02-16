@@ -2,16 +2,24 @@ import time
 from typing import Dict
 
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
-from cloaca.api.get_nearby_observations import get_nearby_observations
+from cloaca.api.get_nearby_observations import (
+    clear_nearby_observations_cache,
+    get_nearby_observations,
+)
 from cloaca.api.get_new_lifers_by_region import (
     get_filtered_lifers_for_region,
+    get_regional_mapping,
 )
 
 from cloaca.api.upload_lifers_csv import upload_lifers_csv
 from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
 
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utilities import repeat_every
+
+
 from fastapi import FastAPI, Request, UploadFile
+
 
 Cloaca_App = FastAPI()
 
@@ -28,11 +36,15 @@ Cloaca_App.add_middleware(
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
-    print(
-        "Time took to process the request and return response is {} sec".format(
-            time.time() - start_time
+    excluded_paths = [
+        "/v1/health",
+    ]
+    if request.url.path not in excluded_paths:
+        print(
+            "Time took to process the request and return response is {} sec".format(
+                time.time() - start_time
+            )
         )
-    )
     return response
 
 
@@ -69,3 +81,18 @@ async def regional_lifers(
     print("returning", len(regional_lifers), "regional lifers")
 
     return regional_lifers
+
+
+# this is deprecated but I can't find another way to use the "repeat every" util without it
+@Cloaca_App.on_event("startup")
+@repeat_every(seconds=60 * 60 * 1)  # every hour
+async def refresh_regional_lifers():
+    print("refreshing regional lifers")
+    await get_regional_mapping()
+
+
+@Cloaca_App.on_event("startup")
+@repeat_every(seconds=60 * 30 * 1)  # every 30 minutes
+async def refresh_observations_cache():
+    print("clearing nearby observations cache")
+    await clear_nearby_observations_cache()
