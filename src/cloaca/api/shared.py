@@ -15,7 +15,7 @@ phoebe_client = AsyncPhoebe(
     api_key=os.environ.get("EBIRD_API_KEY"),
 )
 
-requests: Dict[str, List[PhoebeObservation]] = {}
+nearby_observation_cache: Dict[str, List[PhoebeObservation]] = {}
 cached_species_obs: Dict[str, List[PhoebeObservation]] = {}
 ebirdTaxonomy: Dict[str, EbirdTaxonomyItem] = {}
 
@@ -26,6 +26,11 @@ unwanted_scientific_names = [
 
 def get_phoebe_client():
     return phoebe_client
+
+
+async def shared_clear_nearby_observations_cache():
+    nearby_observation_cache.clear()
+    cached_species_obs.clear()
 
 
 async def fetch_nearby_observations_of_species_from_ebird_with_cache(
@@ -66,7 +71,7 @@ async def fetch_nearby_observations_from_ebird_with_cache(
 ):
     key = f"{latitude}-{longitude}"
     print(f"fetching nearby observations for {latitude}, {longitude}")
-    cache_result = requests.get(key, None)
+    cache_result = nearby_observation_cache.get(key, None)
     if cache_result:
         print("hit cache!")
         return cache_result
@@ -79,7 +84,7 @@ async def fetch_nearby_observations_from_ebird_with_cache(
 
     print("Fetched this many obs:", len(observations))
 
-    requests[key] = observations
+    nearby_observation_cache[key] = observations
 
     return observations
 

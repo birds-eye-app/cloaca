@@ -6,6 +6,7 @@ from cloaca.api.shared import (
     fetch_nearby_observations_from_ebird_with_cache,
     fetch_nearby_observations_of_species_from_ebird_with_cache,
     round_to_nearest_half,
+    shared_clear_nearby_observations_cache,
 )
 from cloaca.parsing.parsing_helpers import Lifer
 from cloaca.types import (
@@ -14,6 +15,10 @@ from cloaca.types import (
     group_lifers_by_location,
     phoebe_observation_to_lifer,
 )
+
+
+async def clear_nearby_observations_cache():
+    await shared_clear_nearby_observations_cache()
 
 
 async def get_nearby_observations(latitude: float, longitude: float, file_id: str):
