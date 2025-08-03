@@ -11,7 +11,7 @@ from cloaca.api.get_new_lifers_by_region import (
     get_regional_mapping,
 )
 
-from cloaca.api.upload_lifers_csv import upload_lifers_csv
+from cloaca.api.upload_lifers_csv import UploadLifersResponse, upload_lifers_csv
 from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,7 +68,7 @@ async def get_lifers_by_location_api(
 
 
 @Cloaca_App.post("/v1/upload_lifers_csv")
-async def upload_lifers_csv_api(file: UploadFile) -> Dict[str, str]:
+async def upload_lifers_csv_api(file: UploadFile) -> UploadLifersResponse:
     return await upload_lifers_csv(file)
 
 
