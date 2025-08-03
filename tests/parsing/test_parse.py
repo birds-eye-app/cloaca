@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 import pandas as pd
 from cloaca.parsing.parse_ebird_personal_export import parse_csv_data_frame
-from cloaca.parsing.parsing_helpers import Lifer, get_lifers
+from cloaca.parsing.parsing_helpers import Lifer, get_lifers, calculate_home_location
 from cloaca.types import get_lifers_from_cache
 from cloaca.main import Cloaca_App
 
@@ -109,3 +109,26 @@ def test_observations_to_lifers():
         "Yellow-billed Cacique (Prevost's)",
         "gull sp.",
     }
+
+
+def test_calculate_home_location():
+    df = pd.read_csv("tests/test_data/MyEBirdData.csv")
+    all_observations = parse_csv_data_frame(df)
+
+    home_location = calculate_home_location(all_observations)
+
+    # Test that we get a home location result
+    assert home_location is not None
+
+    # Test the specific expected result for the test data
+    from cloaca.parsing.parsing_helpers import HomeLocation
+
+    expected_home_location = HomeLocation(
+        location_id="L2987624",
+        location_name="McGolrick Park",
+        latitude=40.7245046,
+        longitude=-73.9433616,
+        checklist_count=30,
+    )
+
+    assert home_location == expected_home_location

@@ -1,3 +1,3 @@
 # cloaca
 
-run with: `uv run fastapi dev`
+run with: `uv run fastapi dev src/cloaca/main.py`

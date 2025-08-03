@@ -104,3 +104,55 @@ def observations_to_lifers(observations: list[Observation]) -> list[Lifer]:
         )
         for obs in observations
     ]
+
+
+@dataclass
+class HomeLocation:
+    location_id: str
+    location_name: str
+    latitude: float
+    longitude: float
+    checklist_count: int
+
+
+def calculate_home_location(observations: list[Observation]) -> HomeLocation | None:
+    """Calculate home location as the hotspot with the most checklists"""
+    if not observations:
+        return None
+
+    # Group by location and count unique submission IDs (checklists)
+    location_checklist_counts: dict[str, dict] = {}
+
+    for obs in observations:
+        if obs.location_id not in location_checklist_counts:
+            location_checklist_counts[obs.location_id] = {
+                "location_name": obs.location,
+                "latitude": obs.latitude,
+                "longitude": obs.longitude,
+                "submission_ids": set(),
+            }
+
+        location_checklist_counts[obs.location_id]["submission_ids"].add(
+            obs.submission_id
+        )
+
+    # Find location with most checklists
+    max_checklists = 0
+    home_location_data = None
+
+    for location_id, data in location_checklist_counts.items():
+        checklist_count = len(data["submission_ids"])
+        if checklist_count > max_checklists:
+            max_checklists = checklist_count
+            home_location_data = {
+                "location_id": location_id,
+                "location_name": data["location_name"],
+                "latitude": data["latitude"],
+                "longitude": data["longitude"],
+                "checklist_count": checklist_count,
+            }
+
+    if home_location_data:
+        return HomeLocation(**home_location_data)
+
+    return None
