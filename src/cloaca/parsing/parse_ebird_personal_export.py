@@ -2,9 +2,12 @@ from fastapi import UploadFile
 import pandas as pd
 
 from cloaca.parsing.parsing_helpers import (
+    HomeLocation,
+    Lifer,
     Observation,
     get_lifers,
     observations_to_lifers,
+    calculate_home_location,
 )
 
 # Define the CSV headers
@@ -41,14 +44,17 @@ def parse_csv_from_file(file: UploadFile) -> list[Observation]:
     return parse_csv_data_frame(df)
 
 
-def parse_csv_from_file_to_lifers(file: UploadFile):
+def parse_csv_from_file_to_lifers(
+    file: UploadFile,
+) -> tuple[list[Lifer], HomeLocation | None]:
     df = pd.read_csv(file.file)
 
     observations = parse_csv_data_frame(df)
 
     lifers = get_lifers(observations)
+    home_location = calculate_home_location(observations)
 
-    return observations_to_lifers(lifers)
+    return observations_to_lifers(lifers), home_location
 
 
 def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
