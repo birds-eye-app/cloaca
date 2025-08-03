@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from cloaca.parsing.parse_ebird_personal_export import parse_csv_from_file_to_lifers
 from cloaca.parsing.parsing_helpers import HomeLocation
 from cloaca.types import set_lifers_to_cache
@@ -9,7 +10,7 @@ from fastapi import UploadFile
 from uuid import uuid4
 
 
-class UploadLifersResponse:
+class UploadLifersResponse(BaseModel):
     key: str
     home_location: HomeLocation | None = None
 
@@ -26,13 +27,14 @@ async def upload_lifers_csv(file: UploadFile):
 
     print(f"parsed csv with key {uuid4_str} and length {len(lifers)}")
 
-    response = UploadLifersResponse()
+    response = UploadLifersResponse(key=uuid4_str, home_location=home_location)
     response.key = uuid4_str
 
     if home_location:
-        response.home_location = home_location
         print(
             f"Home location: {home_location.location_name} with {home_location.checklist_count} checklists"
         )
+    else:
+        print("No home location found")
 
     return response
