@@ -1,5 +1,5 @@
 import time
-from typing import Dict
+from typing import Dict, List, Any
 
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
@@ -10,6 +10,7 @@ from cloaca.api.get_new_lifers_by_region import (
     get_filtered_lifers_for_region,
     get_regional_mapping,
 )
+from cloaca.api.get_popular_hotspots import get_popular_hotspots_api
 
 from cloaca.api.upload_lifers_csv import UploadLifersResponse, upload_lifers_csv
 from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
@@ -81,6 +82,13 @@ async def regional_lifers(
     print("returning", len(regional_lifers), "regional lifers")
 
     return regional_lifers
+
+
+@Cloaca_App.get("/v1/popular_hotspots")
+async def get_popular_hotspots_endpoint(
+    latitude: float, longitude: float, radius_km: float, month: int
+) -> List[Dict[str, Any]]:
+    return await get_popular_hotspots_api(latitude, longitude, radius_km, month)
 
 
 # this is deprecated but I can't find another way to use the "repeat every" util without it
