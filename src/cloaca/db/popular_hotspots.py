@@ -16,6 +16,7 @@ class PopularHotspotResult:
         country_code: str,
         state_code: str,
         county_code: str,
+        distance_km: float | None = None,
     ):
         self.locality_id = locality_id
         self.locality_name = locality_name
@@ -26,9 +27,10 @@ class PopularHotspotResult:
         self.country_code = country_code
         self.state_code = state_code
         self.county_code = county_code
+        self.distance_km = distance_km
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        result = {
             "locality_id": self.locality_id,
             "locality_name": self.locality_name,
             "locality_type": self.locality_type,
@@ -39,12 +41,46 @@ class PopularHotspotResult:
             "state_code": self.state_code,
             "county_code": self.county_code,
         }
+        if self.distance_km is not None:
+            result["distance_km"] = self.distance_km
+        return result
 
 
 def get_db_connection():
-    return duckdb.connect(
-        "/Users/davidmeadows_1/programs/birds-eye-app/swan-lake/dbs/parsed_ebd.db"
-    )
+    """Get database connection with spatial support required."""
+    import os
+
+    try:
+        duck_db_path = os.environ["DUCK_DB_PATH"]
+    except KeyError:
+        raise RuntimeError(
+            "DUCK_DB_PATH environment variable is required. "
+            "Please set it to the path of your spatial database file."
+        )
+
+    if not os.path.exists(duck_db_path):
+        raise FileNotFoundError(
+            f"Spatial database not found at {duck_db_path}. "
+            "Please run 'python src/cloaca/db/build_parsed_db.py' to create the spatial database."
+        )
+
+    con = duckdb.connect(duck_db_path)
+
+    try:
+        # Load spatial extension
+        con.execute("LOAD spatial")
+
+        # Verify spatial columns exist
+        con.execute("SELECT geometry FROM localities LIMIT 1")
+
+        return con
+
+    except Exception as e:
+        con.close()
+        raise RuntimeError(
+            f"Spatial database found but spatial extension not working: {e}. "
+            "Please rebuild the spatial database with 'python src/cloaca/db/build_spatial_db.py'"
+        )
 
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -88,7 +124,7 @@ def get_popular_hotspots(
     latitude: float, longitude: float, radius_km: float, month: int
 ) -> List[PopularHotspotResult]:
     """
-    Get popular hotspots within a given radius and month.
+    Get popular hotspots using spatial extension for optimized geographic queries.
 
     Args:
         latitude: Center latitude
@@ -100,21 +136,20 @@ def get_popular_hotspots(
         List of PopularHotspotResult objects sorted by avg_weekly_checklists descending
     """
     print(
-        f"[DuckDB] Starting popular hotspots query for lat={latitude}, lng={longitude}, radius={radius_km}km, month={month}"
+        f"[DuckDB Spatial] Starting spatial popular hotspots query for lat={latitude}, lng={longitude}, radius={radius_km}km, month={month}"
     )
     start_time = time.time()
 
-    # Calculate bounding box for pre-filtering (add 50% buffer for safety)
-    bbox = get_bounding_box(latitude, longitude, radius_km * 1.5)
-
     con = get_db_connection()
     db_connect_time = time.time()
-    print(f"[DuckDB] Database connection took {db_connect_time - start_time:.3f}s")
+    print(
+        f"[DuckDB Spatial] Database connection took {db_connect_time - start_time:.3f}s"
+    )
 
     try:
-        # Optimized query with geographic bounding box pre-filtering
+        # Spatial query using ST_DWithin for efficient radius filtering
         query = """
-        WITH filtered_localities AS (
+        WITH spatial_localities AS (
             SELECT 
                 locality_id,
                 LOCALITY as locality_name,
@@ -123,16 +158,16 @@ def get_popular_hotspots(
                 LONGITUDE as longitude,
                 country_code,
                 state_code,
-                county_code
+                county_code,
+                ST_Distance(geometry, ST_Point(?, ?)) * 100.0 as distance_km
             FROM localities
             WHERE locality_type = 'H'  -- Only hotspots
-              AND LATITUDE BETWEEN ? AND ?
-              AND LONGITUDE BETWEEN ? AND ?
+              AND ST_DWithin(geometry, ST_Point(?, ?), ?)  -- Spatial radius filter
         ),
         monthly_observations AS (
             SELECT 
                 locality_id,
-                AVG(number_of_checklists) as avg_weekly_checklists
+                sum(number_of_checklists) / count(distinct week) as avg_weekly_checklists
             FROM weekly_species_observations
             WHERE EXTRACT(MONTH FROM week) = ?
             GROUP BY locality_id
@@ -147,66 +182,52 @@ def get_popular_hotspots(
             o.avg_weekly_checklists,
             l.country_code,
             l.state_code,
-            l.county_code
-        FROM filtered_localities l
+            l.county_code,
+            l.distance_km
+        FROM spatial_localities l
         INNER JOIN monthly_observations o ON l.locality_id = o.locality_id
         ORDER BY o.avg_weekly_checklists DESC
         """
 
-        # Execute query with bounding box parameters
+        # Execute spatial query
         query_start = time.time()
-        params = [
-            bbox["min_lat"],
-            bbox["max_lat"],
-            bbox["min_lng"],
-            bbox["max_lng"],
-            month,
-        ]
+        radius_m = radius_km / 100  # Convert km to meters for ST_DWithin
+        params = [longitude, latitude, longitude, latitude, radius_m, month]
         result = con.execute(query, params).fetchall()
         query_end = time.time()
         print(
-            f"[DuckDB] Query execution took {query_end - query_start:.3f}s, returned {len(result)} rows"
+            f"[DuckDB Spatial] Spatial query execution took {query_end - query_start:.3f}s, returned {len(result)} rows"
         )
 
-        # Filter by distance and convert to objects
-        distance_filter_start = time.time()
+        # Convert to objects (no additional distance filtering needed!)
+        conversion_start = time.time()
         hotspots = []
-        distance_calculations = 0
 
         for row in result:
-            hotspot_lat, hotspot_lon = row[3], row[4]
-            distance = haversine_distance_km(
-                latitude, longitude, hotspot_lat, hotspot_lon
-            )
-            distance_calculations += 1
-
-            if distance <= radius_km:
-                hotspots.append(
-                    PopularHotspotResult(
-                        locality_id=row[0],
-                        locality_name=row[1],
-                        locality_type=row[2],
-                        latitude=row[3],
-                        longitude=row[4],
-                        avg_weekly_checklists=float(row[5]),
-                        country_code=row[6],
-                        state_code=row[7],
-                        county_code=row[8],
-                    )
+            hotspots.append(
+                PopularHotspotResult(
+                    locality_id=row[0],
+                    locality_name=row[1],
+                    locality_type=row[2],
+                    latitude=row[3],
+                    longitude=row[4],
+                    avg_weekly_checklists=float(row[5]),
+                    country_code=row[6],
+                    state_code=row[7],
+                    county_code=row[8],
+                    distance_km=float(row[9]),
                 )
+            )
 
-        distance_filter_end = time.time()
+        conversion_end = time.time()
         print(
-            f"[DuckDB] Distance filtering took {distance_filter_end - distance_filter_start:.3f}s"
+            f"[DuckDB Spatial] Object conversion took {conversion_end - conversion_start:.3f}s"
         )
-        print(
-            f"[DuckDB] Processed {distance_calculations} distance calculations, filtered to {len(hotspots)} within {radius_km}km"
-        )
+        print(f"[DuckDB Spatial] Found {len(hotspots)} hotspots within {radius_km}km")
 
-        # Already sorted by query, no additional sorting needed
-
+        # Already sorted by query
         total_time = time.time() - start_time
-        print(f"[DuckDB] Total popular hotspots query completed in {total_time:.3f}s")
+        print(f"[DuckDB Spatial] Total spatial query completed in {total_time:.3f}s")
 
         return hotspots
 
