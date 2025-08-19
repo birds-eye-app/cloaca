@@ -1,4 +1,6 @@
 import duckdb
+import time
+import math
 from typing import List, Dict, Any
 
 
@@ -67,6 +69,21 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     return c * r
 
 
+def get_bounding_box(lat: float, lng: float, radius_km: float) -> dict:
+    """Calculate bounding box for approximate geographic filtering"""
+    # Rough approximation: 1 degree lat ≈ 111km
+    lat_delta = radius_km / 111.0
+    # Longitude delta varies by latitude
+    lng_delta = radius_km / (111.0 * abs(math.cos(math.radians(lat))))
+
+    return {
+        "min_lat": lat - lat_delta,
+        "max_lat": lat + lat_delta,
+        "min_lng": lng - lng_delta,
+        "max_lng": lng + lng_delta,
+    }
+
+
 def get_popular_hotspots(
     latitude: float, longitude: float, radius_km: float, month: int
 ) -> List[PopularHotspotResult]:
@@ -82,10 +99,20 @@ def get_popular_hotspots(
     Returns:
         List of PopularHotspotResult objects sorted by avg_weekly_checklists descending
     """
+    print(
+        f"[DuckDB] Starting popular hotspots query for lat={latitude}, lng={longitude}, radius={radius_km}km, month={month}"
+    )
+    start_time = time.time()
+
+    # Calculate bounding box for pre-filtering (add 50% buffer for safety)
+    bbox = get_bounding_box(latitude, longitude, radius_km * 1.5)
+
     con = get_db_connection()
+    db_connect_time = time.time()
+    print(f"[DuckDB] Database connection took {db_connect_time - start_time:.3f}s")
 
     try:
-        # Build the query
+        # Optimized query with geographic bounding box pre-filtering
         query = """
         WITH filtered_localities AS (
             SELECT 
@@ -99,6 +126,8 @@ def get_popular_hotspots(
                 county_code
             FROM localities
             WHERE locality_type = 'H'  -- Only hotspots
+              AND LATITUDE BETWEEN ? AND ?
+              AND LONGITUDE BETWEEN ? AND ?
         ),
         monthly_observations AS (
             SELECT 
@@ -115,26 +144,41 @@ def get_popular_hotspots(
             l.locality_type,
             l.latitude,
             l.longitude,
-            COALESCE(o.avg_weekly_checklists, 0) as avg_weekly_checklists,
+            o.avg_weekly_checklists,
             l.country_code,
             l.state_code,
             l.county_code
         FROM filtered_localities l
-        LEFT JOIN monthly_observations o ON l.locality_id = o.locality_id
-        WHERE o.avg_weekly_checklists > 0
+        INNER JOIN monthly_observations o ON l.locality_id = o.locality_id
         ORDER BY o.avg_weekly_checklists DESC
         """
 
-        # Execute query
-        result = con.execute(query, [month]).fetchall()
+        # Execute query with bounding box parameters
+        query_start = time.time()
+        params = [
+            bbox["min_lat"],
+            bbox["max_lat"],
+            bbox["min_lng"],
+            bbox["max_lng"],
+            month,
+        ]
+        result = con.execute(query, params).fetchall()
+        query_end = time.time()
+        print(
+            f"[DuckDB] Query execution took {query_end - query_start:.3f}s, returned {len(result)} rows"
+        )
 
         # Filter by distance and convert to objects
+        distance_filter_start = time.time()
         hotspots = []
+        distance_calculations = 0
+
         for row in result:
             hotspot_lat, hotspot_lon = row[3], row[4]
             distance = haversine_distance_km(
                 latitude, longitude, hotspot_lat, hotspot_lon
             )
+            distance_calculations += 1
 
             if distance <= radius_km:
                 hotspots.append(
@@ -151,8 +195,18 @@ def get_popular_hotspots(
                     )
                 )
 
-        # Sort by avg_weekly_checklists descending
-        hotspots.sort(key=lambda x: x.avg_weekly_checklists, reverse=True)
+        distance_filter_end = time.time()
+        print(
+            f"[DuckDB] Distance filtering took {distance_filter_end - distance_filter_start:.3f}s"
+        )
+        print(
+            f"[DuckDB] Processed {distance_calculations} distance calculations, filtered to {len(hotspots)} within {radius_km}km"
+        )
+
+        # Already sorted by query, no additional sorting needed
+
+        total_time = time.time() - start_time
+        print(f"[DuckDB] Total popular hotspots query completed in {total_time:.3f}s")
 
         return hotspots
 
