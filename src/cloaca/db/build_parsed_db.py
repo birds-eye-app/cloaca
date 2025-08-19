@@ -2,35 +2,75 @@ import argparse
 import duckdb
 import sys
 import time
+import threading
 from pathlib import Path
 
 
-def create_weekly_species_observations_table(con):
-    print("Creating weekly_species_observations table...")
-    start = time.time()
-    create_table_query = """
-        create or replace table weekly_species_observations as (
-            select
-                coalesce("SUBSPECIES SCIENTIFIC NAME", "SCIENTIFIC NAME") as species_id,
-                date_trunc('week', "OBSERVATION DATE") as week,
-                "LOCALITY ID" as locality_id,
-                "EXOTIC CODE" as exotic_code,
-                count(*) as number_of_checklists -- sum("OBSERVATION COUNT") as number_of_observations
-            from
-                ebd_full."full"
-            where
-                "OBSERVATION DATE" > current_date - interval '5 years'
-            group by
-                1,
-                2,
-                3,
-                4
-        )
-    """
-    con.execute(create_table_query)
+class Spinner:
+    """Simple spinner for showing progress during long operations."""
 
-    end = time.time()
-    print(f"Created weekly_species_observations table in {end - start:.3f} seconds")
+    def __init__(self, message="Working"):
+        self.message = message
+        self.spinner_chars = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+        self.running = False
+        self.thread = None
+
+    def _spin(self):
+        i = 0
+        while self.running:
+            print(
+                f"\r  {self.message}... {self.spinner_chars[i % len(self.spinner_chars)]}",
+                end="",
+                flush=True,
+            )
+            time.sleep(0.1)
+            i += 1
+
+    def start(self):
+        self.running = True
+        self.thread = threading.Thread(target=self._spin, daemon=True)
+        self.thread.start()
+
+    def stop(self, success_message="Done"):
+        self.running = False
+        if self.thread:
+            self.thread.join(timeout=0.2)
+        print(f"\r  {self.message}... ✅ {success_message}!     ")
+
+
+def create_weekly_species_observations_table(con):
+    start = time.time()
+    spinner = Spinner("Creating weekly_species_observations table")
+    spinner.start()
+
+    try:
+        create_table_query = """
+            create or replace table weekly_species_observations as (
+                select
+                    coalesce("SUBSPECIES SCIENTIFIC NAME", "SCIENTIFIC NAME") as species_id,
+                    date_trunc('week', "OBSERVATION DATE") as week,
+                    "LOCALITY ID" as locality_id,
+                    "EXOTIC CODE" as exotic_code,
+                    count(*) as number_of_checklists -- sum("OBSERVATION COUNT") as number_of_observations
+                from
+                    ebd_full."full"
+                where
+                    "OBSERVATION DATE" > current_date - interval '5 years'
+                group by
+                    1,
+                    2,
+                    3,
+                    4
+            )
+        """
+        con.execute(create_table_query)
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
 # create table parsed_ebd.localities as (
@@ -53,63 +93,114 @@ def create_weekly_species_observations_table(con):
 
 
 def create_localities_table(con):
-    print("Creating localities table...")
     start = time.time()
-    create_table_query = """
-        create or replace table localities as (
-            select
-                distinct "COUNTRY CODE" as country_code,
-                "STATE CODE" as state_code,
-                "COUNTY CODE" as county_code,
-                LOCALITY,
-                "LOCALITY ID" as locality_id,
-                "LOCALITY TYPE" as locality_type,
-                latitude,
-                LONGITUDE
-            from
-                ebd_full."full"
-            where
-                "OBSERVATION DATE" > current_date - interval '5 year'
-            order by
-                locality_id
-        )
-    """
-    con.execute(create_table_query)
+    spinner = Spinner("Creating localities table with spatial columns")
+    spinner.start()
 
-    end = time.time()
-    print(f"Created localities table in {end - start:.3f} seconds")
+    try:
+        create_table_query = """
+            create or replace table localities as (
+                select
+                    distinct "COUNTRY CODE" as country_code,
+                    "STATE CODE" as state_code,
+                    "COUNTY CODE" as county_code,
+                    LOCALITY,
+                    "LOCALITY ID" as locality_id,
+                    "LOCALITY TYPE" as locality_type,
+                    LATITUDE,
+                    LONGITUDE,
+                    ST_Point(LONGITUDE, LATITUDE) as geometry
+                from
+                    ebd_full."full"
+                where
+                    "OBSERVATION DATE" > current_date - interval '5 year'
+                    AND LATITUDE IS NOT NULL 
+                    AND LONGITUDE IS NOT NULL
+                order by
+                    locality_id
+            )
+        """
+        con.execute(create_table_query)
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
 def create_taxonomy_table(con, path_to_ebird_taxonomy_csv):
-    print("Creating taxonomy table...")
     start = time.time()
+    spinner = Spinner("Creating taxonomy table")
+    spinner.start()
 
-    # First read the CSV to understand its structure
-    print(f"Reading taxonomy CSV from: {path_to_ebird_taxonomy_csv}")
-    create_table_query = f"""
-        create or replace table taxonomy as 
-        select * from read_csv_auto('{path_to_ebird_taxonomy_csv}')
-    """
-    con.execute(create_table_query)
+    try:
+        create_table_query = f"""
+            create or replace table taxonomy as 
+            select * from read_csv_auto('{path_to_ebird_taxonomy_csv}')
+        """
+        con.execute(create_table_query)
 
-    end = time.time()
-    print(f"Created taxonomy table in {end - start:.3f} seconds")
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
-def setup_database_connection(ebd_db_path):
-    """Set up database connection and attach the EBD database."""
+def setup_database_connection(ebd_db_path, output_path=None):
+    """Set up database connection with spatial extension."""
     print(f"Connecting to EBD database: {ebd_db_path}")
 
     # Create a new database for parsed results
-    parsed_db_path = Path(ebd_db_path).parent / "parsed_ebd.db"
-    print(f"Creating parsed database: {parsed_db_path}")
+    if output_path:
+        parsed_db_path = Path(output_path)
+        # Ensure the directory exists
+        parsed_db_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        parsed_db_path = Path(ebd_db_path).parent / "parsed_ebd.db"
+
+    print(f"Creating parsed database with spatial support: {parsed_db_path}")
 
     con = duckdb.connect(str(parsed_db_path))
+
+    # Install and load spatial extension
+    spinner = Spinner("Loading spatial extension")
+    spinner.start()
+    try:
+        con.execute("INSTALL spatial")
+        con.execute("LOAD spatial")
+        spinner.stop("Loaded")
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
     # Attach the full EBD database
     con.execute(f"ATTACH '{ebd_db_path}' AS ebd_full")
 
-    return con
+    return con, parsed_db_path
+
+
+def create_spatial_indexes(con):
+    """Create spatial indexes for better query performance."""
+    start = time.time()
+    spinner = Spinner("Creating spatial and database indexes")
+    spinner.start()
+
+    try:
+        # Create spatial index on localities geometry
+        con.execute(
+            "CREATE INDEX idx_localities_spatial ON localities USING RTREE (geometry)"
+        )
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
 def get_table_stats(con):
@@ -138,20 +229,31 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    parser.add_argument("ebd_db_path", help="Path to the full eBird DuckDB file")
-
-    parser.add_argument("taxonomy_csv_path", help="Path to the eBird taxonomy CSV file")
+    parser.add_argument(
+        "-e", "--ebd-db", required=True, help="Path to the full eBird DuckDB file"
+    )
 
     parser.add_argument(
-        "--output-dir",
-        help="Directory to create parsed database in (default: same as input)",
+        "-t", "--taxonomy", required=True, help="Path to the eBird taxonomy CSV file"
+    )
+
+    parser.add_argument(
+        "--skip-indexes",
+        action="store_true",
+        help="Skip creating indexes (faster for development)",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output path for the parsed database file (default: same directory as input with name 'parsed_ebd.db')",
     )
 
     args = parser.parse_args()
 
     # Validate input files exist
-    ebd_path = Path(args.ebd_db_path)
-    taxonomy_path = Path(args.taxonomy_csv_path)
+    ebd_path = Path(args.ebd_db)
+    taxonomy_path = Path(args.taxonomy)
 
     if not ebd_path.exists():
         print(f"Error: EBD database file not found: {ebd_path}")
@@ -169,12 +271,18 @@ def main():
 
     try:
         # Set up database connection
-        con = setup_database_connection(ebd_path)
+        con, output_db_path = setup_database_connection(ebd_path, args.output)
 
         # Create tables
         create_weekly_species_observations_table(con)
         create_localities_table(con)
         create_taxonomy_table(con, str(taxonomy_path))
+
+        # Create indexes unless skipped
+        if not args.skip_indexes:
+            create_spatial_indexes(con)
+        else:
+            print("Skipping index creation")
 
         # Show statistics
         get_table_stats(con)
@@ -185,8 +293,7 @@ def main():
         )
 
         # Show output database path
-        parsed_db_path = Path(ebd_path).parent / "parsed_ebd.db"
-        print(f"Parsed database created at: {parsed_db_path}")
+        print(f"Parsed database created at: {output_db_path}")
 
     except Exception as e:
         print(f"Error: {e}")
