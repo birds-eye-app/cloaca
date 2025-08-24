@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Dict, List, Any
 
@@ -31,6 +32,13 @@ Cloaca_App.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+is_dev = False
+if env := os.getenv("ENVIRONMENT"):
+    if env == "development":
+        is_dev = True
+    else:
+        is_dev = False
 
 
 @Cloaca_App.middleware("http")
@@ -95,6 +103,10 @@ async def get_popular_hotspots_endpoint(
 @Cloaca_App.on_event("startup")
 @repeat_every(seconds=60 * 60 * 1)  # every hour
 async def refresh_regional_lifers():
+    # dont do this on startup in local dev to not spam ebird
+    if is_dev:
+        print("not refreshing regional lifers in dev mode")
+        return
     print("refreshing regional lifers")
     await get_regional_mapping()
 
