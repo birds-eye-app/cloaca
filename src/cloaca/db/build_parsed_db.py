@@ -130,7 +130,7 @@ def create_localities_table(con):
                     "LOCALITY TYPE" as locality_type,
                     LATITUDE,
                     LONGITUDE,
-                    ST_Point(LONGITUDE, LATITUDE) as geometry
+                    ST_Point(LATITUDE, LONGITUDE) as geometry
                 from
                     ebd_full."full"
                 where

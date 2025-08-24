@@ -82,11 +82,19 @@ def get_popular_hotspots(
         FROM localities
         JOIN hotspot_popularity ON localities.locality_id = hotspot_popularity.locality_id
         WHERE locality_type = 'H'  -- Only hotspots
-            AND ST_DWithin(geometry, ST_Point(?, ?), ?)  -- Spatial radius filter
+            AND ST_Distance_Sphere(geometry, ST_Point(?, ?)) <= ?  -- Great circle distance in meters
             AND hotspot_popularity.month = ?
+            and hotspot_popularity.avg_weekly_number_of_observations >= 1
         """
 
-        params = [longitude, latitude, radius_km, month]
+        print(
+            f"Executing get_popular_hotspots with lat: {latitude}, lon: {longitude}, radius: {radius_km}km, month: {month}"
+        )
+
+        # Convert km to meters for the query
+        radius_meters = radius_km * 1000
+        # Note: ST_Distance_Sphere expects [latitude, longitude] axis order per docs
+        params = [latitude, longitude, radius_meters, month]
         query_start_time = time.time()
         result = con.execute(query, params).fetchall()
         query_end_time = time.time()
