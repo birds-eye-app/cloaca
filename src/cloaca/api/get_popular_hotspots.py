@@ -18,4 +18,5 @@ async def get_popular_hotspots_api(
         List of hotspot dictionaries with locality info and average weekly checklists
     """
     hotspots = get_popular_hotspots(latitude, longitude, radius_km, month)
+
     return [hotspot.to_dict() for hotspot in hotspots]

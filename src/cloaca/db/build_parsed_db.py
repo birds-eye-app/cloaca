@@ -73,23 +73,47 @@ def create_weekly_species_observations_table(con):
         raise e
 
 
-# create table parsed_ebd.localities as (
-#     select
-#         distinct "COUNTRY CODE" as country_code,
-#         "STATE CODE" as state_code,
-#         "COUNTY CODE" as county_code,
-#         LOCALITY,
-#         "LOCALITY ID" as locality_id,
-#         "LOCALITY TYPE" as locality_type,
-#         latitude,
-#         LONGITUDE
-#     from
-#         ebd_full."full"
-#     where
-#         "OBSERVATION DATE" > current_date - interval '5 year'
-#     order by
-#         locality_id
-# )
+def create_hotspot_popularity_table(con):
+    start = time.time()
+    spinner = Spinner("Creating hotspot popularity table")
+    spinner.start()
+
+    try:
+        create_table_query = """
+            create or replace table hotspot_popularity as (
+                with number_of_weeks_in_each_month as (
+                    select
+                        extract(month from "OBSERVATION DATE") as month,
+                        count(distinct date_trunc('week', "OBSERVATION DATE")) as num_weeks
+                    from
+                        ebd_full."full"
+                    where
+                        "OBSERVATION DATE" > current_date - interval '5 year'
+                    group by
+                        1
+                )
+                select
+                    "LOCALITY ID" as locality_id,
+                    extract(month from "OBSERVATION DATE") as month,
+                    -- I think i'm doing this right here?
+                    count(*) / max(num_weeks) as avg_weekly_number_of_observations
+                from
+                    ebd_full."full"
+                    join number_of_weeks_in_each_month on extract(month from "OBSERVATION DATE") = month
+                where
+                    "OBSERVATION DATE" > current_date - interval '5 year'
+                group by
+                    1,2
+            )
+        """
+        con.execute(create_table_query)
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
 def create_localities_table(con):
@@ -101,10 +125,7 @@ def create_localities_table(con):
         create_table_query = """
             create or replace table localities as (
                 select
-                    distinct "COUNTRY CODE" as country_code,
-                    "STATE CODE" as state_code,
-                    "COUNTY CODE" as county_code,
-                    LOCALITY,
+                    distinct LOCALITY,
                     "LOCALITY ID" as locality_id,
                     "LOCALITY TYPE" as locality_type,
                     LATITUDE,
@@ -113,8 +134,9 @@ def create_localities_table(con):
                 from
                     ebd_full."full"
                 where
-                    "OBSERVATION DATE" > current_date - interval '5 year'
-                    AND LATITUDE IS NOT NULL 
+                    "OBSERVATION DATE" > current_date - interval '2 year'
+                    and "LOCALITY TYPE" = 'H'
+                    AND LATITUDE IS NOT NULL
                     AND LONGITUDE IS NOT NULL
                 order by
                     locality_id
@@ -207,7 +229,7 @@ def get_table_stats(con):
     """Get statistics about the created tables."""
     print("\n=== Database Statistics ===")
 
-    tables = ["weekly_species_observations", "localities", "taxonomy"]
+    tables = ["localities", "taxonomy", "hotspot_popularity"]
 
     for table in tables:
         try:
@@ -274,9 +296,10 @@ def main():
         con, output_db_path = setup_database_connection(ebd_path, args.output)
 
         # Create tables
-        create_weekly_species_observations_table(con)
+        # create_weekly_species_observations_table(con)
         create_localities_table(con)
         create_taxonomy_table(con, str(taxonomy_path))
+        create_hotspot_popularity_table(con)
 
         # Create indexes unless skipped
         if not args.skip_indexes:

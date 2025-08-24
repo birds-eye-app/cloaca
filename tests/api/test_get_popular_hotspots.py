@@ -14,24 +14,16 @@ class TestGetPopularHotspotsApi:
             PopularHotspotResult(
                 locality_id="L123",
                 locality_name="High Park",
-                locality_type="H",
                 latitude=43.6446,
                 longitude=-79.4625,
                 avg_weekly_checklists=15.5,
-                country_code="CA",
-                state_code="CA-ON",
-                county_code="CA-ON-TO",
             ),
             PopularHotspotResult(
                 locality_id="L456",
                 locality_name="Tommy Thompson Park",
-                locality_type="H",
                 latitude=43.6283,
                 longitude=-79.3292,
                 avg_weekly_checklists=12.3,
-                country_code="CA",
-                state_code="CA-ON",
-                county_code="CA-ON-TO",
             ),
         ]
         mock_get_popular_hotspots.return_value = mock_hotspots
@@ -47,13 +39,9 @@ class TestGetPopularHotspotsApi:
         assert result[0] == {
             "locality_id": "L123",
             "locality_name": "High Park",
-            "locality_type": "H",
             "latitude": 43.6446,
             "longitude": -79.4625,
             "avg_weekly_checklists": 15.5,
-            "country_code": "CA",
-            "state_code": "CA-ON",
-            "county_code": "CA-ON-TO",
         }
         assert result[1]["locality_id"] == "L456"
         assert result[1]["locality_name"] == "Tommy Thompson Park"
