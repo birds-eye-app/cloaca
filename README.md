@@ -27,3 +27,14 @@ python -m pytest -v
 ```
 
 Note: Some tests in `tests/db/` may have import issues and might need to be run individually or skipped.
+
+## 
+todos:
+
+popular hotspots: 
+- [ ] fix buggy reporting on popular hotposts
+
+duckdb stuff: 
+- [ ] publish data and connect it to render
+- [ ] clean up duplication of logging / tracing
+- [ ] connection pooling
