@@ -1,4 +1,5 @@
 import argparse
+import os
 import duckdb
 import sys
 import time
@@ -93,7 +94,7 @@ def create_hotspot_popularity_table(con):
                         1
                 )
                 select
-                    "LOCALITY ID" as locality_id,
+                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
                     extract(month from "OBSERVATION DATE") as month,
                     -- I think i'm doing this right here?
                     count(distinct "SAMPLING EVENT IDENTIFIER") / max(num_weeks) as avg_weekly_number_of_observations
@@ -104,6 +105,7 @@ def create_hotspot_popularity_table(con):
                     "OBSERVATION DATE" > current_date - interval '5 year'
                 group by
                     1,2
+                order by 1,2
             )
         """
         con.execute(create_table_query)
@@ -127,6 +129,7 @@ def create_localities_table(con):
                 select
                     distinct LOCALITY,
                     "LOCALITY ID" as locality_id,
+                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
                     "LOCALITY TYPE" as locality_type,
                     LATITUDE,
                     LONGITUDE,
@@ -139,7 +142,7 @@ def create_localities_table(con):
                     AND LATITUDE IS NOT NULL
                     AND LONGITUDE IS NOT NULL
                 order by
-                    locality_id
+                    locality_id_int
             )
         """
         con.execute(create_table_query)
@@ -316,8 +319,15 @@ def main():
             f"\n=== Completed successfully in {total_end - total_start:.1f} seconds ==="
         )
 
+        if con is not None:
+            con.close()
+
         # Show output database path
         print(f"Parsed database created at: {output_db_path}")
+
+        # get size of DB file on disk
+        db_size = os.path.getsize(output_db_path)
+        print(f"Parsed database size: {db_size / (1024 * 1024):.1f} MB")
 
     except Exception as e:
         print(f"Error: {e}")

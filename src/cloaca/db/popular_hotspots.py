@@ -75,7 +75,7 @@ def get_popular_hotspots(
             LONGITUDE as longitude,
             avg_weekly_number_of_observations
         FROM localities
-        JOIN hotspot_popularity ON localities.locality_id = hotspot_popularity.locality_id
+        JOIN hotspot_popularity ON localities.locality_id_int = hotspot_popularity.locality_id_int
         WHERE locality_type = 'H'  -- Only hotspots
             AND ST_Distance_Sphere(geometry, ST_Point(?, ?)) <= ?  -- Great circle distance in meters
             AND hotspot_popularity.month = ?
