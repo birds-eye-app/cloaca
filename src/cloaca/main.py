@@ -1,5 +1,6 @@
+import os
 import time
-from typing import Dict
+from typing import Dict, List, Any
 
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
@@ -10,6 +11,7 @@ from cloaca.api.get_new_lifers_by_region import (
     get_filtered_lifers_for_region,
     get_regional_mapping,
 )
+from cloaca.api.get_popular_hotspots import get_popular_hotspots_api
 
 from cloaca.api.upload_lifers_csv import UploadLifersResponse, upload_lifers_csv
 from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
@@ -30,6 +32,13 @@ Cloaca_App.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+is_dev = False
+if env := os.getenv("ENVIRONMENT"):
+    if env == "development":
+        is_dev = True
+    else:
+        is_dev = False
 
 
 @Cloaca_App.middleware("http")
@@ -83,10 +92,21 @@ async def regional_lifers(
     return regional_lifers
 
 
+@Cloaca_App.get("/v1/popular_hotspots")
+async def get_popular_hotspots_endpoint(
+    latitude: float, longitude: float, radius_km: float, month: int
+) -> List[Dict[str, Any]]:
+    return await get_popular_hotspots_api(latitude, longitude, radius_km, month)
+
+
 # this is deprecated but I can't find another way to use the "repeat every" util without it
 @Cloaca_App.on_event("startup")
 @repeat_every(seconds=60 * 60 * 1)  # every hour
 async def refresh_regional_lifers():
+    # dont do this on startup in local dev to not spam ebird
+    if is_dev:
+        print("not refreshing regional lifers in dev mode")
+        return
     print("refreshing regional lifers")
     await get_regional_mapping()
 
