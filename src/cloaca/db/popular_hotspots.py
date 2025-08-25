@@ -42,16 +42,14 @@ def get_db_connection():
         )
 
     if not os.path.exists(duck_db_path):
-        raise FileNotFoundError(
-            f"Spatial database not found at {duck_db_path}. "
-            "Please run 'python src/cloaca/db/build_parsed_db.py' to create the spatial database."
-        )
+        raise FileNotFoundError(f"Parsed DuckDB file not found at {duck_db_path}. ")
 
     con = duckdb.connect(duck_db_path)
 
     try:
         # Load spatial extension
-        con.execute("LOAD spatial")
+        con.install_extension("spatial")
+        con.load_extension("spatial")
 
         # Verify spatial columns exist
         con.execute("SELECT geometry FROM localities LIMIT 1")
@@ -60,10 +58,7 @@ def get_db_connection():
 
     except Exception as e:
         con.close()
-        raise RuntimeError(
-            f"Spatial database found but spatial extension not working: {e}. "
-            "Please rebuild the spatial database with 'python src/cloaca/db/build_spatial_db.py'"
-        )
+        raise RuntimeError(f"DB file found but spatial extension not working: {e}. ")
 
 
 def get_popular_hotspots(
