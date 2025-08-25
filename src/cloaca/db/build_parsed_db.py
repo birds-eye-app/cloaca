@@ -96,7 +96,7 @@ def create_hotspot_popularity_table(con):
                     "LOCALITY ID" as locality_id,
                     extract(month from "OBSERVATION DATE") as month,
                     -- I think i'm doing this right here?
-                    count(*) / max(num_weeks) as avg_weekly_number_of_observations
+                    count(distinct "SAMPLING EVENT IDENTIFIER") / max(num_weeks) as avg_weekly_number_of_observations
                 from
                     ebd_full."full"
                     join number_of_weeks_in_each_month on extract(month from "OBSERVATION DATE") = month
@@ -290,6 +290,7 @@ def main():
     print(f"Taxonomy CSV: {taxonomy_path}")
 
     total_start = time.time()
+    con = None
 
     try:
         # Set up database connection
@@ -324,9 +325,8 @@ def main():
 
         traceback.print_exc()
         sys.exit(1)
-
     finally:
-        if "con" in locals():
+        if con is not None:
             con.close()
 
 
