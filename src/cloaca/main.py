@@ -2,6 +2,8 @@ import os
 import time
 from typing import Dict, List, Any
 
+import duckdb
+
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
     clear_nearby_observations_cache,
@@ -21,6 +23,8 @@ from fastapi_utilities import repeat_every
 
 
 from fastapi import FastAPI, Request, UploadFile
+
+from cloaca.db.db import get_db_connection
 
 
 Cloaca_App = FastAPI()
@@ -92,11 +96,17 @@ async def regional_lifers(
     return regional_lifers
 
 
+def get_duck_db_conn_from_state() -> duckdb.DuckDBPyConnection:
+    return Cloaca_App.state.duck_db_conn
+
+
 @Cloaca_App.get("/v1/popular_hotspots")
 async def get_popular_hotspots_endpoint(
     latitude: float, longitude: float, radius_km: float, month: int
 ) -> List[Dict[str, Any]]:
-    return await get_popular_hotspots_api(latitude, longitude, radius_km, month)
+    return await get_popular_hotspots_api(
+        get_duck_db_conn_from_state(), latitude, longitude, radius_km, month
+    )
 
 
 # this is deprecated but I can't find another way to use the "repeat every" util without it
@@ -116,3 +126,20 @@ async def refresh_regional_lifers():
 async def refresh_observations_cache():
     print("clearing nearby observations cache")
     await clear_nearby_observations_cache()
+
+
+@Cloaca_App.on_event("startup")
+@repeat_every(seconds=60 * 30 * 1)  # every 30 minutes
+async def connect_to_duck_db():
+    duck_db_conn = get_db_connection()
+    Cloaca_App.state.duck_db_conn = duck_db_conn
+
+
+@Cloaca_App.on_event("shutdown")
+async def shutdown_event():
+    if Cloaca_App.state.duck_db_conn:
+        try:
+            Cloaca_App.state.duck_db_conn.close()
+            print("DuckDB connection closed.")
+        except Exception as e:
+            print("Error closing DuckDB connection:", e)
