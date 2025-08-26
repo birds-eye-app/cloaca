@@ -1,6 +1,7 @@
-import duckdb
 import time
 from typing import List, Dict, Any
+
+import duckdb
 
 
 class PopularHotspotResult:
@@ -29,44 +30,13 @@ class PopularHotspotResult:
         return result
 
 
-def get_db_connection(read_only: bool = False):
-    """Get database connection with spatial support required."""
-    import os
-
-    try:
-        duck_db_path = os.environ["DUCK_DB_PATH"]
-    except KeyError:
-        raise RuntimeError(
-            "DUCK_DB_PATH environment variable is required. "
-            "Please set it to the path of your spatial database file."
-        )
-
-    if not os.path.exists(duck_db_path):
-        raise FileNotFoundError(f"Parsed DuckDB file not found at {duck_db_path}. ")
-
-    con = duckdb.connect(duck_db_path, read_only=read_only)
-
-    try:
-        # Load spatial extension
-        con.install_extension("spatial")
-        con.load_extension("spatial")
-
-        # Verify spatial columns exist in both original and optimized tables
-        con.execute("SELECT geometry FROM localities LIMIT 1")
-        con.execute("SELECT geometry FROM localities_hotspots LIMIT 1")
-
-        return con
-
-    except Exception as e:
-        con.close()
-        raise RuntimeError(f"DB file found but spatial extension not working: {e}. ")
-
-
 def get_popular_hotspots(
-    latitude: float, longitude: float, radius_km: float, month: int
+    con: duckdb.DuckDBPyConnection,
+    latitude: float,
+    longitude: float,
+    radius_km: float,
+    month: int,
 ) -> List[PopularHotspotResult]:
-    con = get_db_connection(read_only=True)
-
     try:
         # Use the optimized merged table for 79% faster performance
         query = """

@@ -1,9 +1,10 @@
 import argparse
-import duckdb
 import sys
 import time
 import threading
 from pathlib import Path
+
+from .db import get_db_connection
 
 
 class Spinner:
@@ -186,21 +187,7 @@ def setup_database_connection(ebd_db_path, output_path=None):
 
     print(f"Creating parsed database with spatial support: {parsed_db_path}")
 
-    con = duckdb.connect(str(parsed_db_path))
-
-    # Install and load spatial extension
-    spinner = Spinner("Loading spatial extension")
-    spinner.start()
-    try:
-        con.execute("INSTALL spatial")
-        con.execute("LOAD spatial")
-        spinner.stop("Loaded")
-    except Exception as e:
-        spinner.stop("Failed")
-        raise e
-
-    # Attach the full EBD database
-    con.execute(f"ATTACH '{ebd_db_path}' AS ebd_full")
+    con = get_db_connection(read_only=False)
 
     return con, parsed_db_path
 
