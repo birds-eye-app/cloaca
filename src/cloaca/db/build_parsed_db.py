@@ -205,6 +205,38 @@ def setup_database_connection(ebd_db_path, output_path=None):
     return con, parsed_db_path
 
 
+def create_localities_hotspots_table(con):
+    """Create optimized merged table combining localities and hotspot data."""
+    start = time.time()
+    spinner = Spinner("Creating localities_hotspots optimization table")
+    spinner.start()
+
+    try:
+        create_table_query = """
+            CREATE OR REPLACE TABLE localities_hotspots AS
+            SELECT 
+                l.locality_id,
+                l.LOCALITY as locality_name,
+                l.LATITUDE as latitude,
+                l.LONGITUDE as longitude,
+                l.locality_type,
+                l.geometry,
+                hp.month,
+                hp.avg_weekly_number_of_observations
+            FROM localities l
+            JOIN hotspot_popularity hp USING(locality_id_int)
+            WHERE l.locality_type = 'H'
+        """
+        con.execute(create_table_query)
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
+
+
 def create_spatial_indexes(con):
     """Create spatial indexes for better query performance."""
     start = time.time()
@@ -215,6 +247,11 @@ def create_spatial_indexes(con):
         # Create spatial index on localities geometry
         con.execute(
             "CREATE INDEX idx_localities_spatial ON localities USING RTREE (geometry)"
+        )
+
+        # Create spatial index on the optimized merged table
+        con.execute(
+            "CREATE INDEX idx_localities_hotspots_spatial ON localities_hotspots USING RTREE (geometry)"
         )
 
         end = time.time()
@@ -229,17 +266,25 @@ def get_table_stats(con):
     """Get statistics about the created tables."""
     print("\n=== Database Statistics ===")
 
-    tables = ["localities", "taxonomy", "hotspot_popularity"]
+    tables = ["localities", "taxonomy", "hotspot_popularity", "localities_hotspots"]
 
     for table in tables:
         try:
             count_result = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
             print(f"{table}: {count_result[0]:,} rows")
 
-            # Show sample data
-            sample = con.execute(f"SELECT * FROM {table} LIMIT 2").fetchall()
-            if sample:
-                print(f"  Sample: {sample[0]}")
+            # Show sample data for non-merged tables
+            if table != "localities_hotspots":
+                sample = con.execute(f"SELECT * FROM {table} LIMIT 2").fetchall()
+                if sample:
+                    print(f"  Sample: {sample[0]}")
+            else:
+                # Show a simpler sample for the large merged table
+                sample = con.execute(
+                    f"SELECT locality_id, locality_name, month FROM {table} LIMIT 2"
+                ).fetchall()
+                if sample:
+                    print(f"  Sample (locality_id, name, month): {sample[0]}")
 
         except Exception as e:
             print(f"Could not get stats for {table}: {e}")
@@ -301,6 +346,9 @@ def main():
         create_localities_table(con)
         create_taxonomy_table(con, str(taxonomy_path))
         create_hotspot_popularity_table(con)
+
+        # Create optimized merged table for better query performance
+        create_localities_hotspots_table(con)
 
         # Create indexes unless skipped
         if not args.skip_indexes:
