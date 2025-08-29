@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python 3.12
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
@@ -27,12 +27,6 @@ jobs:
       run: |
         uv sync --dev
     
-    - name: Create test data directory
-      run: mkdir -p tests/data
-    
     - name: Run tests
       run: |
-        uv run python -m pytest tests/ -v --tb=short
-      env:
-        # Set any environment variables needed for tests
-        PYTHONPATH: src
+        uv run python -m pytest
