@@ -5,8 +5,10 @@ import threading
 from pathlib import Path
 
 from dotenv import load_dotenv
+from duckdb import DuckDBPyConnection
+import duckdb
 
-from db import get_db_connection_with_path, report_table_stats
+from cloaca.db.db import get_db_connection_with_path, report_table_stats
 
 
 load_dotenv()
@@ -44,45 +46,6 @@ class Spinner:
         print(f"\r  {self.message}... ✅ {success_message}!     ")
 
 
-def create_intermediate_table(con):
-    """creates a table with all the data we'll use but only the columns we need and sorted by observation date"""
-    start = time.time()
-    spinner = Spinner("Creating intermediate table")
-    spinner.start()
-
-    try:
-        create_table_query = """
-            create or replace table ebd_full.intermediate as (
-            select
-                "OBSERVATION DATE",
-                "LOCALITY",
-                "LOCALITY ID",
-                "CATEGORY",
-                "SAMPLING EVENT IDENTIFIER",
-                "LOCALITY TYPE",
-                "LATITUDE",
-                "LONGITUDE",
-                "COMMON NAME",
-                "PROTOCOL TYPE",
-                "EFFORT DISTANCE KM",
-            from
-                ebd_full.full
-            where
-                "OBSERVATION DATE" > current_date - interval '5 year'
-            order by
-                "OBSERVATION DATE"
-            )
-        """
-        con.execute(create_table_query)
-
-        end = time.time()
-        spinner.stop(f"Created in {end - start:.1f}s")
-
-    except Exception as e:
-        spinner.stop("Failed")
-        raise e
-
-
 def create_hotspot_popularity_table(con):
     start = time.time()
     spinner = Spinner("Creating hotspot popularity table")
@@ -96,7 +59,7 @@ def create_hotspot_popularity_table(con):
                         extract(month from "OBSERVATION DATE") as month,
                         count(distinct date_trunc('week', "OBSERVATION DATE")) as num_weeks
                     from
-                        ebd_full.intermediate
+                        ebd_full.full
                     where
                         "OBSERVATION DATE" > current_date - interval '5 year'
                     group by
@@ -108,7 +71,7 @@ def create_hotspot_popularity_table(con):
                     -- I think i'm doing this right here?
                     count(distinct "SAMPLING EVENT IDENTIFIER") / max(num_weeks) as avg_weekly_number_of_observations
                 from
-                    ebd_full.intermediate
+                    ebd_full.full
                     join number_of_weeks_in_each_month on extract(month from "OBSERVATION DATE") = month
                 where
                     "OBSERVATION DATE" > current_date - interval '5 year'
@@ -143,7 +106,7 @@ def create_localities_table(con):
                     LONGITUDE,
                     ST_Point(LATITUDE, LONGITUDE) as geometry
                 from
-                    ebd_full.intermediate
+                    ebd_full.full
                 where
                     "OBSERVATION DATE" > current_date - interval '2 year'
                     and "LOCALITY TYPE" = 'H'
@@ -199,7 +162,7 @@ def setup_database_connections(input_ebd_db_path, parsed_output_db_path):
     return con
 
 
-def create_hotspots_richness_table(con):
+def create_hotspots_richness_table(con: DuckDBPyConnection):
     start = time.time()
     spinner = Spinner("Creating hotspots richness table")
     spinner.start()
@@ -219,7 +182,7 @@ def create_hotspots_richness_table(con):
                         "SAMPLING EVENT IDENTIFIER" as checklist_id,
                         "COMMON NAME" as common_name
                     from
-                        ebd_full.intermediate
+                        ebd_full.full
                     where
                         "OBSERVATION DATE" > current_date - interval '5 year'
                         and CATEGORY = 'species'
@@ -287,9 +250,12 @@ def create_hotspots_richness_table(con):
             """
 
         con.execute(query)
+        print(con.description)
 
         end = time.time()
         spinner.stop(f"Created in {end - start:.1f}s")
+    except duckdb.Error as e:
+        print(f"DuckDB Error: {e}")
     except Exception as e:
         print("Error creating hotspots richness table:", e)
 
@@ -349,34 +315,7 @@ def create_localities_hotspots_table(con):
         raise e
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Build parsed eBird database with weekly aggregations",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-
-    parser.add_argument(
-        "-e", "--ebd-db", required=True, help="Path to the full eBird DuckDB file"
-    )
-
-    parser.add_argument(
-        "-t", "--taxonomy", required=True, help="Path to the eBird taxonomy CSV file"
-    )
-
-    parser.add_argument(
-        "--skip-indexes",
-        action="store_true",
-        help="Skip creating indexes (faster for development)",
-    )
-
-    parser.add_argument(
-        "-o",
-        "--output",
-        help="Output path for the parsed database file",
-    )
-
-    args = parser.parse_args()
-
+def build_parsed_db(args):
     # Validate input files exist
     ebd_path = Path(args.ebd_db)
     output_db_path = Path(args.output)
@@ -402,8 +341,6 @@ def main():
         con = setup_database_connections(ebd_path, output_db_path)
 
         # Create tables
-        create_intermediate_table(con)
-        # create_weekly_species_observations_table(con)
         create_localities_table(con)
         create_taxonomy_table(con, str(taxonomy_path))
         create_hotspot_popularity_table(con)
@@ -438,4 +375,30 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Build parsed eBird database with weekly aggregations",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "-e", "--ebd-db", required=True, help="Path to the full eBird DuckDB file"
+    )
+
+    parser.add_argument(
+        "-t", "--taxonomy", required=True, help="Path to the eBird taxonomy CSV file"
+    )
+
+    parser.add_argument(
+        "--skip-indexes",
+        action="store_true",
+        help="Skip creating indexes (faster for development)",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Output path for the parsed database file",
+    )
+
+    args = parser.parse_args()
+    build_parsed_db(args)
