@@ -12,12 +12,22 @@ class PopularHotspotResult:
         latitude: float,
         longitude: float,
         avg_weekly_checklists: float,
+        likely_common_species_count: int,
+        likely_common_species_std_error: float,
+        likely_uncommon_species_count: int,
+        likely_common_and_uncommon_species_count: int,
     ):
         self.locality_id = locality_id
         self.locality_name = locality_name
         self.latitude = latitude
         self.longitude = longitude
         self.avg_weekly_checklists = avg_weekly_checklists
+        self.likely_common_species_count = likely_common_species_count
+        self.likely_common_species_std_error = likely_common_species_std_error
+        self.likely_uncommon_species_count = likely_uncommon_species_count
+        self.likely_common_and_uncommon_species_count = (
+            likely_common_and_uncommon_species_count
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         result = {
@@ -26,6 +36,10 @@ class PopularHotspotResult:
             "latitude": self.latitude,
             "longitude": self.longitude,
             "avg_weekly_checklists": self.avg_weekly_checklists,
+            "likely_common_species_count": self.likely_common_species_count,
+            "likely_common_species_std_error": self.likely_common_species_std_error,
+            "likely_uncommon_species_count": self.likely_uncommon_species_count,
+            "likely_common_and_uncommon_species_count": self.likely_common_and_uncommon_species_count,
         }
         return result
 
@@ -38,14 +52,17 @@ def get_popular_hotspots(
     month: int,
 ) -> List[PopularHotspotResult]:
     try:
-        # Use the optimized merged table for 79% faster performance
         query = """
         SELECT 
             locality_id,
             locality_name,
             latitude,
             longitude,
-            avg_weekly_number_of_observations
+            avg_weekly_number_of_observations,
+            common_species as likely_common_species_count,
+            std_error as likely_common_species_std_error,
+            uncommon_species as likely_uncommon_species_count,
+            common_and_uncommon_species as likely_common_and_uncommon_species_count
         FROM localities_hotspots
         WHERE ST_Distance_Sphere(geometry, ST_Point(?, ?)) <= ?  -- Great circle distance in meters
             AND month = ?
@@ -76,6 +93,10 @@ def get_popular_hotspots(
                 latitude=row[2],
                 longitude=row[3],
                 avg_weekly_checklists=row[4],
+                likely_common_species_count=row[5],
+                likely_common_species_std_error=row[6],
+                likely_uncommon_species_count=row[7],
+                likely_common_and_uncommon_species_count=row[8],
             )
             for row in result
         ]
