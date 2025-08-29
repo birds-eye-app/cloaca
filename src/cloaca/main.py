@@ -24,7 +24,7 @@ from fastapi_utilities import repeat_every
 
 from fastapi import FastAPI, Request, UploadFile
 
-from cloaca.db.db import get_db_connection
+from cloaca.db.db import get_db_connection_with_env
 
 
 Cloaca_App = FastAPI()
@@ -131,7 +131,9 @@ async def refresh_observations_cache():
 @Cloaca_App.on_event("startup")
 @repeat_every(seconds=60 * 30 * 1)  # every 30 minutes
 async def connect_to_duck_db():
-    duck_db_conn = get_db_connection()
+    print("Connecting to DuckDB at startup...")
+    duck_db_conn = get_db_connection_with_env()
+    print("Connected to DuckDB at startup")
     Cloaca_App.state.duck_db_conn = duck_db_conn
 
 
