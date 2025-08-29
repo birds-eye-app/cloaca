@@ -4,7 +4,12 @@ import time
 import threading
 from pathlib import Path
 
-from .db import get_db_connection
+from dotenv import load_dotenv
+
+from db import get_db_connection_with_path, report_table_stats
+
+
+load_dotenv()
 
 
 class Spinner:
@@ -39,29 +44,33 @@ class Spinner:
         print(f"\r  {self.message}... ✅ {success_message}!     ")
 
 
-def create_weekly_species_observations_table(con):
+def create_intermediate_table(con):
+    """creates a table with all the data we'll use but only the columns we need and sorted by observation date"""
     start = time.time()
-    spinner = Spinner("Creating weekly_species_observations table")
+    spinner = Spinner("Creating intermediate table")
     spinner.start()
 
     try:
         create_table_query = """
-            create or replace table weekly_species_observations as (
-                select
-                    coalesce("SUBSPECIES SCIENTIFIC NAME", "SCIENTIFIC NAME") as species_id,
-                    date_trunc('week', "OBSERVATION DATE") as week,
-                    "LOCALITY ID" as locality_id,
-                    "EXOTIC CODE" as exotic_code,
-                    count(*) as number_of_checklists -- sum("OBSERVATION COUNT") as number_of_observations
-                from
-                    ebd_full."full"
-                where
-                    "OBSERVATION DATE" > current_date - interval '5 years'
-                group by
-                    1,
-                    2,
-                    3,
-                    4
+            create or replace table ebd_full.intermediate as (
+            select
+                "OBSERVATION DATE",
+                "LOCALITY",
+                "LOCALITY ID",
+                "CATEGORY",
+                "SAMPLING EVENT IDENTIFIER",
+                "LOCALITY TYPE",
+                "LATITUDE",
+                "LONGITUDE",
+                "COMMON NAME",
+                "PROTOCOL TYPE",
+                "EFFORT DISTANCE KM",
+            from
+                ebd_full.full
+            where
+                "OBSERVATION DATE" > current_date - interval '5 year'
+            order by
+                "OBSERVATION DATE"
             )
         """
         con.execute(create_table_query)
@@ -87,19 +96,19 @@ def create_hotspot_popularity_table(con):
                         extract(month from "OBSERVATION DATE") as month,
                         count(distinct date_trunc('week', "OBSERVATION DATE")) as num_weeks
                     from
-                        ebd_full."full"
+                        ebd_full.intermediate
                     where
                         "OBSERVATION DATE" > current_date - interval '5 year'
                     group by
                         1
                 )
                 select
-                    "LOCALITY ID" as locality_id,
+                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
                     extract(month from "OBSERVATION DATE") as month,
                     -- I think i'm doing this right here?
                     count(distinct "SAMPLING EVENT IDENTIFIER") / max(num_weeks) as avg_weekly_number_of_observations
                 from
-                    ebd_full."full"
+                    ebd_full.intermediate
                     join number_of_weeks_in_each_month on extract(month from "OBSERVATION DATE") = month
                 where
                     "OBSERVATION DATE" > current_date - interval '5 year'
@@ -128,12 +137,13 @@ def create_localities_table(con):
                 select
                     distinct LOCALITY,
                     "LOCALITY ID" as locality_id,
+                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
                     "LOCALITY TYPE" as locality_type,
                     LATITUDE,
                     LONGITUDE,
                     ST_Point(LATITUDE, LONGITUDE) as geometry
                 from
-                    ebd_full."full"
+                    ebd_full.intermediate
                 where
                     "OBSERVATION DATE" > current_date - interval '2 year'
                     and "LOCALITY TYPE" = 'H'
@@ -173,23 +183,131 @@ def create_taxonomy_table(con, path_to_ebird_taxonomy_csv):
         raise e
 
 
-def setup_database_connection(ebd_db_path, output_path=None):
-    """Set up database connection with spatial extension."""
-    print(f"Connecting to EBD database: {ebd_db_path}")
+def setup_database_connections(input_ebd_db_path, parsed_output_db_path):
+    print(f"Connecting to input EBD database: {input_ebd_db_path}")
+    print(f"Connecting to parsed output database: {parsed_output_db_path}")
 
-    # Create a new database for parsed results
-    if output_path:
-        parsed_db_path = Path(output_path)
-        # Ensure the directory exists
-        parsed_db_path.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        parsed_db_path = Path(ebd_db_path).parent / "parsed_ebd.db"
+    con = get_db_connection_with_path(
+        parsed_output_db_path,
+        read_only=False,
+        verify_tables_exist=False,
+        require_db_to_exist_already=False,
+    )
 
-    print(f"Creating parsed database with spatial support: {parsed_db_path}")
+    con.execute(f"ATTACH DATABASE '{input_ebd_db_path}' AS ebd_full;")
 
-    con = get_db_connection(read_only=False)
+    return con
 
-    return con, parsed_db_path
+
+def create_hotspots_richness_table(con):
+    start = time.time()
+    spinner = Spinner("Creating hotspots richness table")
+    spinner.start()
+
+    try:
+        query = """
+            create or replace table hotspots_richness as (
+                with
+                    input_data as (
+                    select distinct -- distinct is here to exclude duplicate (shared) checklists
+                        extract (
+                        month
+                        from
+                            "OBSERVATION DATE"
+                        ) as month,
+                        "LOCALITY ID" as locality_id,
+                        "SAMPLING EVENT IDENTIFIER" as checklist_id,
+                        "COMMON NAME" as common_name
+                    from
+                        ebd_full.intermediate
+                    where
+                        "OBSERVATION DATE" > current_date - interval '5 year'
+                        and CATEGORY = 'species'
+                        and "PROTOCOL TYPE" in ('Stationary', 'Traveling')
+                        and "EFFORT DISTANCE KM" < 10
+                    ),
+                    total_checklists as (
+                    select
+                        month,
+                        locality_id,
+                        count(distinct checklist_id) as total_checklists
+                    from
+                        input_data
+                    group by
+                        1,
+                        2
+                    ),
+                    species_checklists as (
+                    select
+                        month,
+                        locality_id,
+                        common_name,
+                        count(distinct checklist_id) as species_checklists
+                    from
+                        input_data
+                    group by
+                        1,
+                        2,
+                        3
+                    ),
+                    d as (
+                    select
+                        month,
+                        locality_id,
+                        count(distinct common_name) filter(
+                        where
+                            species_checklists / total_checklists > 0.06
+                        ) as common_species,
+                        count(distinct common_name) filter(
+                        where
+                            species_checklists / total_checklists between 0.01 and 0.06
+                        ) as uncommon_species,
+                        max(total_checklists) as total_checklists
+                    from
+                        total_checklists
+                        join species_checklists using (locality_id, month)
+                    group by
+                        1,
+                        2
+                    )
+                select
+                    *,
+                    common_species + uncommon_species as common_and_uncommon_species,
+                    CAST(SUBSTRING(locality_id, 2) AS INTEGER) as locality_id_int,
+                    -- Standard error approximation
+                    sqrt(common_species) / total_checklists as std_error,
+                    -- 95% confidence interval
+                    common_species - 1.96 * sqrt(common_species) as ci_lower,
+                    common_species + 1.96 * sqrt(common_species) as ci_upper
+                from
+                    d
+                order by
+                    std_error
+                )
+            """
+
+        con.execute(query)
+
+        end = time.time()
+        spinner.stop(f"Created in {end - start:.1f}s")
+    except Exception as e:
+        print("Error creating hotspots richness table:", e)
+
+
+def drop_hotspots_richness_table(con):
+    """Drop the hotspots richness table if it exists."""
+    start = time.time()
+    spinner = Spinner("Dropping hotspots richness table")
+    spinner.start()
+
+    try:
+        con.execute("DROP TABLE IF EXISTS hotspots_richness")
+        end = time.time()
+        spinner.stop(f"Dropped in {end - start:.1f}s")
+
+    except Exception as e:
+        spinner.stop("Failed")
+        raise e
 
 
 def create_localities_hotspots_table(con):
@@ -201,18 +319,25 @@ def create_localities_hotspots_table(con):
     try:
         create_table_query = """
             CREATE OR REPLACE TABLE localities_hotspots AS
-            SELECT 
-                l.locality_id,
-                l.LOCALITY as locality_name,
-                l.LATITUDE as latitude,
-                l.LONGITUDE as longitude,
-                l.locality_type,
-                l.geometry,
-                hp.month,
-                hp.avg_weekly_number_of_observations
-            FROM localities l
-            JOIN hotspot_popularity hp USING(locality_id_int)
-            WHERE l.locality_type = 'H'
+            SELECT
+            l.locality_id,
+            l.LOCALITY as locality_name,
+            l.LATITUDE as latitude,
+            l.LONGITUDE as longitude,
+            l.locality_type,
+            l.geometry,
+            hp.month,
+            hp.avg_weekly_number_of_observations,
+            hr.common_species,
+            hr.uncommon_species, 
+            hr.common_and_uncommon_species,
+            hr.std_error
+            FROM
+            localities l
+            JOIN hotspot_popularity hp USING (locality_id_int)
+            LEFT JOIN hotspots_richness hr using (locality_id_int)
+            WHERE
+            l.locality_type = 'H'
         """
         con.execute(create_table_query)
 
@@ -222,59 +347,6 @@ def create_localities_hotspots_table(con):
     except Exception as e:
         spinner.stop("Failed")
         raise e
-
-
-def create_spatial_indexes(con):
-    """Create spatial indexes for better query performance."""
-    start = time.time()
-    spinner = Spinner("Creating spatial and database indexes")
-    spinner.start()
-
-    try:
-        # Create spatial index on localities geometry
-        con.execute(
-            "CREATE INDEX idx_localities_spatial ON localities USING RTREE (geometry)"
-        )
-
-        # Create spatial index on the optimized merged table
-        con.execute(
-            "CREATE INDEX idx_localities_hotspots_spatial ON localities_hotspots USING RTREE (geometry)"
-        )
-
-        end = time.time()
-        spinner.stop(f"Created in {end - start:.1f}s")
-
-    except Exception as e:
-        spinner.stop("Failed")
-        raise e
-
-
-def get_table_stats(con):
-    """Get statistics about the created tables."""
-    print("\n=== Database Statistics ===")
-
-    tables = ["localities", "taxonomy", "hotspot_popularity", "localities_hotspots"]
-
-    for table in tables:
-        try:
-            count_result = con.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
-            print(f"{table}: {count_result[0]:,} rows")
-
-            # Show sample data for non-merged tables
-            if table != "localities_hotspots":
-                sample = con.execute(f"SELECT * FROM {table} LIMIT 2").fetchall()
-                if sample:
-                    print(f"  Sample: {sample[0]}")
-            else:
-                # Show a simpler sample for the large merged table
-                sample = con.execute(
-                    f"SELECT locality_id, locality_name, month FROM {table} LIMIT 2"
-                ).fetchall()
-                if sample:
-                    print(f"  Sample (locality_id, name, month): {sample[0]}")
-
-        except Exception as e:
-            print(f"Could not get stats for {table}: {e}")
 
 
 def main():
@@ -300,13 +372,14 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        help="Output path for the parsed database file (default: same directory as input with name 'parsed_ebd.db')",
+        help="Output path for the parsed database file",
     )
 
     args = parser.parse_args()
 
     # Validate input files exist
     ebd_path = Path(args.ebd_db)
+    output_db_path = Path(args.output)
     taxonomy_path = Path(args.taxonomy)
 
     if not ebd_path.exists():
@@ -326,25 +399,24 @@ def main():
 
     try:
         # Set up database connection
-        con, output_db_path = setup_database_connection(ebd_path, args.output)
+        con = setup_database_connections(ebd_path, output_db_path)
 
         # Create tables
+        create_intermediate_table(con)
         # create_weekly_species_observations_table(con)
         create_localities_table(con)
         create_taxonomy_table(con, str(taxonomy_path))
         create_hotspot_popularity_table(con)
+        create_hotspots_richness_table(con)
 
         # Create optimized merged table for better query performance
         create_localities_hotspots_table(con)
 
-        # Create indexes unless skipped
-        if not args.skip_indexes:
-            create_spatial_indexes(con)
-        else:
-            print("Skipping index creation")
+        # drop this once we've created the final table for DB size
+        drop_hotspots_richness_table(con)
 
         # Show statistics
-        get_table_stats(con)
+        report_table_stats(con)
 
         total_end = time.time()
         print(
