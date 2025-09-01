@@ -71,27 +71,27 @@ class TestBuildParsedDb:
         )
 
         # Check row count
-        row_count = con.execute('SELECT count(*) FROM "full"').fetchone()
-        assert row_count is not None and row_count[0] == 10000, (
-            f"Expected 100 rows, got {row_count}"
+        row_count = con.execute("SELECT count(*) FROM ebd_sorted").fetchone()
+        assert row_count is not None and row_count[0] == 4863, (
+            f"Expected 4863 rows, got {row_count}"
         )
 
         assert_expected_vs_actual_columns(
             con,
             [
-                "OBSERVATION DATE",
-                "LOCALITY",
-                "LOCALITY ID",
-                "CATEGORY",
-                "SAMPLING EVENT IDENTIFIER",
-                "LOCALITY TYPE",
-                "LATITUDE",
-                "LONGITUDE",
-                "COMMON NAME",
-                "PROTOCOL TYPE",
-                "EFFORT DISTANCE KM",
+                "observation_date",
+                "locality",
+                "locality_id",
+                "category",
+                "sampling_event_identifier",
+                "locality_type",
+                "latitude",
+                "longitude",
+                "common_name",
+                "protocol_name",
+                "effort_distance_km",
             ],
-            "full",
+            "ebd_sorted",
         )
 
         con.close()
@@ -136,12 +136,12 @@ class TestBuildParsedDb:
             assert_expected_vs_actual_columns(
                 con,
                 [
-                    "LOCALITY",
+                    "locality",
                     "locality_id",
                     "locality_id_int",
                     "locality_type",
-                    "LATITUDE",
-                    "LONGITUDE",
+                    "latitude",
+                    "longitude",
                     "geometry",
                 ],
                 "localities",
