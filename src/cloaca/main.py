@@ -39,6 +39,7 @@ Cloaca_App.add_middleware(
 
 is_dev = False
 if env := os.getenv("ENVIRONMENT"):
+    print("Environment:", env)
     if env == "development":
         is_dev = True
     else:
@@ -89,6 +90,9 @@ async def upload_lifers_csv_api(file: UploadFile) -> UploadLifersResponse:
 async def regional_lifers(
     latitude: float, longitude: float, file_id: str
 ) -> list[Lifer]:
+    if is_dev:
+        print("not fetching regional lifers in dev mode")
+        return []
     regional_lifers = await get_filtered_lifers_for_region(latitude, longitude, file_id)
 
     print("returning", len(regional_lifers), "regional lifers")

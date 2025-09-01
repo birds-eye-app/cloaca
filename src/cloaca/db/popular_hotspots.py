@@ -68,6 +68,7 @@ def get_popular_hotspots(
             AND month = ?
             AND avg_weekly_number_of_observations >= 1
         ORDER BY avg_weekly_number_of_observations DESC
+        limit 1000
         """
 
         print(

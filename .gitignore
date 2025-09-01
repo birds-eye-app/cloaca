@@ -13,3 +13,4 @@ wheels/
 
 .vscode/*
 .env
+src/cloaca/swan_lake/dbs/*
