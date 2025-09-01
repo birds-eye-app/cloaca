@@ -56,25 +56,25 @@ def create_hotspot_popularity_table(con):
             create or replace table hotspot_popularity as (
                 with number_of_weeks_in_each_month as (
                     select
-                        extract(month from "OBSERVATION DATE") as month,
-                        count(distinct date_trunc('week', "OBSERVATION DATE")) as num_weeks
+                        extract(month from observation_date) as month,
+                        count(distinct date_trunc('week', observation_date)) as num_weeks
                     from
-                        ebd_full.full
+                        ebd_full.ebd_sorted
                     where
-                        "OBSERVATION DATE" > current_date - interval '5 year'
+                        observation_date > current_date - interval '5 year'
                     group by
                         1
                 )
                 select
-                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
-                    extract(month from "OBSERVATION DATE") as month,
+                    CAST(SUBSTRING(locality_id, 2) AS INTEGER) as locality_id_int,
+                    extract(month from observation_date) as month,
                     -- I think i'm doing this right here?
-                    count(distinct "SAMPLING EVENT IDENTIFIER") / max(num_weeks) as avg_weekly_number_of_observations
+                    count(distinct sampling_event_identifier) / max(num_weeks) as avg_weekly_number_of_observations
                 from
-                    ebd_full.full
-                    join number_of_weeks_in_each_month on extract(month from "OBSERVATION DATE") = month
+                    ebd_full.ebd_sorted
+                    join number_of_weeks_in_each_month on extract(month from observation_date) = month
                 where
-                    "OBSERVATION DATE" > current_date - interval '5 year'
+                    observation_date > current_date - interval '5 year'
                 group by
                     1,2
             )
@@ -98,20 +98,20 @@ def create_localities_table(con):
         create_table_query = """
             create or replace table localities as (
                 select
-                    distinct LOCALITY,
-                    "LOCALITY ID" as locality_id,
-                    CAST(SUBSTRING("LOCALITY ID", 2) AS INTEGER) as locality_id_int,
-                    "LOCALITY TYPE" as locality_type,
-                    LATITUDE,
-                    LONGITUDE,
-                    ST_Point(LATITUDE, LONGITUDE) as geometry
+                    distinct locality,
+                    locality_id,
+                    CAST(SUBSTRING(locality_id, 2) AS INTEGER) as locality_id_int,
+                    locality_type,
+                    latitude,
+                    longitude,
+                    ST_Point(latitude, longitude) as geometry
                 from
-                    ebd_full.full
+                    ebd_full.ebd_sorted
                 where
-                    "OBSERVATION DATE" > current_date - interval '2 year'
-                    and "LOCALITY TYPE" = 'H'
-                    AND LATITUDE IS NOT NULL
-                    AND LONGITUDE IS NOT NULL
+                    observation_date > current_date - interval '2 year'
+                    and locality_type = 'H'
+                    AND latitude IS NOT NULL
+                    AND longitude IS NOT NULL
                 order by
                     locality_id
             )
@@ -157,7 +157,7 @@ def setup_database_connections(input_ebd_db_path, parsed_output_db_path):
         require_db_to_exist_already=False,
     )
 
-    con.execute(f"ATTACH DATABASE '{input_ebd_db_path}' AS ebd_full;")
+    con.execute(f"ATTACH DATABASE '{input_ebd_db_path}' AS ebd_full (READ_ONLY);")
 
     return con
 
@@ -176,18 +176,18 @@ def create_hotspots_richness_table(con: DuckDBPyConnection):
                         extract (
                         month
                         from
-                            "OBSERVATION DATE"
+                            observation_date
                         ) as month,
-                        "LOCALITY ID" as locality_id,
-                        "SAMPLING EVENT IDENTIFIER" as checklist_id,
-                        "COMMON NAME" as common_name
+                        locality_id as locality_id,
+                        sampling_event_identifier as checklist_id,
+                        common_name as common_name
                     from
-                        ebd_full.full
+                        ebd_full.ebd_sorted
                     where
-                        "OBSERVATION DATE" > current_date - interval '5 year'
-                        and CATEGORY = 'species'
-                        and "PROTOCOL TYPE" in ('Stationary', 'Traveling')
-                        and "EFFORT DISTANCE KM" < 10
+                        observation_date > current_date - interval '5 year'
+                        and category = 'species'
+                        and protocol_name in ('Stationary', 'Traveling')
+                        and effort_distance_km < 10
                     ),
                     total_checklists as (
                     select
@@ -244,13 +244,10 @@ def create_hotspots_richness_table(con: DuckDBPyConnection):
                     common_species + 1.96 * sqrt(common_species) as ci_upper
                 from
                     d
-                order by
-                    std_error
-                )
+            )
             """
 
         con.execute(query)
-        print(con.description)
 
         end = time.time()
         spinner.stop(f"Created in {end - start:.1f}s")
@@ -304,6 +301,7 @@ def create_localities_hotspots_table(con):
             LEFT JOIN hotspots_richness hr using (locality_id_int)
             WHERE
             l.locality_type = 'H'
+            order by hp.month, l.geometry
         """
         con.execute(create_table_query)
 

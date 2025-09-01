@@ -1,56 +1,27 @@
 #!/bin/bash
 
-# Script to create test data database for build_parsed_db tests
-# This creates a small sample database with 100 rows from the real ebird_ny.db
-
 set -e  # Exit on any error
 
-# Configuration
-# source db is first arg
-SOURCE_DB="$1"
-TEST_DATA_DIR="tests/data"
-TEST_INPUT_DB="$TEST_DATA_DIR/test_input.db"
+# create a test DB using the eBird sample data
+SAMPLE_DATA_PATH='ebd_sampling_data_mar_2025.txt'
+# compress the sample data into a .gz file
+echo "Compressing $SAMPLE_DATA_PATH to $SAMPLE_DATA_PATH.gz"
+gzip -k "$SAMPLE_DATA_PATH"
+# .tar that
+echo "Creating tarball ${SAMPLE_DATA_PATH%.txt}.tar"
+tar -cvf "${SAMPLE_DATA_PATH%.txt}.tar" "$SAMPLE_DATA_PATH.gz"
 
-echo "=== Creating Test Data for build_parsed_db Tests ==="
+# now use our scripts to do the rest
 
-# Create test data directory if it doesn't exist
-echo "Creating test data directory..."
-mkdir -p "$TEST_DATA_DIR"
+echo "Running EBD parser script"
+../../src/cloaca/swan_lake/scripts/parse_ebd.sh ebd_sampling_data_mar_2025 ./ ./ 1
 
-# Remove existing test database if it exists
-if [ -f "$TEST_INPUT_DB" ]; then
-    echo "Removing existing test input database..."
-    rm -f "$TEST_INPUT_DB"
-fi
+# delete .tar & .gz
+rm -f "$SAMPLE_DATA_PATH.gz" "${SAMPLE_DATA_PATH%.txt}.tar"
 
-# Check if source database exists
-if [ ! -f "$SOURCE_DB" ]; then
-    echo "Error: Source database not found at $SOURCE_DB"
-    exit 1
-fi
+rm -f ebd_sampling_data_mar_2025_sorted.db
 
-echo "Creating test input database with 100 sample rows..."
-duckdb "$TEST_INPUT_DB" <<SQL
-ATTACH '$SOURCE_DB' AS source;
-CREATE TABLE test_input.full AS (
-    SELECT * FROM source.full 
-    where
-        "OBSERVATION DATE" > current_date - interval '2 year'
-        and CATEGORY = 'species'
-        and "PROTOCOL TYPE" in ('Stationary', 'Traveling')
-        and "EFFORT DISTANCE KM" < 10
-        and "LOCALITY TYPE" = 'H'
-        AND LATITUDE IS NOT NULL
-        AND LONGITUDE IS NOT NULL
-    LIMIT 10000
-);
-DETACH source;
-SQL
+../../src/cloaca/swan_lake/scripts/sort_edb_in_place_sort_of.sh ebd_sampling_data_mar_2025.db test_input.db
 
-# Verify the test database was created correctly
-echo "Verifying test database..."
-duckdb "$TEST_INPUT_DB" "SELECT * FROM test_input.full;"
-
-echo ""
-echo "=== Test Data Creation Complete ==="
-echo "Test input database: $TEST_INPUT_DB"
+# delete the unsorted db
+rm -f ebd_sampling_data_mar_2025.db
