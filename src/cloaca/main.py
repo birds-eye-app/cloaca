@@ -91,8 +91,10 @@ async def upload_lifers_csv_api(file: UploadFile) -> UploadLifersResponse:
 
 @Cloaca_App.get("/v1/bird_calls/call")
 async def get_bird_call_api(location_code: str | None, request: Request) -> str:
-    domain = request.base_url
+    domain = str(request.base_url)
     path = request.url.path
+    if domain.endswith("/") and path.startswith("/"):
+        path = path[1:]
     return await get_bird_call(location_code, str(domain) + path)
 
 
