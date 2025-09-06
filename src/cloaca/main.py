@@ -4,6 +4,8 @@ from typing import Dict, List, Any
 
 import duckdb
 
+from cloaca.api.bird_calls.get_audio_file import get_audio_file
+from cloaca.api.bird_calls.get_bird_call import get_bird_call
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
     clear_nearby_observations_cache,
@@ -84,6 +86,18 @@ async def get_lifers_by_location_api(
 @Cloaca_App.post("/v1/upload_lifers_csv")
 async def upload_lifers_csv_api(file: UploadFile) -> UploadLifersResponse:
     return await upload_lifers_csv(file)
+
+
+@Cloaca_App.get("/v1/bird_calls/call")
+async def get_bird_call_api(location_code: str | None, request: Request) -> str:
+    domain = str(request.base_url)
+    path = "v1/bird_calls/audio_file"
+    return await get_bird_call(location_code, str(domain) + path)
+
+
+@Cloaca_App.get("/v1/bird_calls/audio_file")
+async def get_bird_call_audio_file(location_code: str | None):
+    return await get_audio_file(location_code)
 
 
 @Cloaca_App.get("/v1/regional_new_potential_lifers")
