@@ -4,6 +4,9 @@ from typing import Dict, List, Any
 
 import duckdb
 
+from cloaca.api.bird_calls.get_audio_file import get_audio_file
+from cloaca.api.bird_calls.get_bird_call import get_bird_call
+from cloaca.api.bird_calls.main import MCGOLRICK_PARK_HOTSPOT_ID
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
     clear_nearby_observations_cache,
@@ -86,6 +89,18 @@ async def upload_lifers_csv_api(file: UploadFile) -> UploadLifersResponse:
     return await upload_lifers_csv(file)
 
 
+@Cloaca_App.get("/v1/bird_calls/call")
+async def get_bird_call_api(location_code: str | None, request: Request) -> str:
+    domain = request.base_url
+    path = request.url.path
+    return await get_bird_call(location_code, str(domain) + path)
+
+
+@Cloaca_App.get("/v1/bird_calls/audio_file")
+async def get_bird_call_audio_file(location_code: str | None):
+    return await get_audio_file(location_code)
+
+
 @Cloaca_App.get("/v1/regional_new_potential_lifers")
 async def regional_lifers(
     latitude: float, longitude: float, file_id: str
@@ -139,6 +154,13 @@ async def connect_to_duck_db():
     duck_db_conn = get_db_connection_with_env()
     print("Connected to DuckDB at startup")
     Cloaca_App.state.duck_db_conn = duck_db_conn
+
+
+@Cloaca_App.on_event("startup")
+@repeat_every(seconds=60 * 15 * 1)  # every 15 minutes
+async def refresh_mcgolrick_bird_call():
+    print("Refreshing McGolrick Park bird call...")
+    await get_bird_call(MCGOLRICK_PARK_HOTSPOT_ID)
 
 
 @Cloaca_App.on_event("shutdown")
