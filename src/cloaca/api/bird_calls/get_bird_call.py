@@ -1,5 +1,7 @@
 import time
 from urllib.parse import urlencode
+
+from fastapi import Response
 from cloaca.api.bird_calls.main import MCGOLRICK_PARK_HOTSPOT_ID, run_bird_calls_job
 
 from twilio.twiml.voice_response import VoiceResponse
@@ -7,7 +9,7 @@ from twilio.twiml.voice_response import VoiceResponse
 last_refresh_times = {}
 
 
-async def get_bird_call(location_code: str | None, url: str) -> str:
+async def get_bird_call(location_code: str | None, url: str) -> Response:
     if location_code is None:
         location_code = MCGOLRICK_PARK_HOTSPOT_ID
 
@@ -30,4 +32,4 @@ async def get_bird_call(location_code: str | None, url: str) -> str:
     response = VoiceResponse()
     response.play(complete_url)
 
-    return str(response)
+    return Response(content=str(response), media_type="application/xml")

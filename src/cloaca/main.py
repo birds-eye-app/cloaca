@@ -6,7 +6,6 @@ import duckdb
 
 from cloaca.api.bird_calls.get_audio_file import get_audio_file
 from cloaca.api.bird_calls.get_bird_call import get_bird_call
-from cloaca.api.bird_calls.main import MCGOLRICK_PARK_HOTSPOT_ID
 from cloaca.api.get_lifers_by_location import get_lifers_by_location
 from cloaca.api.get_nearby_observations import (
     clear_nearby_observations_cache,
@@ -154,13 +153,6 @@ async def connect_to_duck_db():
     duck_db_conn = get_db_connection_with_env()
     print("Connected to DuckDB at startup")
     Cloaca_App.state.duck_db_conn = duck_db_conn
-
-
-@Cloaca_App.on_event("startup")
-@repeat_every(seconds=60 * 15 * 1)  # every 15 minutes
-async def refresh_mcgolrick_bird_call():
-    print("Refreshing McGolrick Park bird call...")
-    await get_bird_call(MCGOLRICK_PARK_HOTSPOT_ID)
 
 
 @Cloaca_App.on_event("shutdown")
