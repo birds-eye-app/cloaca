@@ -26,6 +26,9 @@ MCGOLRICK_PARK_COMMON_BIRDS = {
     "eawpew",  # Eastern Pewee
     "chiswi",  # Chimney Swift
     "amhgul1",  # American Herring Gull
+    "comgra",  # Common Grackle
+    "cangoo",  # Canada Goose
+    "whtspa",  # White-throated Sparrow
 }
 
 MCGOLRICK_PARK_PATCH_RARITIES = {
