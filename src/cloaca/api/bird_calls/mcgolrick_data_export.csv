@@ -1,0 +1,127 @@
+common_name,species_code,family,species_group,total_appearances,total_appearances_rank
+European Starling,eursta,Sturnidae (Starlings),Starlings and Mynas,1386,1
+Rock Pigeon,rocpig,Columbidae (Pigeons and Doves),Pigeons and Doves,1381,2
+House Sparrow,houspa,Passeridae (Old World Sparrows),Old World Sparrows,1354,3
+American Robin,amerob,Turdidae (Thrushes and Allies),Thrushes,1200,4
+Mourning Dove,moudov,Columbidae (Pigeons and Doves),Pigeons and Doves,976,5
+Common Grackle,comgra,Icteridae (Troupials and Allies),Blackbirds,733,6
+White-throated Sparrow,whtspa,Passerellidae (New World Sparrows),New World Sparrows,701,7
+Blue Jay,blujay,"Corvidae (Crows, Jays, and Magpies)","Jays, Magpies, Crows, and Ravens",671,8
+Red-bellied Woodpecker,rebwoo,Picidae (Woodpeckers),Woodpeckers,612,9
+Downy Woodpecker,dowwoo,Picidae (Woodpeckers),Woodpeckers,589,10
+American Crow,amecro,"Corvidae (Crows, Jays, and Magpies)","Jays, Magpies, Crows, and Ravens",525,11
+Northern Flicker,norfli,Picidae (Woodpeckers),Woodpeckers,422,12
+Laughing Gull,laugul,"Laridae (Gulls, Terns, and Skimmers)","Gulls, Terns, and Skimmers",386,13
+Yellow-bellied Sapsucker,yebsap,Picidae (Woodpeckers),Woodpeckers,379,14
+Black-and-white Warbler,bawwar,Parulidae (New World Warblers),Wood-Warblers,360,15
+Northern Cardinal,norcar,Cardinalidae (Cardinals and Allies),"Cardinals, Grosbeaks, and Allies",359,16
+Ovenbird,ovenbi1,Parulidae (New World Warblers),Wood-Warblers,343,17
+American Redstart,amered,Parulidae (New World Warblers),Wood-Warblers,325,18
+Hermit Thrush,herthr,Turdidae (Thrushes and Allies),Thrushes,267,19
+Ruby-crowned Kinglet,ruckin,Regulidae (Kinglets),Kinglets,246,20
+Northern Parula,norpar,Parulidae (New World Warblers),Wood-Warblers,227,21
+Gray Catbird,grycat,Mimidae (Mockingbirds and Thrashers),"Catbirds, Mockingbirds, and Thrashers",208,22
+Chimney Swift,chiswi,Apodidae (Swifts),Swifts,204,23
+Tufted Titmouse,tuftit,"Paridae (Tits, Chickadees, and Titmice)","Tits, Chickadees, and Titmice",197,24
+Red-tailed Hawk,rethaw,"Accipitridae (Hawks, Eagles, and Kites)","Vultures, Hawks, and Allies",178,25
+Eastern Wood-Pewee,eawpew,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",176,26
+Common Yellowthroat,comyel,Parulidae (New World Warblers),Wood-Warblers,176,27
+Fish Crow,fiscro,"Corvidae (Crows, Jays, and Magpies)","Jays, Magpies, Crows, and Ravens",157,28
+Yellow-rumped Warbler,yerwar,Parulidae (New World Warblers),Wood-Warblers,151,29
+House Finch,houfin,"Fringillidae (Finches, Euphonias, and Allies)","Finches, Euphonias, and Allies",140,30
+Dark-eyed Junco,daejun,Passerellidae (New World Sparrows),New World Sparrows,139,31
+Scarlet Tanager,scatan,Cardinalidae (Cardinals and Allies),"Cardinals, Grosbeaks, and Allies",137,32
+Red-eyed Vireo,reevir1,"Vireonidae (Vireos, Shrike-Babblers, and Erpornis)",Vireos,135,33
+Blackpoll Warbler,bkpwar,Parulidae (New World Warblers),Wood-Warblers,131,34
+Black-throated Blue Warbler,btbwar,Parulidae (New World Warblers),Wood-Warblers,127,35
+Baltimore Oriole,balori,Icteridae (Troupials and Allies),Blackbirds,124,36
+Chipping Sparrow,chispa,Passerellidae (New World Sparrows),New World Sparrows,123,37
+White-breasted Nuthatch,whbnut,Sittidae (Nuthatches),Nuthatches,122,38
+American Kestrel,amekes,Falconidae (Falcons and Caracaras),Falcons and Caracaras,117,39
+Cooper's Hawk,coohaw,"Accipitridae (Hawks, Eagles, and Kites)","Vultures, Hawks, and Allies",111,40
+Rose-breasted Grosbeak,robgro,Cardinalidae (Cardinals and Allies),"Cardinals, Grosbeaks, and Allies",109,41
+Eastern Phoebe,easpho,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",108,42
+Northern Mockingbird,normoc,Mimidae (Mockingbirds and Thrashers),"Catbirds, Mockingbirds, and Thrashers",106,43
+Blue-headed Vireo,buhvir,"Vireonidae (Vireos, Shrike-Babblers, and Erpornis)",Vireos,103,44
+Golden-crowned Kinglet,gockin,Regulidae (Kinglets),Kinglets,96,45
+Magnolia Warbler,magwar,Parulidae (New World Warblers),Wood-Warblers,92,46
+Eastern Towhee,eastow,Passerellidae (New World Sparrows),New World Sparrows,88,47
+Great Crested Flycatcher,grcfly,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",85,48
+Swainson's Thrush,swathr,Turdidae (Thrushes and Allies),Thrushes,81,49
+Double-crested Cormorant,doccor,Phalacrocoracidae (Cormorants and Shags),Cormorants and Anhingas,73,50
+Yellow Warbler,yelwar,Parulidae (New World Warblers),Wood-Warblers,72,51
+Song Sparrow,sonspa,Passerellidae (New World Sparrows),New World Sparrows,70,52
+Canada Goose,cangoo,"Anatidae (Ducks, Geese, and Waterfowl)",Waterfowl,69,53
+Black-throated Green Warbler,btnwar,Parulidae (New World Warblers),Wood-Warblers,65,54
+Bay-breasted Warbler,babwar,Parulidae (New World Warblers),Wood-Warblers,63,55
+Brown Creeper,brncre,Certhiidae (Treecreepers),Treecreepers,58,56
+Veery,veery,Turdidae (Thrushes and Allies),Thrushes,58,57
+Palm Warbler,palwar,Parulidae (New World Warblers),Wood-Warblers,55,58
+American Herring Gull,amhgul1,"Laridae (Gulls, Terns, and Skimmers)","Gulls, Terns, and Skimmers",54,59
+Chestnut-sided Warbler,chswar,Parulidae (New World Warblers),Wood-Warblers,54,60
+Ring-billed Gull,ribgul,"Laridae (Gulls, Terns, and Skimmers)","Gulls, Terns, and Skimmers",40,61
+Cedar Waxwing,cedwax,Bombycillidae (Waxwings),Waxwings,39,62
+Black-capped Chickadee,bkcchi,"Paridae (Tits, Chickadees, and Titmice)","Tits, Chickadees, and Titmice",38,63
+Red-winged Blackbird,rewbla,Icteridae (Troupials and Allies),Blackbirds,38,64
+Canada Warbler,canwar,Parulidae (New World Warblers),Wood-Warblers,38,65
+Pine Warbler,pinwar,Parulidae (New World Warblers),Wood-Warblers,31,66
+Wood Thrush,woothr,Turdidae (Thrushes and Allies),Thrushes,30,67
+Swamp Sparrow,swaspa,Passerellidae (New World Sparrows),New World Sparrows,29,68
+Common Raven,comrav,"Corvidae (Crows, Jays, and Magpies)","Jays, Magpies, Crows, and Ravens",26,69
+Brown Thrasher,brnthr,Mimidae (Mockingbirds and Thrashers),"Catbirds, Mockingbirds, and Thrashers",26,70
+Blackburnian Warbler,bkbwar,Parulidae (New World Warblers),Wood-Warblers,26,71
+Prairie Warbler,prawar,Parulidae (New World Warblers),Wood-Warblers,25,72
+Yellow-billed Cuckoo,yebcuc,Cuculidae (Cuckoos),Cuckoos,24,73
+Osprey,osprey,Pandionidae (Osprey),"Vultures, Hawks, and Allies",24,74
+Warbling Vireo,warvir,"Vireonidae (Vireos, Shrike-Babblers, and Erpornis)",Vireos,23,75
+Peregrine Falcon,perfal,Falconidae (Falcons and Caracaras),Falcons and Caracaras,21,76
+Nashville Warbler,naswar,Parulidae (New World Warblers),Wood-Warblers,19,77
+Fox Sparrow,foxspa,Passerellidae (New World Sparrows),New World Sparrows,18,78
+Wilson's Warbler,wlswar,Parulidae (New World Warblers),Wood-Warblers,18,79
+Blue-gray Gnatcatcher,buggna,Polioptilidae (Gnatcatchers),Gnatcatchers,16,80
+Northern House Wren,houwre,Troglodytidae (Wrens),Wrens,16,81
+Merlin,merlin,Falconidae (Falcons and Caracaras),Falcons and Caracaras,15,82
+Eastern Kingbird,easkin,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",12,83
+Cape May Warbler,camwar,Parulidae (New World Warblers),Wood-Warblers,12,84
+Ruby-throated Hummingbird,rthhum,Trochilidae (Hummingbirds),Hummingbirds,10,85
+American Woodcock,amewoo,Scolopacidae (Sandpipers and Allies),Shorebirds,9,86
+Yellow-bellied Flycatcher,yebfly,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",9,87
+Barn Swallow,barswa,Hirundinidae (Swallows),Martins and Swallows,9,88
+American Goldfinch,amegfi,"Fringillidae (Finches, Euphonias, and Allies)","Finches, Euphonias, and Allies",9,89
+Orchard Oriole,orcori,Icteridae (Troupials and Allies),Blackbirds,9,90
+Great Blue Heron,grbher3,"Ardeidae (Herons, Egrets, and Bitterns)","Herons, Ibis, and Allies",8,91
+Winter Wren,winwre3,Troglodytidae (Wrens),Wrens,8,92
+Yellow-crowned Night Heron,ycnher,"Ardeidae (Herons, Egrets, and Bitterns)","Herons, Ibis, and Allies",7,93
+Willow Flycatcher,wilfly,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",7,94
+Yellow-throated Vireo,yetvir,"Vireonidae (Vireos, Shrike-Babblers, and Erpornis)",Vireos,7,95
+White-crowned Sparrow,whcspa,Passerellidae (New World Sparrows),New World Sparrows,7,96
+Hooded Warbler,hoowar,Parulidae (New World Warblers),Wood-Warblers,7,97
+Blue-winged Warbler,buwwar,Parulidae (New World Warblers),Wood-Warblers,6,98
+Turkey Vulture,turvul,Cathartidae (New World Vultures),"Vultures, Hawks, and Allies",5,99
+Olive-sided Flycatcher,olsfly,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",5,100
+Gray-cheeked Thrush,gycthr,Turdidae (Thrushes and Allies),Thrushes,5,101
+Tennessee Warbler,tenwar,Parulidae (New World Warblers),Wood-Warblers,5,102
+Tree Swallow,treswa,Hirundinidae (Swallows),Martins and Swallows,4,103
+Savannah Sparrow,savspa,Passerellidae (New World Sparrows),New World Sparrows,4,104
+Belted Kingfisher,belkin1,Alcedinidae (Kingfishers),Kingfishers,3,105
+Least Flycatcher,leafly,Tyrannidae (Tyrant Flycatchers),"Tyrant Flycatchers: Pewees, Kingbirds, and Allies",3,106
+Red-breasted Nuthatch,rebnut,Sittidae (Nuthatches),Nuthatches,3,107
+Carolina Wren,carwre,Troglodytidae (Wrens),Wrens,3,108
+Northern Waterthrush,norwat,Parulidae (New World Warblers),Wood-Warblers,3,109
+Mute Swan,mutswa,"Anatidae (Ducks, Geese, and Waterfowl)",Waterfowl,2,110
+Wild Turkey,wiltur,"Phasianidae (Pheasants, Grouse, and Allies)","Grouse, Quail, and Allies",2,111
+Black-billed Cuckoo,bkbcuc,Cuculidae (Cuckoos),Cuckoos,2,112
+Great Egret,greegr,"Ardeidae (Herons, Egrets, and Bitterns)","Herons, Ibis, and Allies",2,113
+Lincoln's Sparrow,linspa,Passerellidae (New World Sparrows),New World Sparrows,2,114
+Mallard,mallar3,"Anatidae (Ducks, Geese, and Waterfowl)",Waterfowl,1,115
+Common Nighthawk,comnig,Caprimulgidae (Nightjars and Allies),Nightjars,1,116
+Killdeer,killde,Charadriidae (Plovers and Lapwings),Shorebirds,1,117
+American Bittern,amebit,"Ardeidae (Herons, Egrets, and Bitterns)","Herons, Ibis, and Allies",1,118
+Green Heron,grnher,"Ardeidae (Herons, Egrets, and Bitterns)","Herons, Ibis, and Allies",1,119
+Sharp-shinned Hawk,shshaw,"Accipitridae (Hawks, Eagles, and Kites)","Vultures, Hawks, and Allies",1,120
+Hairy Woodpecker,haiwoo,Picidae (Woodpeckers),Woodpeckers,1,121
+Purple Finch,purfin,"Fringillidae (Finches, Euphonias, and Allies)","Finches, Euphonias, and Allies",1,122
+Field Sparrow,fiespa,Passerellidae (New World Sparrows),New World Sparrows,1,123
+Brown-headed Cowbird,bnhcow,Icteridae (Troupials and Allies),Blackbirds,1,124
+Mourning Warbler,mouwar,Parulidae (New World Warblers),Wood-Warblers,1,125
+Summer Tanager,sumtan,Cardinalidae (Cardinals and Allies),"Cardinals, Grosbeaks, and Allies",1,126
