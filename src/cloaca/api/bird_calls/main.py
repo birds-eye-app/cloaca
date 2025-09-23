@@ -24,8 +24,17 @@ PATCH_FAVORITE_SPECIES_CODES = [
     "amekes",  # American Kestrel
 ]
 
+PATCH_ABSOLUTE_MEGA_HIGHLIGHTS = [
+    (
+        "mouwar",
+        "2025-09-23",
+        "Found by P-slay. All credit to the queen.",
+    ),  # p-slay's mourning warbler
+]
+
 
 class BirdRarityTier(enum.Enum):
+    ABSOLUTE_MEGA = "absolute_mega"  # ones I want to specifically highlight
     # genuinely rare birds that would show up on eBird's rarity reports
     RARITY = "rarity"
     # birds that are rare for the park (like the Cuckoo or Flycatcher today)
@@ -43,6 +52,7 @@ class PatchObservation:
     rarity_tier: BirdRarityTier
     species_group: str | None = None
     total_appearances: int | None = None
+    notes: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -60,6 +70,7 @@ class PatchObservation:
             "Last Seen": self.date_last_seen,
             "Rarity": self.rarity_tier.value,
             "Species Group": self.species_group,
+            "Notes": self.notes if self.notes else "",
         }
 
 
@@ -90,6 +101,15 @@ def phoebe_to_patch_observation(
     if df_match is not None:
         patch_obs.species_group = df_match["species_group"]
         patch_obs.total_appearances = df_match["total_appearances"]
+
+    # check if it's in the absolute mega highlights
+    # check for exact match on species code and within 3 days of the date
+    for code, date, notes in PATCH_ABSOLUTE_MEGA_HIGHLIGHTS:
+        if obs.species_code == code and obs.obs_dt >= date:
+            print(f"Marking {obs.species_code} as absolute mega highlight ({notes})")
+            patch_obs.rarity_tier = BirdRarityTier.ABSOLUTE_MEGA
+            patch_obs.notes = notes
+            return patch_obs
 
     if is_rarity:
         patch_obs.rarity_tier = BirdRarityTier.RARITY
@@ -151,6 +171,8 @@ async def request_bird_report_from_llm(hotspot_name: str, tabulated_results: str
 
     You always want to focus on reporting `rarity` level birds first, then `patch_rarity`'s, followed by `patch_favorites`. Prioritize birds that have been seen the most recently. Don't report any birds that were last seen more than 3 days ago.
 
+    If there are any `absolute_mega` birds in the list, you should always report those first, no matter what. These are birds that are extremely rare and exciting, and you want to make sure to highlight them. To highlight them appropriately, you should use a slightly more excited tone or shout when you say the name of the bird. For example, "OH MY GOODNESS CAN YOU BELIEVE IT, A MOURNING WARBLER WAS JUST SEEN THIS MORNING!"
+
     There are two special report types: 
     1. Warbler report: if there are any warblers in the list, you should group them together into a "warbler report" section of your summary. For example, "For today's warbler report, we have Yellow, Black-and-White, Black-Throated-Green, Northern Parulas, and Common Yellowthroats all being seen." Note: we're specifically not saying "Warbler" every single time. Just say the first part of the name, like "Tennessee" or Cape May" or "Black-throated Green".
 
@@ -163,46 +185,49 @@ Here's an example input:
 Current time: 2025-09-07 10:00
 Hotspot: McGolrick Park
 
-+----------------+---------------------------+------------------+
-| Rarity         | Common Name               | Last Seen        |
-+================+===========================+==================+
-| patch_favorite | Baltimore Oriole          | 2025-08-30 18:25 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Ovenbird                  | 2025-08-30 18:25 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Black-and-white Warbler   | 2025-09-01 07:00 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Chestnut-sided Warbler    | 2025-09-01 07:00 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Scarlet Tanager           | 2025-09-01 07:00 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Great Crested Flycatcher  | 2025-09-02 06:30 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Common Yellowthroat       | 2025-09-02 06:30 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Magnolia Warbler          | 2025-09-02 06:30 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Ruby-throated Hummingbird | 2025-09-06 06:30 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Yellow Warbler            | 2025-09-06 07:55 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Northern Parula           | 2025-09-06 09:52 |
-+----------------+---------------------------+------------------+
-| patch_favorite | American Redstart         | 2025-09-06 10:37 |
-+----------------+---------------------------+------------------+
-| patch_favorite | Northern Waterthrush      | 2025-09-06 11:08 |
-+----------------+---------------------------+------------------+
-| patch_rarity | Cape May Warbler          | 2025-09-06 11:08 |
-+----------------+---------------------------+------------------+
-| patch_rarity   | Olive-sided Flycatcher    | 2025-09-05 18:26 |
-+----------------+---------------------------+------------------+
-| patch_rarity   | Yellow-billed Cuckoo      | 2025-09-06 11:08 |
-+----------------+---------------------------+------------------+
+    +---------------------------+------------------+----------------+---------------------------------------+-------------------------------------------+
+| Rarity                    | Common Name      | Last Seen      | Species Group                         | Notes                                     |
++===========================+==================+================+=======================================+===========================================+
+| Mourning Warbler          | 2025-09-23 08:15 | absolute_mega  | Wood-Warblers                         | Found by P-slay. All credit to the queen. |
++---------------------------+------------------+----------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Baltimore Oriole          | 2025-08-30 18:25 | Blackbirds                            |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Ovenbird                  | 2025-08-30 18:25 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Black-and-white Warbler   | 2025-09-01 07:00 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Chestnut-sided Warbler    | 2025-09-01 07:00 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Scarlet Tanager           | 2025-09-01 07:00 | Tanagers                              |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Great Crested Flycatcher  | 2025-09-02 06:30 | Flycatchers                           |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Common Yellowthroat       | 2025-09-02 06:30 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Magnolia Warbler          | 2025-09-02 06:30 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Ruby-throated Hummingbird | 2025-09-06 06:30 | Hummingbirds                          |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Yellow Warbler            | 2025-09-06 07:55 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Northern Parula           | 2025-09-06 09:52 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | American Redstart         | 2025-09-06 10:37 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_favorite | Northern Waterthrush      | 2025-09-06 11:08 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_rarity   | Cape May Warbler          | 2025-09-06 11:08 | Wood-Warblers                         |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_rarity   | Olive-sided Flycatcher    | 2025-09-05 18:26 | Flycatchers                           |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
+| patch_rarity   | Yellow-billed Cuckoo      | 2025-09-06 11:08 | Cuckoos                               |                                           |
++----------------+---------------------------+------------------+---------------------------------------+-------------------------------------------+
 ```
 
 And here's an example of how you would report this
 
 > Thanks for calling McGolrick Park rare bird alert. 
+> OH MY GOODNESS CAN YOU BELIEVE IT, A MOURNING WARBLER WAS JUST SEEN THIS MORNING! ALL CREDIT TO THE QUEEN P-SLAY.
 > A Yellow-Billed cuckoo was seen starting this morning as well as a Cape May Warbler.
 > Yesterday, an Olive-sided flycatcher was seen. 
 > For today's warbler report, we have Yellow, Northern Parula, Cape May, American Redstart, and Northern Waterthrush all being seen.
@@ -214,6 +239,9 @@ And here's an example of how you would report this
     Current time: {__import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M")}
     {tabulated_results}
     """
+
+    print("System prompt:", system_prompt)
+    print("User prompt:", user_prompt)
 
     openai = AsyncOpenAI()
     async with openai.realtime.connect(
@@ -358,7 +386,7 @@ async def run_bird_calls_job(region_code: str):
         hotspot_name,
         tabulate(
             [po.to_llm_dict().values() for po in notable_patch_observations],
-            headers=["Rarity", "Common Name", "Last Seen", "Species Group"],
+            headers=["Rarity", "Common Name", "Last Seen", "Species Group", "Notes"],
             tablefmt="grid",
         ),
     )
