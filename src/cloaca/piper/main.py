@@ -89,6 +89,11 @@ async def on_message(message: discord.Message):
         await message.reply("What birds are you curious about?")
         return
 
+    if ref_msg is not None:
+        logger.info("query (reply to %d): %s", ref_msg.id, query)
+    else:
+        logger.info("query: %s", query)
+
     # Build context from cache or reply chain
     prior_messages = None
     prior_context = None
