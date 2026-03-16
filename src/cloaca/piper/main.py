@@ -6,6 +6,7 @@ import discord
 from cloaca.piper.bird_query import ask_bird_query
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 intents = discord.Intents.default()
 intents.message_content = True
