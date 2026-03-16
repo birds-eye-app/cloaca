@@ -1,0 +1,50 @@
+# Exported from Render on 2026-03-16T15:50:00Z
+version: "1"
+projects:
+- name: Birds Eye
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: cloaca
+      runtime: docker
+      repo: https://github.com/birds-eye-app/cloaca
+      plan: starter
+      envVars:
+      - key: BIRD_CALL_DATA_EXPORT_PATH
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AUDIO_FILES_PATH
+        sync: false
+      - key: DUCK_DB_PATH
+        sync: false
+      - key: EBIRD_API_KEY
+        sync: false
+      region: oregon
+      healthCheckPath: /v1/health
+      dockerContext: .
+      dockerfilePath: ./Dockerfile
+      disk:
+        name: disk
+        mountPath: /var/data
+        sizeGB: 1
+      autoDeployTrigger: checksPass
+
+    - type: worker
+      name: piper
+      runtime: docker
+      repo: https://github.com/birds-eye-app/cloaca
+      plan: starter
+      envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PIPER_DISCORD_BOT_TOKEN
+        sync: false
+      - key: EBIRD_MCP_URL
+        sync: false
+      region: oregon
+      dockerContext: .
+      dockerfilePath: ./Dockerfile
+      dockerCommand: uv run python3 -m cloaca.piper.main
+      autoDeployTrigger: checksPass
