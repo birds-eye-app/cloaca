@@ -50,12 +50,23 @@ logger = logging.getLogger(__name__)
 client = AsyncAnthropic()
 
 
-async def ask_bird_query(query: str) -> tuple[str, QueryStats]:
+async def ask_bird_query(
+    query: str,
+    prior_messages: list[dict] | None = None,
+    prior_context: str | None = None,
+) -> tuple[str, QueryStats, list[dict]]:
     start = time.monotonic()
     chunks: list[str] = []
     total_input_tokens = 0
     total_output_tokens = 0
     tool_call_count = 0
+
+    if prior_messages:
+        messages = prior_messages + [{"role": "user", "content": query}]
+    elif prior_context:
+        messages = [{"role": "user", "content": f"{prior_context}\n\nNew question: {query}"}]
+    else:
+        messages = [{"role": "user", "content": query}]
 
     async with sse_client(EBIRD_MCP_URL) as (read, write):
         async with ClientSession(read, write) as mcp_client:
@@ -69,7 +80,7 @@ async def ask_bird_query(query: str) -> tuple[str, QueryStats]:
                 thinking={"type": "adaptive"},
                 system=SYSTEM_PROMPT,
                 tools=[async_mcp_tool(t, mcp_client) for t in tools_result.tools],
-                messages=[{"role": "user", "content": query}],
+                messages=messages,
                 stream=True,
             )
 
@@ -93,4 +104,6 @@ async def ask_bird_query(query: str) -> tuple[str, QueryStats]:
         output_tokens=total_output_tokens,
         tool_calls=tool_call_count,
     )
-    return "".join(chunks), stats
+    response_text = "".join(chunks)
+    updated_messages = messages + [{"role": "assistant", "content": response_text}]
+    return response_text, stats, updated_messages
