@@ -41,6 +41,8 @@ projects:
         sync: false
       - key: PIPER_DISCORD_BOT_TOKEN
         sync: false
+      - key: EBIRD_MCP_URL
+        sync: false
       region: oregon
       dockerContext: .
       dockerfilePath: ./Dockerfile

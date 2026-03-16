@@ -1,3 +1,4 @@
+import os
 import time
 from dataclasses import dataclass
 
@@ -6,7 +7,7 @@ from anthropic.lib.tools.mcp import async_mcp_tool
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
-EBIRD_MCP_URL = "EBIRD_MCP_URL_REDACTED"
+EBIRD_MCP_URL = os.environ["EBIRD_MCP_URL"]
 
 SYSTEM_PROMPT = """You are a birding assistant for New York City. You answer questions about bird sightings, eBird observations, hotspots, and birding topics — but only for NYC and the surrounding area (the five boroughs, Long Island, New Jersey, Connecticut, and the lower Hudson Valley).
 
