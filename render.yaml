@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: cloaca
+    runtime: docker
+    repo: https://github.com/birds-eye-app/cloaca
+    branch: main
+    region: oregon
+    plan: starter
+    healthCheckPath: /v1/health
+    autoDeploy: true
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    disk:
+      name: disk
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: EBIRD_API_KEY
+        sync: false
+      - key: DUCK_DB_PATH
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+
+  - type: worker
+    name: piper
+    runtime: docker
+    repo: https://github.com/birds-eye-app/cloaca
+    branch: main
+    region: oregon
+    plan: starter
+    autoDeploy: true
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uv run python3 -m cloaca.piper.main
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PIPER_DISCORD_BOT_TOKEN
+        sync: false
