@@ -43,6 +43,8 @@ projects:
         sync: false
       - key: EBIRD_MCP_URL
         sync: false
+      - key: DUCK_DB_PATH
+        value: /var/data/parsed_full_sorted.db
 
       region: oregon
       dockerContext: .
