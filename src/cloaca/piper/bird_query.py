@@ -2,7 +2,6 @@ from typing import AsyncGenerator
 
 from anthropic import AsyncAnthropic
 from anthropic.lib.tools.mcp import async_mcp_tool
-from fastapi.responses import StreamingResponse
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
@@ -17,7 +16,7 @@ If a question is not about birds, bird sightings, eBird, or birding, decline pol
 client = AsyncAnthropic()
 
 
-async def _stream_bird_query(query: str) -> AsyncGenerator[str, None]:
+async def stream_bird_query(query: str) -> AsyncGenerator[str, None]:
     async with sse_client(EBIRD_MCP_URL) as (read, write):
         async with ClientSession(read, write) as mcp_client:
             await mcp_client.initialize()
@@ -51,7 +50,3 @@ async def _stream_bird_query(query: str) -> AsyncGenerator[str, None]:
                 print(
                     f"[bird_query] turn done: stop_reason={final.stop_reason}, output_tokens={final.usage.output_tokens}"
                 )
-
-
-async def bird_query(query: str) -> StreamingResponse:
-    return StreamingResponse(_stream_bird_query(query), media_type="text/plain")

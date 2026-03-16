@@ -15,7 +15,6 @@ from cloaca.api.get_new_lifers_by_region import (
     get_filtered_lifers_for_region,
     get_regional_mapping,
 )
-from cloaca.api.bird_query.main import bird_query
 from cloaca.api.get_popular_hotspots import get_popular_hotspots_api
 
 from cloaca.api.upload_lifers_csv import UploadLifersResponse, upload_lifers_csv
@@ -26,7 +25,6 @@ from fastapi_utilities import repeat_every
 
 
 from fastapi import FastAPI, Request, UploadFile
-from fastapi.responses import StreamingResponse
 
 from cloaca.db.db import get_db_connection_with_env
 
@@ -64,11 +62,6 @@ async def add_process_time_header(request: Request, call_next):
             )
         )
     return response
-
-
-@Cloaca_App.post("/v1/bird_query")
-async def bird_query_api(query: str) -> StreamingResponse:
-    return await bird_query(query)
 
 
 @Cloaca_App.get("/v1/health")
