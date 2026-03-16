@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from dataclasses import dataclass
@@ -44,6 +45,8 @@ class QueryStats:
         return (self.input_tokens * 5 + self.output_tokens * 25) / 1_000_000
 
 
+logger = logging.getLogger(__name__)
+
 client = AsyncAnthropic()
 
 
@@ -58,7 +61,7 @@ async def ask_bird_query(query: str) -> tuple[str, QueryStats]:
         async with ClientSession(read, write) as mcp_client:
             await mcp_client.initialize()
             tools_result = await mcp_client.list_tools()
-            print(f"[bird_query] Connected, {len(tools_result.tools)} tools")
+            logger.info("Connected, %d tools", len(tools_result.tools))
 
             runner = client.beta.messages.tool_runner(
                 model="claude-sonnet-4-6",
@@ -75,18 +78,14 @@ async def ask_bird_query(query: str) -> tuple[str, QueryStats]:
                     if event.type == "content_block_stop":
                         if event.content_block.type == "tool_use":
                             tool_call_count += 1
-                            print(
-                                f"[bird_query] tool_call: {event.content_block.name} input={event.content_block.input}"
-                            )
+                            logger.info("tool_call: %s input=%s", event.content_block.name, event.content_block.input)
                     elif event.type == "text":
                         chunks.append(event.text)
 
                 final = await message_stream.get_final_message()
                 total_input_tokens += final.usage.input_tokens
                 total_output_tokens += final.usage.output_tokens
-                print(
-                    f"[bird_query] turn done: stop_reason={final.stop_reason}, output_tokens={final.usage.output_tokens}"
-                )
+                logger.info("turn done: stop_reason=%s, output_tokens=%d", final.stop_reason, final.usage.output_tokens)
 
     stats = QueryStats(
         elapsed_s=time.monotonic() - start,

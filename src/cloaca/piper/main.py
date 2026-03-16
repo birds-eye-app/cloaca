@@ -1,8 +1,11 @@
+import logging
 import os
 
 import discord
 
 from cloaca.piper.bird_query import ask_bird_query
+
+logging.basicConfig(level=logging.INFO)
 
 intents = discord.Intents.default()
 intents.message_content = True
