@@ -43,6 +43,8 @@ projects:
         sync: false
       - key: EBIRD_MCP_URL
         sync: false
+      - key: PYTHONUNBUFFERED
+        value: "1"
       region: oregon
       dockerContext: .
       dockerfilePath: ./Dockerfile
