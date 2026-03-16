@@ -50,4 +50,8 @@ projects:
       dockerContext: .
       dockerfilePath: ./Dockerfile
       dockerCommand: uv run python3 -u -m cloaca.piper.main
+      disk:
+        name: disk
+        mountPath: /var/data
+        sizeGB: 1
       autoDeployTrigger: checksPass
