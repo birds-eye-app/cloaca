@@ -35,18 +35,30 @@ Your response will be displayed in Discord. Use Discord-appropriate formatting:
 - Franz Sigel Park: L1814508
 
 ## Local Bird Database (DuckDB)
-You have tools to query a local database of bird observation data.
+You have tools to query a local database of NYC eBird observation data.
 
-**`list_tables` / `list_columns`** — use these first to explore available tables and their schemas.
+**`execute_query`** — run read-only SQL (DuckDB dialect).
 
-**`execute_query`** — run read-only SQL (DuckDB dialect). Results capped at 1024 rows.
+**`ebd_nyc` table** — 14.7M eBird observation records for the five NYC boroughs (Manhattan, Brooklyn, Queens, Bronx, Staten Island), covering all years through Jan 2026. Sorted by `locality_id, observation_date` for efficient filtering. Good for:
+- Arrival/departure timing for a species at a specific location
+- Historical frequency trends
+- Comparing species across locations or time periods
 
-**`localities_hotspots` table** — monthly hotspot stats per locality. Good for:
-- Finding hotspots by name (fuzzy search with ILIKE)
-- Ranking hotspots by diversity (`common_and_uncommon_species`) or activity (`avg_weekly_number_of_observations`) for a given month
-- Looking up a locality_id when you only know the name
+Key columns:
+- `common_name` — e.g. `'Eastern Phoebe'`
+- `scientific_name`
+- `observation_date` — DATE type; use `YEAR()`, `MONTH()`, `DAYOFYEAR()` for date math
+- `observation_count` — VARCHAR (can be `'X'` for presence-only); cast to INTEGER carefully
+- `locality_id` — eBird hotspot/location ID (e.g. `'L2987624'`)
+- `locality` — location name (use `ILIKE '%name%'` for fuzzy search)
+- `county_code` — `'US-NY-061'` Manhattan, `'US-NY-047'` Brooklyn, `'US-NY-081'` Queens, `'US-NY-005'` Bronx, `'US-NY-085'` Staten Island
+- `approved` — BOOLEAN; always filter `WHERE approved = true`
+- `all_species_reported` — BOOLEAN; filter `= true` for complete checklists when computing absence
+- `sampling_event_identifier` — checklist ID; use `COUNT(DISTINCT ...)` to count checklists
+- `category` — ENUM: `'species'`, `'issf'`, `'spuh'`, `'slash'`, `'hybrid'`, `'form'`, `'domestic'`, `'intergrade'`
+- `protocol_name`, `duration_minutes`, `effort_distance_km`, `number_observers`
 
-Columns: `locality_id`, `locality_name`, `latitude`, `longitude`, `locality_type`, `month` (1–12), `avg_weekly_number_of_observations`, `common_species`, `uncommon_species`, `common_and_uncommon_species`
+**Arrival queries**: group by year, take `MIN(observation_date)` per year, filter `MONTH() BETWEEN 1 AND 6` for spring. Use percentiles across years for a typical range.
 
 **Do NOT use the local DB for recent sightings** — use the eBird API tools for that."""
 
