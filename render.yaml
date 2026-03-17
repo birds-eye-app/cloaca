@@ -43,9 +43,15 @@ projects:
         sync: false
       - key: EBIRD_MCP_URL
         sync: false
+      - key: DUCK_DB_PATH
+        value: /var/data/parsed_full_sorted.db
 
       region: oregon
       dockerContext: .
       dockerfilePath: ./Dockerfile
       dockerCommand: uv run python3 -u -m cloaca.piper.main
+      disk:
+        name: disk
+        mountPath: /var/data
+        sizeGB: 1
       autoDeployTrigger: checksPass
