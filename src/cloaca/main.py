@@ -1,3 +1,4 @@
+import asyncio
 import os
 import time
 from typing import Dict, List, Any
@@ -129,6 +130,20 @@ async def get_popular_hotspots_endpoint(
 
 # this is deprecated but I can't find another way to use the "repeat every" util without it
 @Cloaca_App.on_event("startup")
+async def start_piper():
+    if is_dev:
+        print("skipping piper in dev mode")
+        return
+    token = os.getenv("PIPER_DISCORD_BOT_TOKEN")
+    if not token:
+        print("PIPER_DISCORD_BOT_TOKEN not set, skipping piper")
+        return
+    from cloaca.piper.main import start as piper_start
+    asyncio.create_task(piper_start())
+    print("piper started")
+
+
+@Cloaca_App.on_event("startup")
 @repeat_every(seconds=60 * 60 * 1)  # every hour
 async def refresh_regional_lifers():
     # dont do this on startup in local dev to not spam ebird
@@ -163,3 +178,7 @@ async def shutdown_event():
             print("DuckDB connection closed.")
         except Exception as e:
             print("Error closing DuckDB connection:", e)
+    from cloaca.piper.main import bot
+    if not bot.is_closed():
+        await bot.close()
+        print("piper stopped")

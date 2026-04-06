@@ -121,4 +121,10 @@ async def on_message(message: discord.Message):
     cache_put(reply.id, updated_messages)
 
 
-bot.run(os.environ["PIPER_DISCORD_BOT_TOKEN"])
+async def start():
+    await bot.start(os.environ["PIPER_DISCORD_BOT_TOKEN"])
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(start())
