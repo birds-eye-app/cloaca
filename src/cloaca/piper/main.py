@@ -16,9 +16,15 @@ from cloaca.piper.birdcast import (
 )
 from cloaca.piper.year_lifers import (
     WATCHED_HOTSPOTS,
+    all_time_list_link_view,
+    backfill_all_time_species,
     backfill_year_species,
+    check_for_new_all_time_lifers,
     check_for_new_year_lifers,
+    fetch_recent_observations,
+    format_all_time_lifer_message,
     format_year_lifer_message,
+    get_all_time_total,
     get_year_total,
     year_list_link_view,
 )
@@ -105,26 +111,55 @@ async def check_year_lifers():
         channel = bot.get_channel(hotspot.channel_id)
         if channel is None:
             logger.warning(
-                "could not find year lifers channel %d for %s",
+                "could not find channel %d for %s",
                 hotspot.channel_id,
                 hotspot.name,
             )
             continue
 
         try:
-            new_lifers = await check_for_new_year_lifers(hotspot.id)
+            observations = await fetch_recent_observations(hotspot.id)
+        except Exception:
+            logger.exception("failed to fetch observations for %s", hotspot.name)
+            continue
+
+        # Check all-time lifers first (takes priority over year lifers)
+        try:
+            new_all_time = check_for_new_all_time_lifers(hotspot.id, observations)
+        except Exception:
+            logger.exception("failed to check all-time lifers for %s", hotspot.name)
+            new_all_time = []
+
+        if new_all_time:
+            total = get_all_time_total(hotspot.id)
+            message = format_all_time_lifer_message(new_all_time, hotspot.name, total)
+            await channel.send(message, view=all_time_list_link_view(hotspot.id))
+            logger.info(
+                "posted %d new all-time lifer(s) for %s",
+                len(new_all_time),
+                hotspot.name,
+            )
+
+        # Check year lifers, excluding any that were all-time lifers
+        try:
+            new_year = check_for_new_year_lifers(hotspot.id, observations)
         except Exception:
             logger.exception("failed to check year lifers for %s", hotspot.name)
-            continue
+            new_year = []
 
-        if not new_lifers:
-            logger.info("no new year lifers at %s", hotspot.name)
-            continue
+        all_time_codes = {o.speciesCode for o in new_all_time}
+        new_year = [o for o in new_year if o.speciesCode not in all_time_codes]
 
-        total = get_year_total(hotspot.id)
-        message = format_year_lifer_message(new_lifers, hotspot.name, total)
-        await channel.send(message, view=year_list_link_view(hotspot.id))
-        logger.info("posted %d new year lifer(s) for %s", len(new_lifers), hotspot.name)
+        if new_year:
+            total = get_year_total(hotspot.id)
+            message = format_year_lifer_message(new_year, hotspot.name, total)
+            await channel.send(message, view=year_list_link_view(hotspot.id))
+            logger.info(
+                "posted %d new year lifer(s) for %s", len(new_year), hotspot.name
+            )
+
+        if not new_all_time and not new_year:
+            logger.info("no new lifers at %s", hotspot.name)
 
 
 @tasks.loop(time=datetime.time(hour=22, minute=0, tzinfo=datetime.timezone.utc))
@@ -166,6 +201,18 @@ async def on_ready():
                     )
             except Exception:
                 logger.exception("failed to backfill year species for %s", hotspot.name)
+            try:
+                count = await backfill_all_time_species(hotspot.id)
+                if count > 0:
+                    logger.info(
+                        "backfilled %d all-time species for %s",
+                        count,
+                        hotspot.name,
+                    )
+            except Exception:
+                logger.exception(
+                    "failed to backfill all-time species for %s", hotspot.name
+                )
         check_year_lifers.start()
 
 

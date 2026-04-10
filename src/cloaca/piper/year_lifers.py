@@ -76,6 +76,13 @@ def _ensure_tables(con: duckdb.DuckDBPyConnection):
             PRIMARY KEY (hotspot_id, year)
         );
     """)
+    con.execute("""
+        CREATE TABLE IF NOT EXISTS hotspot_all_time_species (
+            hotspot_id VARCHAR NOT NULL,
+            species_code VARCHAR NOT NULL,
+            PRIMARY KEY (hotspot_id, species_code)
+        );
+    """)
 
 
 def get_year_total(hotspot_id: str) -> int:
@@ -101,6 +108,39 @@ def _get_known_species(hotspot_id: str, year: int) -> set[str]:
         .fetchall()
     )
     return {row[0] for row in rows}
+
+
+def get_all_time_total(hotspot_id: str) -> int:
+    rows = (
+        get_state_db()
+        .execute(
+            "SELECT COUNT(*) FROM hotspot_all_time_species WHERE hotspot_id = ?",
+            [hotspot_id],
+        )
+        .fetchone()
+    )
+    return rows[0] if rows else 0
+
+
+def _get_known_all_time_species(hotspot_id: str) -> set[str]:
+    rows = (
+        get_state_db()
+        .execute(
+            "SELECT species_code FROM hotspot_all_time_species WHERE hotspot_id = ?",
+            [hotspot_id],
+        )
+        .fetchall()
+    )
+    return {row[0] for row in rows}
+
+
+def _insert_all_time_species(hotspot_id: str, species_code: str):
+    get_state_db().execute(
+        """INSERT INTO hotspot_all_time_species (hotspot_id, species_code)
+           VALUES (?, ?)
+           ON CONFLICT DO NOTHING""",
+        [hotspot_id, species_code],
+    )
 
 
 def _insert_species(
@@ -222,8 +262,7 @@ async def backfill_year_species(hotspot_id: str) -> int:
 
     count = len(earliest_per_species)
     _mark_backfill_complete(hotspot_id, year, count)
-    # Flush WAL so external readers (e.g. SSH) can see the data
-    get_state_db().execute("FORCE CHECKPOINT")
+
     logger.info(
         "backfill complete for %s/%d: %d species (%d failed days)",
         hotspot_id,
@@ -234,20 +273,43 @@ async def backfill_year_species(hotspot_id: str) -> int:
     return count
 
 
+ALL_TIME_BACKFILL_YEAR = 0
+
+
+async def backfill_all_time_species(hotspot_id: str) -> int:
+    if _is_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR):
+        logger.info("skipping all-time backfill for %s — already complete", hotspot_id)
+        return 0
+
+    logger.info("starting all-time species backfill for %s", hotspot_id)
+
+    species_codes = await get_phoebe_client().product.species_list.list(
+        region_code=hotspot_id
+    )
+
+    for code in species_codes:
+        _insert_all_time_species(hotspot_id, code)
+
+    count = len(species_codes)
+    _mark_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR, count)
+    logger.info("all-time backfill complete for %s: %d species", hotspot_id, count)
+    return count
+
+
 # ---------------------------------------------------------------------------
 # Polling
 # ---------------------------------------------------------------------------
 
 
-async def check_for_new_year_lifers(
+async def fetch_recent_observations(
     hotspot_id: str,
 ) -> list[eBirdHistoricFullObservation]:
+    """Fetch observations for today and yesterday (shared by year + all-time checks)."""
     now = datetime.datetime.now(EASTERN)
     today = now.date()
     yesterday = today - datetime.timedelta(days=1)
 
-    # Fetch observations for today and yesterday (skip yesterday on Jan 1
-    # to avoid counting last year's observations as new-year lifers)
+    # Skip yesterday on Jan 1 to avoid counting last year's observations
     dates_to_check = [today]
     if yesterday.year == today.year:
         dates_to_check.append(yesterday)
@@ -261,12 +323,14 @@ async def check_for_new_year_lifers(
                 "failed to fetch observations for %s on %s", hotspot_id, date
             )
 
-    if not observations:
-        return []
+    return observations
 
-    known = _get_known_species(hotspot_id, now.year)
 
-    # Group by species, keep earliest observation per species
+def _find_new_species(
+    observations: list[eBirdHistoricFullObservation],
+    known: set[str],
+) -> list[eBirdHistoricFullObservation]:
+    """From observations, find species not in known set. Returns earliest obs per species."""
     earliest_new: dict[str, eBirdHistoricFullObservation] = {}
     for obs in observations:
         if obs.speciesCode in known:
@@ -275,19 +339,54 @@ async def check_for_new_year_lifers(
             earliest_new[obs.speciesCode] = obs
         elif obs.obsDt < earliest_new[obs.speciesCode].obsDt:
             earliest_new[obs.speciesCode] = obs
+    return list(earliest_new.values())
 
-    if not earliest_new:
+
+def check_for_new_year_lifers(
+    hotspot_id: str,
+    observations: list[eBirdHistoricFullObservation],
+) -> list[eBirdHistoricFullObservation]:
+    now = datetime.datetime.now(EASTERN)
+
+    if not observations:
         return []
 
-    # Insert new lifers into DB
-    new_lifers = list(earliest_new.values())
+    known = _get_known_species(hotspot_id, now.year)
+    new_lifers = _find_new_species(observations, known)
+
+    if not new_lifers:
+        return []
+
     for obs in new_lifers:
         _insert_species(hotspot_id, now.year, obs)
-    # Flush WAL so external readers (e.g. SSH) can see the data
-    get_state_db().execute("FORCE CHECKPOINT")
 
     logger.info(
         "found %d new year lifer(s) at %s: %s",
+        len(new_lifers),
+        hotspot_id,
+        ", ".join(o.comName for o in new_lifers),
+    )
+    return new_lifers
+
+
+def check_for_new_all_time_lifers(
+    hotspot_id: str,
+    observations: list[eBirdHistoricFullObservation],
+) -> list[eBirdHistoricFullObservation]:
+    if not observations:
+        return []
+
+    known = _get_known_all_time_species(hotspot_id)
+    new_lifers = _find_new_species(observations, known)
+
+    if not new_lifers:
+        return []
+
+    for obs in new_lifers:
+        _insert_all_time_species(hotspot_id, obs.speciesCode)
+
+    logger.info(
+        "found %d new all-time lifer(s) at %s: %s",
         len(new_lifers),
         hotspot_id,
         ", ".join(o.comName for o in new_lifers),
@@ -335,6 +434,52 @@ def format_year_lifer_message(
     return "\n".join(lines)
 
 
+def format_all_time_lifer_message(
+    new_lifers: list[eBirdHistoricFullObservation],
+    hotspot_name: str,
+    all_time_total: int,
+) -> str:
+    if len(new_lifers) == 1:
+        obs = new_lifers[0]
+        date_str = obs.obsDt.strftime("%b %-d")
+        header = (
+            f"🎉🥳 **New Park Bird for {hotspot_name}!** (#{all_time_total} all-time)"
+        )
+        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        body = (
+            f"**{obs.comName}** — first spotted by "
+            f"{obs.userDisplayName} ({date_str})\n"
+            f"[View checklist]({checklist_url})"
+        )
+        return f"{header}\n\n{body}"
+
+    header = (
+        f"🎉🥳 **{len(new_lifers)} New Park Birds "
+        f"for {hotspot_name}!** (now at {all_time_total} species all-time)"
+    )
+    lines = [header, ""]
+    for obs in new_lifers:
+        date_str = obs.obsDt.strftime("%b %-d")
+        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        lines.append(
+            f"**{obs.comName}** — {obs.userDisplayName} "
+            f"({date_str}) · [checklist]({checklist_url})"
+        )
+    return "\n".join(lines)
+
+
+def all_time_list_link_view(hotspot_id: str) -> discord.ui.View:
+    view = discord.ui.View()
+    view.add_item(
+        discord.ui.Button(
+            style=discord.ButtonStyle.link,
+            label="View All-Time List on eBird",
+            url=f"https://ebird.org/hotspot/{hotspot_id}/bird-list",
+        )
+    )
+    return view
+
+
 def year_list_link_view(hotspot_id: str) -> discord.ui.View:
     view = discord.ui.View()
     view.add_item(
@@ -360,16 +505,33 @@ if __name__ == "__main__":
     async def _main():
         for hotspot in WATCHED_HOTSPOTS:
             print(f"\n--- {hotspot.name} ({hotspot.id}) ---")
-            count = await backfill_year_species(hotspot.id)
-            print(f"Backfilled {count} species")
 
-            total = get_year_total(hotspot.id)
-            print(f"Year total: {total}")
+            year_count = await backfill_year_species(hotspot.id)
+            print(f"Backfilled {year_count} year species")
 
-            new = await check_for_new_year_lifers(hotspot.id)
-            if new:
+            all_time_count = await backfill_all_time_species(hotspot.id)
+            print(f"Backfilled {all_time_count} all-time species")
+
+            print(f"Year total: {get_year_total(hotspot.id)}")
+            print(f"All-time total: {get_all_time_total(hotspot.id)}")
+
+            observations = await fetch_recent_observations(hotspot.id)
+
+            new_all_time = check_for_new_all_time_lifers(hotspot.id, observations)
+            if new_all_time:
+                total = get_all_time_total(hotspot.id)
+                msg = format_all_time_lifer_message(new_all_time, hotspot.name, total)
+                print(msg)
+            else:
+                print("No new all-time lifers found")
+
+            # Filter out all-time lifers from year lifer notifications
+            all_time_codes = {o.speciesCode for o in new_all_time}
+            new_year = check_for_new_year_lifers(hotspot.id, observations)
+            new_year = [o for o in new_year if o.speciesCode not in all_time_codes]
+            if new_year:
                 total = get_year_total(hotspot.id)
-                msg = format_year_lifer_message(new, hotspot.name, total)
+                msg = format_year_lifer_message(new_year, hotspot.name, total)
                 print(msg)
             else:
                 print("No new year lifers found")
