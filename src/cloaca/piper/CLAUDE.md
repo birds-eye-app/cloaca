@@ -12,6 +12,7 @@ Piper runs inside the cloaca FastAPI server as an asyncio background task (not a
 - `bird_query.py` — Core query logic. Connects to two MCP servers (eBird API via SSE, DuckDB via stdio), builds a tool-augmented Claude conversation, and streams the response. Contains the system prompt and the cached DuckDB connection pool.
 - `birdcast.py` — Daily BirdCast migration forecast. Fetches a 3-night forecast from the BirdCast API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Scheduled via `discord.ext.tasks.loop` at 22:00 UTC (6 PM EDT). Response is validated with Pydantic models (`BirdcastForecast`, `ForecastNight`).
 - `cli.py` — Standalone CLI for testing queries without Discord: `uv run python -m cloaca.piper.cli "what warblers are in prospect park?"`
+- `year_lifers.py` — Year lifer tracking for hotspots. Polls the eBird historic observations API every 15 minutes (hourly at night) to detect new species at McGolrick Park. Stores the year's species list in a writable DuckDB state DB (`PIPER_STATE_DB_PATH`). On first run, backfills the current year from the API. Posts Discord notifications when new species are found, including the observer name and checklist link. Reuses `eBirdHistoricFullObservation` from `scripts/fetch_yearly_hotspot_data.py` and `get_phoebe_client()` from `api/shared.py`.
 
 ### How a query flows
 
@@ -41,6 +42,7 @@ The DuckDB MCP server (mcp-server-motherduck) is spawned as a subprocess. To avo
 - `ANTHROPIC_API_KEY` — Claude API key
 - `PIPER_DUCK_DB_PATH` — Path to the ebd_nyc.db DuckDB file (optional; enables historical queries)
 - `BIRDCAST_API_KEY` — API key for BirdCast forecast endpoint (required for daily forecast)
+- `PIPER_STATE_DB_PATH` — Path to the writable DuckDB state file for year lifers (defaults to `piper_state.db`)
 
 ## Local development
 
@@ -54,6 +56,11 @@ uv run python -m cloaca.piper.cli "when do eastern phoebes usually arrive in cen
 To test the BirdCast forecast message locally:
 ```bash
 uv run python -m cloaca.piper.birdcast
+```
+
+To test the year lifers feature (backfill + poll) without Discord:
+```bash
+uv run python -m cloaca.piper.year_lifers
 ```
 
 To run the bot standalone (outside of cloaca):
