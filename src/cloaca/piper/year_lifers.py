@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import random
+from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
 import duckdb
@@ -17,9 +18,18 @@ from cloaca.scripts.fetch_yearly_hotspot_data import (
 
 logger = logging.getLogger(__name__)
 
-MCGOLRICK_HOTSPOT_ID = "L2987624"
-MCGOLRICK_HOTSPOT_NAME = "McGolrick Park"
-YEAR_LIFERS_CHANNEL_ID = 1492224353537102025
+
+@dataclass
+class Hotspot:
+    id: str
+    name: str
+    channel_id: int
+
+
+WATCHED_HOTSPOTS = [
+    Hotspot(id="L2987624", name="McGolrick Park", channel_id=1492224353537102025),
+    Hotspot(id="L1814508", name="Franz Sigel Park", channel_id=1492237397700776128),
+]
 
 EASTERN = ZoneInfo("America/New_York")
 
@@ -212,6 +222,8 @@ async def backfill_year_species(hotspot_id: str) -> int:
 
     count = len(earliest_per_species)
     _mark_backfill_complete(hotspot_id, year, count)
+    # Flush WAL so external readers (e.g. SSH) can see the data
+    get_state_db().execute("FORCE CHECKPOINT")
     logger.info(
         "backfill complete for %s/%d: %d species (%d failed days)",
         hotspot_id,
@@ -271,6 +283,8 @@ async def check_for_new_year_lifers(
     new_lifers = list(earliest_new.values())
     for obs in new_lifers:
         _insert_species(hotspot_id, now.year, obs)
+    # Flush WAL so external readers (e.g. SSH) can see the data
+    get_state_db().execute("FORCE CHECKPOINT")
 
     logger.info(
         "found %d new year lifer(s) at %s: %s",
@@ -344,19 +358,21 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     async def _main():
-        count = await backfill_year_species(MCGOLRICK_HOTSPOT_ID)
-        print(f"Backfilled {count} species")
+        for hotspot in WATCHED_HOTSPOTS:
+            print(f"\n--- {hotspot.name} ({hotspot.id}) ---")
+            count = await backfill_year_species(hotspot.id)
+            print(f"Backfilled {count} species")
 
-        total = get_year_total(MCGOLRICK_HOTSPOT_ID)
-        print(f"Year total: {total}")
+            total = get_year_total(hotspot.id)
+            print(f"Year total: {total}")
 
-        new = await check_for_new_year_lifers(MCGOLRICK_HOTSPOT_ID)
-        if new:
-            total = get_year_total(MCGOLRICK_HOTSPOT_ID)
-            msg = format_year_lifer_message(new, MCGOLRICK_HOTSPOT_NAME, total)
-            print(msg)
-        else:
-            print("No new year lifers found")
+            new = await check_for_new_year_lifers(hotspot.id)
+            if new:
+                total = get_year_total(hotspot.id)
+                msg = format_year_lifer_message(new, hotspot.name, total)
+                print(msg)
+            else:
+                print("No new year lifers found")
 
         close_state_db()
 

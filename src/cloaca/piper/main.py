@@ -15,9 +15,7 @@ from cloaca.piper.birdcast import (
     format_forecast_message,
 )
 from cloaca.piper.year_lifers import (
-    MCGOLRICK_HOTSPOT_ID,
-    MCGOLRICK_HOTSPOT_NAME,
-    YEAR_LIFERS_CHANNEL_ID,
+    WATCHED_HOTSPOTS,
     backfill_year_species,
     check_for_new_year_lifers,
     format_year_lifer_message,
@@ -93,11 +91,6 @@ _last_year_lifer_check: datetime.datetime | None = None
 async def check_year_lifers():
     global _last_year_lifer_check
 
-    channel = bot.get_channel(YEAR_LIFERS_CHANNEL_ID)
-    if channel is None:
-        logger.warning("could not find year lifers channel %d", YEAR_LIFERS_CHANNEL_ID)
-        return
-
     now = datetime.datetime.now(_EASTERN)
     is_night = now.hour < 6 or now.hour >= 22
 
@@ -108,20 +101,30 @@ async def check_year_lifers():
 
     _last_year_lifer_check = now
 
-    try:
-        new_lifers = await check_for_new_year_lifers(MCGOLRICK_HOTSPOT_ID)
-    except Exception:
-        logger.exception("failed to check year lifers")
-        return
+    for hotspot in WATCHED_HOTSPOTS:
+        channel = bot.get_channel(hotspot.channel_id)
+        if channel is None:
+            logger.warning(
+                "could not find year lifers channel %d for %s",
+                hotspot.channel_id,
+                hotspot.name,
+            )
+            continue
 
-    if not new_lifers:
-        logger.info("no new year lifers")
-        return
+        try:
+            new_lifers = await check_for_new_year_lifers(hotspot.id)
+        except Exception:
+            logger.exception("failed to check year lifers for %s", hotspot.name)
+            continue
 
-    total = get_year_total(MCGOLRICK_HOTSPOT_ID)
-    message = format_year_lifer_message(new_lifers, MCGOLRICK_HOTSPOT_NAME, total)
-    await channel.send(message, view=year_list_link_view(MCGOLRICK_HOTSPOT_ID))
-    logger.info("posted %d new year lifer(s)", len(new_lifers))
+        if not new_lifers:
+            logger.info("no new year lifers at %s", hotspot.name)
+            continue
+
+        total = get_year_total(hotspot.id)
+        message = format_year_lifer_message(new_lifers, hotspot.name, total)
+        await channel.send(message, view=year_list_link_view(hotspot.id))
+        logger.info("posted %d new year lifer(s) for %s", len(new_lifers), hotspot.name)
 
 
 @tasks.loop(time=datetime.time(hour=22, minute=0, tzinfo=datetime.timezone.utc))
@@ -152,24 +155,17 @@ async def on_ready():
     if not post_birdcast_forecast.is_running():
         post_birdcast_forecast.start()
     if not check_year_lifers.is_running():
-        try:
-            count = await backfill_year_species(MCGOLRICK_HOTSPOT_ID)
-            if count > 0:
-                logger.info(
-                    "backfilled %d year species for %s",
-                    count,
-                    MCGOLRICK_HOTSPOT_ID,
-                )
-        except Exception:
-            logger.exception("failed to backfill year species")
-        # TEMP FIX: clear state so backfill re-runs with correct dates
-        # (amerob got wrong date from the test notification)
-        from cloaca.piper.year_lifers import get_state_db
-
-        get_state_db().execute("DELETE FROM hotspot_year_species WHERE year = 2026")
-        get_state_db().execute("DELETE FROM backfill_status WHERE year = 2026")
-        count = await backfill_year_species(MCGOLRICK_HOTSPOT_ID)
-        logger.info("TEMP FIX: re-backfilled %d species with correct dates", count)
+        for hotspot in WATCHED_HOTSPOTS:
+            try:
+                count = await backfill_year_species(hotspot.id)
+                if count > 0:
+                    logger.info(
+                        "backfilled %d year species for %s",
+                        count,
+                        hotspot.name,
+                    )
+            except Exception:
+                logger.exception("failed to backfill year species for %s", hotspot.name)
         check_year_lifers.start()
 
 
