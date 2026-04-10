@@ -12,7 +12,7 @@ Piper runs inside the cloaca FastAPI server as an asyncio background task (not a
 - `bird_query.py` — Core query logic. Connects to two MCP servers (eBird API via SSE, DuckDB via stdio), builds a tool-augmented Claude conversation, and streams the response. Contains the system prompt and the cached DuckDB connection pool.
 - `birdcast.py` — Daily BirdCast migration forecast. Fetches a 3-night forecast from the BirdCast API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Scheduled via `discord.ext.tasks.loop` at 22:00 UTC (6 PM EDT). Response is validated with Pydantic models (`BirdcastForecast`, `ForecastNight`).
 - `cli.py` — Standalone CLI for testing queries without Discord: `uv run python -m cloaca.piper.cli "what warblers are in prospect park?"`
-- `year_lifers.py` — Year lifer tracking for hotspots. Polls the eBird historic observations API every 15 minutes (hourly at night) to detect new species at McGolrick Park. Stores the year's species list in a writable DuckDB state DB (`PIPER_STATE_DB_PATH`). On first run, backfills the current year from the API. Posts Discord notifications when new species are found, including the observer name and checklist link. Reuses `eBirdHistoricFullObservation` from `scripts/fetch_yearly_hotspot_data.py` and `get_phoebe_client()` from `api/shared.py`.
+- `year_lifers.py` — Year lifer tracking for multiple hotspots. Polls the eBird historic observations API every 15 minutes (hourly at night) to detect new species. Stores the year's species list in a writable DuckDB state DB (`PIPER_STATE_DB_PATH`). On first run, backfills the current year from the API for each hotspot. Posts Discord notifications per hotspot channel when new species are found, including the observer name and checklist link. Hotspots are configured via the `WATCHED_HOTSPOTS` list of `Hotspot` dataclasses. Reuses `eBirdHistoricFullObservation` from `scripts/fetch_yearly_hotspot_data.py` and `get_phoebe_client()` from `api/shared.py`.
 
 ### How a query flows
 
@@ -37,13 +37,19 @@ The DuckDB MCP server (mcp-server-motherduck) is spawned as a subprocess. To avo
 
 ### Year lifer tracking
 
-`year_lifers.py` tracks first-of-year species sightings at McGolrick Park (hotspot `L2987624`). It uses the eBird historic observations API (`detail=full`, `rank=create`) which returns observer names — the standard recent observations endpoint does not.
+`year_lifers.py` tracks first-of-year species sightings at watched hotspots. It uses the eBird historic observations API (`detail=full`, `rank=create`) which returns observer names — the standard recent observations endpoint does not.
 
-**State DB**: A separate writable DuckDB file (`PIPER_STATE_DB_PATH`) stores a `hotspot_year_species` table with species code, first observation date, observer name, and checklist ID. This is independent of the large read-only `ebd_nyc.db`.
+**Watched hotspots** are defined in the `WATCHED_HOTSPOTS` list. Each `Hotspot` has an eBird ID, display name, and Discord channel ID. Currently:
+- McGolrick Park (`L2987624`) → #mcgolrick-park
+- Franz Sigel Park (`L1814508`) → #franz-sigel-park
 
-**Backfill**: On first startup (when the table is empty for the current year), iterates Jan 1 through yesterday calling the eBird API day-by-day (~100 calls, 0.5s delay between each). Subsequent startups skip this.
+To add a new hotspot, append a `Hotspot` entry to the list.
 
-**Polling**: Every 15 minutes, fetches observations for today and yesterday (2 API calls). During night hours (10pm–6am ET), enforces at least 1 hour between checks. New species are inserted and posted to #mcgolrick-park.
+**State DB**: A separate writable DuckDB file (`PIPER_STATE_DB_PATH`) stores a `hotspot_year_species` table with species code, first observation date, observer name, and checklist ID. This is independent of the large read-only `ebd_nyc.db`. After writes, `FORCE CHECKPOINT` is called so external readers (e.g. SSH sessions) can see the data.
+
+**Backfill**: On first startup per hotspot (tracked in `backfill_status` table), iterates Jan 1 through yesterday calling the eBird API day-by-day (~100 calls per hotspot, 0.5s delay between each). Subsequent startups skip completed hotspots.
+
+**Polling**: Every 15 minutes, fetches observations for today and yesterday (2 API calls per hotspot). During night hours (10pm–6am ET), enforces at least 1 hour between checks. New species are inserted and posted to the hotspot's Discord channel.
 
 **Year rollover**: On Jan 1, the table is empty for the new year, triggering a backfill of 0 days. The regular poll picks up the first species naturally.
 
@@ -52,7 +58,7 @@ The DuckDB MCP server (mcp-server-motherduck) is spawned as a subprocess. To avo
 | Task | Schedule | Channel | Module |
 |------|----------|---------|--------|
 | BirdCast forecast | Daily at 22:00 UTC (6 PM EDT) | #bird-cast-updates | `birdcast.py` |
-| Year lifer check | Every 15 min (hourly at night) | #mcgolrick-park | `year_lifers.py` |
+| Year lifer check | Every 15 min (hourly at night) | Per hotspot (see `WATCHED_HOTSPOTS`) | `year_lifers.py` |
 
 Both are started in `on_ready()` via `discord.ext.tasks.loop`.
 
@@ -93,8 +99,7 @@ uv run python -m cloaca.piper.main
 
 - `PIPER_BOT_UPDATES_CHANNEL_ID` in `main.py` — Discord channel where Piper posts "I'm up!" on startup (#piper-bot-updates)
 - `BIRDCAST_CHANNEL_ID` in `birdcast.py` — Discord channel for daily migration forecasts (#bird-cast-updates)
-- `YEAR_LIFERS_CHANNEL_ID` in `year_lifers.py` — Discord channel for year lifer notifications (#mcgolrick-park)
-- `MCGOLRICK_HOTSPOT_ID` in `year_lifers.py` — eBird hotspot ID for McGolrick Park (`L2987624`)
+- `WATCHED_HOTSPOTS` in `year_lifers.py` — List of `Hotspot` dataclasses (id, name, channel_id) for year lifer tracking
 - `CACHE_MAX_SIZE` in `main.py` — Max conversation cache entries (50)
 - `_DUCK_IDLE_SECONDS` in `bird_query.py` — DuckDB connection idle timeout (5 min)
 - Claude model used: `claude-sonnet-4-6` (set in `bird_query.py`)
