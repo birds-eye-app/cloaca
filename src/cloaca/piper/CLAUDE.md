@@ -10,6 +10,7 @@ Piper runs inside the cloaca FastAPI server as an asyncio background task (not a
 
 - `main.py` — Discord bot event handlers (`on_ready`, `on_message`), conversation cache, reply-chain context builder. Entry point is the `start()` coroutine.
 - `bird_query.py` — Core query logic. Connects to two MCP servers (eBird API via SSE, DuckDB via stdio), builds a tool-augmented Claude conversation, and streams the response. Contains the system prompt and the cached DuckDB connection pool.
+- `birdcast.py` — Daily BirdCast migration forecast. Fetches a 3-night forecast from the BirdCast API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Scheduled via `discord.ext.tasks.loop` at 22:00 UTC (6 PM EDT). Response is validated with Pydantic models (`BirdcastForecast`, `ForecastNight`).
 - `cli.py` — Standalone CLI for testing queries without Discord: `uv run python -m cloaca.piper.cli "what warblers are in prospect park?"`
 
 ### How a query flows
@@ -39,6 +40,7 @@ The DuckDB MCP server (mcp-server-motherduck) is spawned as a subprocess. To avo
 - `EBIRD_MCP_URL` — SSE endpoint for the eBird MCP server
 - `ANTHROPIC_API_KEY` — Claude API key
 - `PIPER_DUCK_DB_PATH` — Path to the ebd_nyc.db DuckDB file (optional; enables historical queries)
+- `BIRDCAST_API_KEY` — API key for BirdCast forecast endpoint (required for daily forecast)
 
 ## Local development
 
@@ -49,6 +51,11 @@ To test queries without the Discord bot:
 uv run python -m cloaca.piper.cli "when do eastern phoebes usually arrive in central park?"
 ```
 
+To test the BirdCast forecast message locally:
+```bash
+uv run python -m cloaca.piper.birdcast
+```
+
 To run the bot standalone (outside of cloaca):
 ```bash
 uv run python -m cloaca.piper.main
@@ -57,6 +64,7 @@ uv run python -m cloaca.piper.main
 ## Key constants
 
 - `PIPER_BOT_UPDATES_CHANNEL_ID` in `main.py` — Discord channel where Piper posts "I'm up!" on startup (#piper-bot-updates)
+- `BIRDCAST_CHANNEL_ID` in `birdcast.py` — Discord channel for daily migration forecasts (#bird-cast-updates)
 - `CACHE_MAX_SIZE` in `main.py` — Max conversation cache entries (50)
 - `_DUCK_IDLE_SECONDS` in `bird_query.py` — DuckDB connection idle timeout (5 min)
 - Claude model used: `claude-sonnet-4-6` (set in `bird_query.py`)
