@@ -1,3 +1,4 @@
+import asyncio
 import os
 import time
 from typing import Dict, List, Any
@@ -128,6 +129,36 @@ async def get_popular_hotspots_endpoint(
 
 
 # this is deprecated but I can't find another way to use the "repeat every" util without it
+_piper_task: asyncio.Task | None = None
+
+
+@Cloaca_App.on_event("startup")
+async def start_piper():
+    global _piper_task
+    token = os.getenv("PIPER_DISCORD_BOT_TOKEN")
+    if not token:
+        print("PIPER_DISCORD_BOT_TOKEN not set, skipping piper")
+        return
+    from cloaca.piper.main import start as piper_start
+
+    async def _run_piper():
+        delay = 5
+        while True:
+            try:
+                await piper_start()
+            except asyncio.CancelledError:
+                return
+            except Exception as e:
+                print(f"piper crashed: {e}, restarting in {delay}s")
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 300)
+            else:
+                return
+
+    _piper_task = asyncio.create_task(_run_piper())
+    print("piper started")
+
+
 @Cloaca_App.on_event("startup")
 @repeat_every(seconds=60 * 60 * 1)  # every hour
 async def refresh_regional_lifers():
@@ -163,3 +194,16 @@ async def shutdown_event():
             print("DuckDB connection closed.")
         except Exception as e:
             print("Error closing DuckDB connection:", e)
+    if _piper_task is not None:
+        from cloaca.piper.main import bot
+        from cloaca.piper.bird_query import close_duck_conn
+
+        if not bot.is_closed():
+            await bot.close()
+        _piper_task.cancel()
+        try:
+            await _piper_task
+        except asyncio.CancelledError:
+            pass
+        await close_duck_conn()
+        print("piper stopped")
