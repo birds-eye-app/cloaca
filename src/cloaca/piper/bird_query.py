@@ -66,7 +66,17 @@ async def _get_duck_conn(duck_db_path: str) -> _CachedDuckConn:
         _duck_conn.reset_timer()
         return _duck_conn
 
-EBIRD_MCP_URL = os.environ["EBIRD_MCP_URL"]
+async def close_duck_conn() -> None:
+    global _duck_conn
+    async with _duck_lock:
+        if _duck_conn is not None:
+            if _duck_conn._timer:
+                _duck_conn._timer.cancel()
+            await _duck_conn.stack.aclose()
+            _duck_conn = None
+            logger.info("DuckDB MCP closed on shutdown")
+
+EBIRD_MCP_URL = os.environ.get("EBIRD_MCP_URL", "")
 
 SYSTEM_PROMPT = """You are a birding assistant for New York City. You answer questions about bird sightings, eBird observations, hotspots, and birding topics — but only for NYC and the surrounding area (the five boroughs, Long Island, New Jersey, Connecticut, and the lower Hudson Valley).
 
