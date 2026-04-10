@@ -57,6 +57,15 @@ def _ensure_tables(con: duckdb.DuckDBPyConnection):
             PRIMARY KEY (hotspot_id, year, species_code)
         );
     """)
+    con.execute("""
+        CREATE TABLE IF NOT EXISTS backfill_status (
+            hotspot_id VARCHAR NOT NULL,
+            year INTEGER NOT NULL,
+            completed_at TIMESTAMP NOT NULL,
+            species_count INTEGER NOT NULL,
+            PRIMARY KEY (hotspot_id, year)
+        );
+    """)
 
 
 def get_year_total(hotspot_id: str) -> int:
@@ -139,17 +148,36 @@ async def fetch_observations_for_date(
 # ---------------------------------------------------------------------------
 
 
+def _is_backfill_complete(hotspot_id: str, year: int) -> bool:
+    row = (
+        get_state_db()
+        .execute(
+            "SELECT 1 FROM backfill_status WHERE hotspot_id = ? AND year = ?",
+            [hotspot_id, year],
+        )
+        .fetchone()
+    )
+    return row is not None
+
+
+def _mark_backfill_complete(hotspot_id: str, year: int, species_count: int):
+    get_state_db().execute(
+        """INSERT INTO backfill_status (hotspot_id, year, completed_at, species_count)
+           VALUES (?, ?, CURRENT_TIMESTAMP, ?)
+           ON CONFLICT DO NOTHING""",
+        [hotspot_id, year, species_count],
+    )
+
+
 async def backfill_year_species(hotspot_id: str) -> int:
     now = datetime.datetime.now(EASTERN)
     year = now.year
 
-    existing = get_year_total(hotspot_id)
-    if existing > 0:
+    if _is_backfill_complete(hotspot_id, year):
         logger.info(
-            "skipping backfill for %s/%d — already have %d species",
+            "skipping backfill for %s/%d — already complete",
             hotspot_id,
             year,
-            existing,
         )
         return 0
 
@@ -183,6 +211,7 @@ async def backfill_year_species(hotspot_id: str) -> int:
         _insert_species(hotspot_id, year, obs)
 
     count = len(earliest_per_species)
+    _mark_backfill_complete(hotspot_id, year, count)
     logger.info(
         "backfill complete for %s/%d: %d species (%d failed days)",
         hotspot_id,
@@ -205,9 +234,14 @@ async def check_for_new_year_lifers(
     today = now.date()
     yesterday = today - datetime.timedelta(days=1)
 
-    # Fetch observations for today and yesterday
+    # Fetch observations for today and yesterday (skip yesterday on Jan 1
+    # to avoid counting last year's observations as new-year lifers)
+    dates_to_check = [today]
+    if yesterday.year == today.year:
+        dates_to_check.append(yesterday)
+
     observations: list[eBirdHistoricFullObservation] = []
-    for date in (today, yesterday):
+    for date in dates_to_check:
         try:
             observations.extend(await fetch_observations_for_date(hotspot_id, date))
         except Exception:
