@@ -313,7 +313,7 @@ def format_year_lifer_message(
         header = f"{birds[0]} **Year Bird #{year_total} for {hotspot_name}!**"
         checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
         body = (
-            f"\U0001f426 **{obs.comName}** — first spotted by "
+            f"**{obs.comName}** — first spotted by "
             f"{obs.userDisplayName} ({date_str})\n"
             f"[View checklist]({checklist_url})"
         )
@@ -329,7 +329,7 @@ def format_year_lifer_message(
         date_str = obs.obsDt.strftime("%b %-d")
         checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
         lines.append(
-            f"\U0001f426 **{obs.comName}** — {obs.userDisplayName} "
+            f"**{obs.comName}** — {obs.userDisplayName} "
             f"({date_str}) · [checklist]({checklist_url})"
         )
     return "\n".join(lines)
