@@ -125,7 +125,7 @@ async def check_year_lifers():
 
         # Check all-time lifers first (takes priority over year lifers)
         try:
-            new_all_time = await check_for_new_all_time_lifers(hotspot.id, observations)
+            new_all_time = check_for_new_all_time_lifers(hotspot.id, observations)
         except Exception:
             logger.exception("failed to check all-time lifers for %s", hotspot.name)
             new_all_time = []
@@ -142,7 +142,7 @@ async def check_year_lifers():
 
         # Check year lifers, excluding any that were all-time lifers
         try:
-            new_year = await check_for_new_year_lifers(hotspot.id, observations)
+            new_year = check_for_new_year_lifers(hotspot.id, observations)
         except Exception:
             logger.exception("failed to check year lifers for %s", hotspot.name)
             new_year = []

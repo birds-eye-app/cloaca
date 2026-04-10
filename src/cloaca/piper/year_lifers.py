@@ -342,7 +342,7 @@ def _find_new_species(
     return list(earliest_new.values())
 
 
-async def check_for_new_year_lifers(
+def check_for_new_year_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
 ) -> list[eBirdHistoricFullObservation]:
@@ -369,7 +369,7 @@ async def check_for_new_year_lifers(
     return new_lifers
 
 
-async def check_for_new_all_time_lifers(
+def check_for_new_all_time_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
 ) -> list[eBirdHistoricFullObservation]:
@@ -517,7 +517,7 @@ if __name__ == "__main__":
 
             observations = await fetch_recent_observations(hotspot.id)
 
-            new_all_time = await check_for_new_all_time_lifers(hotspot.id, observations)
+            new_all_time = check_for_new_all_time_lifers(hotspot.id, observations)
             if new_all_time:
                 total = get_all_time_total(hotspot.id)
                 msg = format_all_time_lifer_message(new_all_time, hotspot.name, total)
@@ -527,7 +527,7 @@ if __name__ == "__main__":
 
             # Filter out all-time lifers from year lifer notifications
             all_time_codes = {o.speciesCode for o in new_all_time}
-            new_year = await check_for_new_year_lifers(hotspot.id, observations)
+            new_year = check_for_new_year_lifers(hotspot.id, observations)
             new_year = [o for o in new_year if o.speciesCode not in all_time_codes]
             if new_year:
                 total = get_year_total(hotspot.id)
