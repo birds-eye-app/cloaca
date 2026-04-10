@@ -22,6 +22,14 @@ class _CachedDuckConn:
         self.session = session
         self.tools = tools
         self._timer: asyncio.Task | None = None
+        self._use_count: int = 0
+
+    def acquire(self) -> None:
+        self._use_count += 1
+
+    def release(self) -> None:
+        self._use_count -= 1
+        self.reset_timer()
 
     def reset_timer(self) -> None:
         if self._timer:
@@ -32,6 +40,8 @@ class _CachedDuckConn:
         global _duck_conn
         await asyncio.sleep(_DUCK_IDLE_SECONDS)
         async with _duck_lock:
+            if self._use_count > 0:
+                return
             await self.stack.aclose()
             if _duck_conn is self:
                 _duck_conn = None
@@ -66,6 +76,7 @@ async def _get_duck_conn(duck_db_path: str) -> _CachedDuckConn:
         _duck_conn.reset_timer()
         return _duck_conn
 
+
 async def close_duck_conn() -> None:
     global _duck_conn
     async with _duck_lock:
@@ -75,6 +86,7 @@ async def close_duck_conn() -> None:
             await _duck_conn.stack.aclose()
             _duck_conn = None
             logger.info("DuckDB MCP closed on shutdown")
+
 
 EBIRD_MCP_URL = os.environ.get("EBIRD_MCP_URL", "")
 
@@ -151,6 +163,8 @@ async def ask_bird_query(
     prior_messages: list[dict] | None = None,
     prior_context: str | None = None,
 ) -> tuple[str, QueryStats, list[dict]]:
+    if not EBIRD_MCP_URL:
+        raise RuntimeError("EBIRD_MCP_URL is not set")
     start = time.monotonic()
     chunks: list[str] = []
     total_input_tokens = 0
@@ -160,7 +174,9 @@ async def ask_bird_query(
     if prior_messages:
         messages = prior_messages + [{"role": "user", "content": query}]
     elif prior_context:
-        messages = [{"role": "user", "content": f"{prior_context}\n\nNew question: {query}"}]
+        messages = [
+            {"role": "user", "content": f"{prior_context}\n\nNew question: {query}"}
+        ]
     else:
         messages = [{"role": "user", "content": query}]
 
@@ -168,8 +184,12 @@ async def ask_bird_query(
 
     async with AsyncExitStack() as stack:
         # eBird SSE connection
-        ebird_read, ebird_write = await stack.enter_async_context(sse_client(EBIRD_MCP_URL))
-        ebird_client = await stack.enter_async_context(ClientSession(ebird_read, ebird_write))
+        ebird_read, ebird_write = await stack.enter_async_context(
+            sse_client(EBIRD_MCP_URL)
+        )
+        ebird_client = await stack.enter_async_context(
+            ClientSession(ebird_read, ebird_write)
+        )
         await ebird_client.initialize()
         ebird_tools = await ebird_client.list_tools()
         logger.info("eBird connected, %d tools", len(ebird_tools.tools))
@@ -177,33 +197,47 @@ async def ask_bird_query(
         tools = [async_mcp_tool(t, ebird_client) for t in ebird_tools.tools]
 
         # DuckDB stdio connection (cached, idle TTL)
+        duck: _CachedDuckConn | None = None
         if duck_db_path:
             duck = await _get_duck_conn(duck_db_path)
+            duck.acquire()
             tools += [async_mcp_tool(t, duck.session) for t in duck.tools]
 
-        runner = client.beta.messages.tool_runner(
-            model="claude-sonnet-4-6",
-            max_tokens=4096,
-            thinking={"type": "adaptive"},
-            system=SYSTEM_PROMPT,
-            tools=tools,
-            messages=messages,
-            stream=True,
-        )
+        try:
+            runner = client.beta.messages.tool_runner(
+                model="claude-sonnet-4-6",
+                max_tokens=4096,
+                thinking={"type": "adaptive"},
+                system=SYSTEM_PROMPT,
+                tools=tools,
+                messages=messages,
+                stream=True,
+            )
 
-        async for message_stream in runner:
-            async for event in message_stream:
-                if event.type == "content_block_stop":
-                    if event.content_block.type == "tool_use":
-                        tool_call_count += 1
-                        logger.info("tool_call: %s input=%s", event.content_block.name, event.content_block.input)
-                elif event.type == "text":
-                    chunks.append(event.text)
+            async for message_stream in runner:
+                async for event in message_stream:
+                    if event.type == "content_block_stop":
+                        if event.content_block.type == "tool_use":
+                            tool_call_count += 1
+                            logger.info(
+                                "tool_call: %s input=%s",
+                                event.content_block.name,
+                                event.content_block.input,
+                            )
+                    elif event.type == "text":
+                        chunks.append(event.text)
 
-            final = await message_stream.get_final_message()
-            total_input_tokens += final.usage.input_tokens
-            total_output_tokens += final.usage.output_tokens
-            logger.info("turn done: stop_reason=%s, output_tokens=%d", final.stop_reason, final.usage.output_tokens)
+                final = await message_stream.get_final_message()
+                total_input_tokens += final.usage.input_tokens
+                total_output_tokens += final.usage.output_tokens
+                logger.info(
+                    "turn done: stop_reason=%s, output_tokens=%d",
+                    final.stop_reason,
+                    final.usage.output_tokens,
+                )
+        finally:
+            if duck is not None:
+                duck.release()
 
     stats = QueryStats(
         elapsed_s=time.monotonic() - start,

@@ -47,5 +47,5 @@ Managed per-service in the Render dashboard. Key ones for cloaca+piper:
 - `ANTHROPIC_API_KEY` -- Claude API access for piper
 - `PIPER_DISCORD_BOT_TOKEN` -- Discord bot token
 - `EBIRD_MCP_URL` -- eBird MCP server endpoint
-- `PIPER_DUCK_DB_PATH` -- path to DuckDB on the Render disk (`/var/data/ebd_nyc.db`)
-- `DUCK_DB_PATH` -- path to cloaca's own DuckDB for hotspot queries
+- `PIPER_DUCK_DB_PATH` -- path to the eBird observation database on the Render disk (`/var/data/ebd_nyc.db`), used by piper via MCP
+- `DUCK_DB_PATH` -- path to cloaca's own DuckDB for hotspot queries (separate database from piper's)

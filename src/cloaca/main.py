@@ -142,10 +142,18 @@ async def start_piper():
     from cloaca.piper.main import start as piper_start
 
     async def _run_piper():
-        try:
-            await piper_start()
-        except Exception as e:
-            print(f"piper crashed: {e}")
+        delay = 5
+        while True:
+            try:
+                await piper_start()
+            except asyncio.CancelledError:
+                return
+            except Exception as e:
+                print(f"piper crashed: {e}, restarting in {delay}s")
+                await asyncio.sleep(delay)
+                delay = min(delay * 2, 300)
+            else:
+                return
 
     _piper_task = asyncio.create_task(_run_piper())
     print("piper started")
@@ -189,7 +197,13 @@ async def shutdown_event():
     if _piper_task is not None:
         from cloaca.piper.main import bot
         from cloaca.piper.bird_query import close_duck_conn
+
         if not bot.is_closed():
             await bot.close()
+        _piper_task.cancel()
+        try:
+            await _piper_task
+        except asyncio.CancelledError:
+            pass
         await close_duck_conn()
         print("piper stopped")
