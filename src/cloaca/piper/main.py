@@ -162,14 +162,14 @@ async def on_ready():
                 )
         except Exception:
             logger.exception("failed to backfill year species")
-        # TEMP TEST: delete amerob so the poll detects it as a new year lifer
+        # TEMP FIX: clear state so backfill re-runs with correct dates
+        # (amerob got wrong date from the test notification)
         from cloaca.piper.year_lifers import get_state_db
 
-        get_state_db().execute(
-            "DELETE FROM hotspot_year_species"
-            " WHERE species_code = 'amerob' AND year = 2026"
-        )
-        logger.info("TEMP TEST: deleted amerob to test notification")
+        get_state_db().execute("DELETE FROM hotspot_year_species WHERE year = 2026")
+        get_state_db().execute("DELETE FROM backfill_status WHERE year = 2026")
+        count = await backfill_year_species(MCGOLRICK_HOTSPOT_ID)
+        logger.info("TEMP FIX: re-backfilled %d species with correct dates", count)
         check_year_lifers.start()
 
 
