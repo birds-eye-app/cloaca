@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import re
+from zoneinfo import ZoneInfo
 
 import discord
 from discord.ext import tasks
@@ -12,6 +13,14 @@ from cloaca.piper.birdcast import (
     birdcast_link_view,
     fetch_birdcast_forecast,
     format_forecast_message,
+)
+from cloaca.piper.year_lifers import (
+    WATCHED_HOTSPOTS,
+    backfill_year_species,
+    check_for_new_year_lifers,
+    format_year_lifer_message,
+    get_year_total,
+    year_list_link_view,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -74,6 +83,50 @@ async def build_prior_context(ref_msg: discord.Message) -> str:
 PIPER_BOT_UPDATES_CHANNEL_ID = 1492206410711433397
 
 
+_EASTERN = ZoneInfo("America/New_York")
+_last_year_lifer_check: datetime.datetime | None = None
+
+
+@tasks.loop(minutes=15)
+async def check_year_lifers():
+    global _last_year_lifer_check
+
+    now = datetime.datetime.now(_EASTERN)
+    is_night = now.hour < 6 or now.hour >= 22
+
+    if is_night and _last_year_lifer_check is not None:
+        elapsed = (now - _last_year_lifer_check).total_seconds()
+        if elapsed < 3600:
+            return
+
+    _last_year_lifer_check = now
+
+    for hotspot in WATCHED_HOTSPOTS:
+        channel = bot.get_channel(hotspot.channel_id)
+        if channel is None:
+            logger.warning(
+                "could not find year lifers channel %d for %s",
+                hotspot.channel_id,
+                hotspot.name,
+            )
+            continue
+
+        try:
+            new_lifers = await check_for_new_year_lifers(hotspot.id)
+        except Exception:
+            logger.exception("failed to check year lifers for %s", hotspot.name)
+            continue
+
+        if not new_lifers:
+            logger.info("no new year lifers at %s", hotspot.name)
+            continue
+
+        total = get_year_total(hotspot.id)
+        message = format_year_lifer_message(new_lifers, hotspot.name, total)
+        await channel.send(message, view=year_list_link_view(hotspot.id))
+        logger.info("posted %d new year lifer(s) for %s", len(new_lifers), hotspot.name)
+
+
 @tasks.loop(time=datetime.time(hour=22, minute=0, tzinfo=datetime.timezone.utc))
 async def post_birdcast_forecast():
     channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
@@ -101,6 +154,19 @@ async def on_ready():
         )
     if not post_birdcast_forecast.is_running():
         post_birdcast_forecast.start()
+    if not check_year_lifers.is_running():
+        for hotspot in WATCHED_HOTSPOTS:
+            try:
+                count = await backfill_year_species(hotspot.id)
+                if count > 0:
+                    logger.info(
+                        "backfilled %d year species for %s",
+                        count,
+                        hotspot.name,
+                    )
+            except Exception:
+                logger.exception("failed to backfill year species for %s", hotspot.name)
+        check_year_lifers.start()
 
 
 @bot.event
