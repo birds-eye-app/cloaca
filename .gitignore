@@ -14,3 +14,4 @@ wheels/
 .vscode/*
 .env
 src/cloaca/swan_lake/dbs/*
+piper_state.db

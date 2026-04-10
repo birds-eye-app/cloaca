@@ -21,6 +21,8 @@ projects:
         sync: false
       - key: PIPER_DUCK_DB_PATH
         value: /var/data/ebd_nyc.db
+      - key: PIPER_STATE_DB_PATH
+        value: /var/data/piper_state.db
       - key: EBIRD_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
