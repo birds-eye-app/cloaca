@@ -162,7 +162,7 @@ async def check_year_lifers():
             logger.info("no new lifers at %s", hotspot.name)
 
 
-@tasks.loop(time=datetime.time(hour=22, minute=0, tzinfo=datetime.timezone.utc))
+@tasks.loop(time=datetime.time(hour=7, minute=0, tzinfo=_EASTERN))
 async def post_birdcast_forecast():
     channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
     if channel is None:
