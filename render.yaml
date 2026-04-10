@@ -19,37 +19,20 @@ projects:
         sync: false
       - key: DUCK_DB_PATH
         sync: false
+      - key: PIPER_DUCK_DB_PATH
+        value: /var/data/ebd_nyc.db
       - key: EBIRD_API_KEY
         sync: false
-      region: oregon
-      healthCheckPath: /v1/health
-      dockerContext: .
-      dockerfilePath: ./Dockerfile
-      disk:
-        name: disk
-        mountPath: /var/data
-        sizeGB: 1
-      autoDeployTrigger: checksPass
-
-    - type: worker
-      name: piper
-      runtime: docker
-      repo: https://github.com/birds-eye-app/cloaca
-      plan: starter
-      envVars:
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: PIPER_DISCORD_BOT_TOKEN
         sync: false
       - key: EBIRD_MCP_URL
         sync: false
-      - key: DUCK_DB_PATH
-        value: /var/data/ebd_nyc.db
-
       region: oregon
+      healthCheckPath: /v1/health
       dockerContext: .
       dockerfilePath: ./Dockerfile
-      dockerCommand: uv run python3 -u -m cloaca.piper.main
       disk:
         name: disk
         mountPath: /var/data

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import time
@@ -10,7 +11,84 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client
 
-EBIRD_MCP_URL = os.environ["EBIRD_MCP_URL"]
+_DUCK_IDLE_SECONDS = 5 * 60
+_duck_lock = asyncio.Lock()
+_duck_conn: "_CachedDuckConn | None" = None
+
+
+class _CachedDuckConn:
+    def __init__(self, stack: AsyncExitStack, session: ClientSession, tools: list):
+        self.stack = stack
+        self.session = session
+        self.tools = tools
+        self._timer: asyncio.Task | None = None
+        self._use_count: int = 0
+
+    def acquire(self) -> None:
+        self._use_count += 1
+
+    def release(self) -> None:
+        self._use_count -= 1
+        self.reset_timer()
+
+    def reset_timer(self) -> None:
+        if self._timer:
+            self._timer.cancel()
+        self._timer = asyncio.create_task(self._idle_close())
+
+    async def _idle_close(self) -> None:
+        global _duck_conn
+        await asyncio.sleep(_DUCK_IDLE_SECONDS)
+        async with _duck_lock:
+            if self._use_count > 0:
+                return
+            await self.stack.aclose()
+            if _duck_conn is self:
+                _duck_conn = None
+        logger.info("DuckDB MCP closed after %ds idle", _DUCK_IDLE_SECONDS)
+
+
+async def _get_duck_conn(duck_db_path: str) -> _CachedDuckConn:
+    global _duck_conn
+    async with _duck_lock:
+        if _duck_conn is not None:
+            _duck_conn.reset_timer()
+            logger.info("reusing DuckDB MCP connection")
+            return _duck_conn
+
+        stack = AsyncExitStack()
+        await stack.__aenter__()
+        try:
+            params = StdioServerParameters(
+                command="uvx",
+                args=["mcp-server-motherduck", "--db-path", duck_db_path],
+            )
+            read, write = await stack.enter_async_context(stdio_client(params))
+            session = await stack.enter_async_context(ClientSession(read, write))
+            await session.initialize()
+            tools = (await session.list_tools()).tools
+            logger.info("DuckDB MCP connected, %d tools", len(tools))
+        except Exception:
+            await stack.aclose()
+            raise
+
+        _duck_conn = _CachedDuckConn(stack, session, tools)
+        _duck_conn.reset_timer()
+        return _duck_conn
+
+
+async def close_duck_conn() -> None:
+    global _duck_conn
+    async with _duck_lock:
+        if _duck_conn is not None:
+            if _duck_conn._timer:
+                _duck_conn._timer.cancel()
+            await _duck_conn.stack.aclose()
+            _duck_conn = None
+            logger.info("DuckDB MCP closed on shutdown")
+
+
+EBIRD_MCP_URL = os.environ.get("EBIRD_MCP_URL", "")
 
 SYSTEM_PROMPT = """You are a birding assistant for New York City. You answer questions about bird sightings, eBird observations, hotspots, and birding topics — but only for NYC and the surrounding area (the five boroughs, Long Island, New Jersey, Connecticut, and the lower Hudson Valley).
 
@@ -85,6 +163,8 @@ async def ask_bird_query(
     prior_messages: list[dict] | None = None,
     prior_context: str | None = None,
 ) -> tuple[str, QueryStats, list[dict]]:
+    if not EBIRD_MCP_URL:
+        raise RuntimeError("EBIRD_MCP_URL is not set")
     start = time.monotonic()
     chunks: list[str] = []
     total_input_tokens = 0
@@ -94,58 +174,70 @@ async def ask_bird_query(
     if prior_messages:
         messages = prior_messages + [{"role": "user", "content": query}]
     elif prior_context:
-        messages = [{"role": "user", "content": f"{prior_context}\n\nNew question: {query}"}]
+        messages = [
+            {"role": "user", "content": f"{prior_context}\n\nNew question: {query}"}
+        ]
     else:
         messages = [{"role": "user", "content": query}]
 
-    duck_db_path = os.environ.get("DUCK_DB_PATH")
+    duck_db_path = os.environ.get("PIPER_DUCK_DB_PATH")
 
     async with AsyncExitStack() as stack:
         # eBird SSE connection
-        ebird_read, ebird_write = await stack.enter_async_context(sse_client(EBIRD_MCP_URL))
-        ebird_client = await stack.enter_async_context(ClientSession(ebird_read, ebird_write))
+        ebird_read, ebird_write = await stack.enter_async_context(
+            sse_client(EBIRD_MCP_URL)
+        )
+        ebird_client = await stack.enter_async_context(
+            ClientSession(ebird_read, ebird_write)
+        )
         await ebird_client.initialize()
         ebird_tools = await ebird_client.list_tools()
         logger.info("eBird connected, %d tools", len(ebird_tools.tools))
 
         tools = [async_mcp_tool(t, ebird_client) for t in ebird_tools.tools]
 
-        # DuckDB stdio connection (optional)
+        # DuckDB stdio connection (cached, idle TTL)
+        duck: _CachedDuckConn | None = None
         if duck_db_path:
-            duck_params = StdioServerParameters(
-                command="uvx",
-                args=["mcp-server-motherduck", "--db-path", duck_db_path],
+            duck = await _get_duck_conn(duck_db_path)
+            duck.acquire()
+            tools += [async_mcp_tool(t, duck.session) for t in duck.tools]
+
+        try:
+            runner = client.beta.messages.tool_runner(
+                model="claude-sonnet-4-6",
+                max_tokens=4096,
+                thinking={"type": "adaptive"},
+                system=SYSTEM_PROMPT,
+                tools=tools,
+                messages=messages,
+                stream=True,
             )
-            duck_read, duck_write = await stack.enter_async_context(stdio_client(duck_params))
-            duck_client = await stack.enter_async_context(ClientSession(duck_read, duck_write))
-            await duck_client.initialize()
-            duck_tools = await duck_client.list_tools()
-            logger.info("DuckDB connected, %d tools", len(duck_tools.tools))
-            tools += [async_mcp_tool(t, duck_client) for t in duck_tools.tools]
 
-        runner = client.beta.messages.tool_runner(
-            model="claude-sonnet-4-6",
-            max_tokens=4096,
-            thinking={"type": "adaptive"},
-            system=SYSTEM_PROMPT,
-            tools=tools,
-            messages=messages,
-            stream=True,
-        )
+            async for message_stream in runner:
+                async for event in message_stream:
+                    if event.type == "content_block_stop":
+                        if event.content_block.type == "tool_use":
+                            tool_call_count += 1
+                            logger.info(
+                                "tool_call: %s input=%s",
+                                event.content_block.name,
+                                event.content_block.input,
+                            )
+                    elif event.type == "text":
+                        chunks.append(event.text)
 
-        async for message_stream in runner:
-            async for event in message_stream:
-                if event.type == "content_block_stop":
-                    if event.content_block.type == "tool_use":
-                        tool_call_count += 1
-                        logger.info("tool_call: %s input=%s", event.content_block.name, event.content_block.input)
-                elif event.type == "text":
-                    chunks.append(event.text)
-
-            final = await message_stream.get_final_message()
-            total_input_tokens += final.usage.input_tokens
-            total_output_tokens += final.usage.output_tokens
-            logger.info("turn done: stop_reason=%s, output_tokens=%d", final.stop_reason, final.usage.output_tokens)
+                final = await message_stream.get_final_message()
+                total_input_tokens += final.usage.input_tokens
+                total_output_tokens += final.usage.output_tokens
+                logger.info(
+                    "turn done: stop_reason=%s, output_tokens=%d",
+                    final.stop_reason,
+                    final.usage.output_tokens,
+                )
+        finally:
+            if duck is not None:
+                duck.release()
 
     stats = QueryStats(
         elapsed_s=time.monotonic() - start,

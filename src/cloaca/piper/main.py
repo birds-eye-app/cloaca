@@ -56,9 +56,17 @@ async def build_prior_context(ref_msg: discord.Message) -> str:
     return "[Prior conversation — reconstructed from Discord, not current session:]\n" + "\n\n".join(turns)
 
 
+PIPER_BOT_UPDATES_CHANNEL_ID = 1492206410711433397
+
+
 @bot.event
 async def on_ready():
     logger.info("online as %s", bot.user)
+    channel = bot.get_channel(PIPER_BOT_UPDATES_CHANNEL_ID)
+    if channel:
+        await channel.send("I'm up!")
+    else:
+        logger.warning("could not find startup channel %d", PIPER_BOT_UPDATES_CHANNEL_ID)
 
 
 @bot.event
@@ -121,4 +129,10 @@ async def on_message(message: discord.Message):
     cache_put(reply.id, updated_messages)
 
 
-bot.run(os.environ["PIPER_DISCORD_BOT_TOKEN"])
+async def start():
+    await bot.start(os.environ["PIPER_DISCORD_BOT_TOKEN"])
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(start())
