@@ -35,6 +35,27 @@ The DuckDB MCP server (mcp-server-motherduck) is spawned as a subprocess. To avo
 - A 5-minute idle timer that closes the subprocess when unused
 - A global lock for thread-safe access
 
+### Year lifer tracking
+
+`year_lifers.py` tracks first-of-year species sightings at McGolrick Park (hotspot `L2987624`). It uses the eBird historic observations API (`detail=full`, `rank=create`) which returns observer names — the standard recent observations endpoint does not.
+
+**State DB**: A separate writable DuckDB file (`PIPER_STATE_DB_PATH`) stores a `hotspot_year_species` table with species code, first observation date, observer name, and checklist ID. This is independent of the large read-only `ebd_nyc.db`.
+
+**Backfill**: On first startup (when the table is empty for the current year), iterates Jan 1 through yesterday calling the eBird API day-by-day (~100 calls, 0.5s delay between each). Subsequent startups skip this.
+
+**Polling**: Every 15 minutes, fetches observations for today and yesterday (2 API calls). During night hours (10pm–6am ET), enforces at least 1 hour between checks. New species are inserted and posted to #mcgolrick-park.
+
+**Year rollover**: On Jan 1, the table is empty for the new year, triggering a backfill of 0 days. The regular poll picks up the first species naturally.
+
+### Scheduled tasks
+
+| Task | Schedule | Channel | Module |
+|------|----------|---------|--------|
+| BirdCast forecast | Daily at 22:00 UTC (6 PM EDT) | #bird-cast-updates | `birdcast.py` |
+| Year lifer check | Every 15 min (hourly at night) | #mcgolrick-park | `year_lifers.py` |
+
+Both are started in `on_ready()` via `discord.ext.tasks.loop`.
+
 ## Environment variables
 
 - `PIPER_DISCORD_BOT_TOKEN` — Discord bot token (required for piper to start)
@@ -72,6 +93,8 @@ uv run python -m cloaca.piper.main
 
 - `PIPER_BOT_UPDATES_CHANNEL_ID` in `main.py` — Discord channel where Piper posts "I'm up!" on startup (#piper-bot-updates)
 - `BIRDCAST_CHANNEL_ID` in `birdcast.py` — Discord channel for daily migration forecasts (#bird-cast-updates)
+- `YEAR_LIFERS_CHANNEL_ID` in `year_lifers.py` — Discord channel for year lifer notifications (#mcgolrick-park)
+- `MCGOLRICK_HOTSPOT_ID` in `year_lifers.py` — eBird hotspot ID for McGolrick Park (`L2987624`)
 - `CACHE_MAX_SIZE` in `main.py` — Max conversation cache entries (50)
 - `_DUCK_IDLE_SECONDS` in `bird_query.py` — DuckDB connection idle timeout (5 min)
 - Claude model used: `claude-sonnet-4-6` (set in `bird_query.py`)
