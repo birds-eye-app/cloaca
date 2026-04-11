@@ -184,6 +184,7 @@ async def fetch_observations_for_date(
         cat="species",
         r=[hotspot_id],
         detail="full",
+        include_provisional=True,
     )
     text = await raw_response.text()
     if not text or text.strip() == "[]":
