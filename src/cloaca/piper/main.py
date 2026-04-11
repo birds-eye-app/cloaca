@@ -142,12 +142,8 @@ async def check_year_lifers():
 
         if confirmed_at:
             total = get_all_time_total(hotspot.id)
-            message = format_all_time_lifer_message(
-                confirmed_at, hotspot.name, total
-            )
-            await channel.send(
-                message, view=all_time_list_link_view(hotspot.id)
-            )
+            message = format_all_time_lifer_message(confirmed_at, hotspot.name, total)
+            await channel.send(message, view=all_time_list_link_view(hotspot.id))
             logger.info(
                 "posted %d confirmed all-time lifer(s) for %s",
                 len(confirmed_at),
@@ -158,9 +154,7 @@ async def check_year_lifers():
             message = format_tentative_all_time_lifer_message(
                 provisional_at, hotspot.name
             )
-            await channel.send(
-                message, view=all_time_list_link_view(hotspot.id)
-            )
+            await channel.send(message, view=all_time_list_link_view(hotspot.id))
             logger.info(
                 "posted %d tentative all-time lifer(s) for %s",
                 len(provisional_at),
@@ -176,24 +170,16 @@ async def check_year_lifers():
             logger.exception("failed to check year lifers for %s", hotspot.name)
             confirmed_yr, provisional_yr = [], []
 
-        all_time_codes = {
-            o.speciesCode for o in confirmed_at + provisional_at
-        }
-        confirmed_yr = [
-            o for o in confirmed_yr if o.speciesCode not in all_time_codes
-        ]
+        all_time_codes = {o.speciesCode for o in confirmed_at + provisional_at}
+        confirmed_yr = [o for o in confirmed_yr if o.speciesCode not in all_time_codes]
         provisional_yr = [
             o for o in provisional_yr if o.speciesCode not in all_time_codes
         ]
 
         if confirmed_yr:
             total = get_year_total(hotspot.id)
-            message = format_year_lifer_message(
-                confirmed_yr, hotspot.name, total
-            )
-            await channel.send(
-                message, view=year_list_link_view(hotspot.id)
-            )
+            message = format_year_lifer_message(confirmed_yr, hotspot.name, total)
+            await channel.send(message, view=year_list_link_view(hotspot.id))
             logger.info(
                 "posted %d confirmed year lifer(s) for %s",
                 len(confirmed_yr),
@@ -201,12 +187,8 @@ async def check_year_lifers():
             )
 
         if provisional_yr:
-            message = format_tentative_year_lifer_message(
-                provisional_yr, hotspot.name
-            )
-            await channel.send(
-                message, view=year_list_link_view(hotspot.id)
-            )
+            message = format_tentative_year_lifer_message(provisional_yr, hotspot.name)
+            await channel.send(message, view=year_list_link_view(hotspot.id))
             logger.info(
                 "posted %d tentative year lifer(s) for %s",
                 len(provisional_yr),
@@ -226,39 +208,32 @@ async def check_year_lifers():
             pend_confirmed, pend_invalidated = [], []
 
         if pend_confirmed:
-            at_confirmed = [
-                p for p in pend_confirmed if p.lifer_type == "all_time"
-            ]
-            yr_confirmed = [
-                p for p in pend_confirmed if p.lifer_type == "year"
-            ]
+            at_confirmed = [p for p in pend_confirmed if p.lifer_type == "all_time"]
+            yr_confirmed = [p for p in pend_confirmed if p.lifer_type == "year"]
             if at_confirmed:
                 total = get_all_time_total(hotspot.id)
                 message = format_confirmed_all_time_lifer_message(
                     at_confirmed, hotspot.name, total
                 )
-                await channel.send(
-                    message, view=all_time_list_link_view(hotspot.id)
-                )
+                await channel.send(message, view=all_time_list_link_view(hotspot.id))
             if yr_confirmed:
                 total = get_year_total(hotspot.id)
                 message = format_confirmed_year_lifer_message(
                     yr_confirmed, hotspot.name, total
                 )
-                await channel.send(
-                    message, view=year_list_link_view(hotspot.id)
-                )
+                await channel.send(message, view=year_list_link_view(hotspot.id))
 
         if pend_invalidated:
-            message = format_invalidated_lifer_message(
-                pend_invalidated, hotspot.name
-            )
+            message = format_invalidated_lifer_message(pend_invalidated, hotspot.name)
             await channel.send(message)
 
         has_activity = (
-            confirmed_at or provisional_at
-            or confirmed_yr or provisional_yr
-            or pend_confirmed or pend_invalidated
+            confirmed_at
+            or provisional_at
+            or confirmed_yr
+            or provisional_yr
+            or pend_confirmed
+            or pend_invalidated
         )
         if not has_activity:
             logger.info("no new lifers at %s", hotspot.name)

@@ -257,9 +257,7 @@ def _insert_pending_provisional(
     )
 
 
-def _remove_pending_provisional(
-    hotspot_id: str, species_code: str, lifer_type: str
-):
+def _remove_pending_provisional(hotspot_id: str, species_code: str, lifer_type: str):
     get_state_db().execute(
         """DELETE FROM pending_provisional_lifers
            WHERE hotspot_id = ? AND species_code = ? AND lifer_type = ?""",
@@ -472,9 +470,7 @@ def _split_confirmed_provisional(
     provisional: list[eBirdHistoricFullObservation] = []
     for obs in new_lifers:
         if any(
-            o.obsReviewed
-            for o in all_observations
-            if o.speciesCode == obs.speciesCode
+            o.obsReviewed for o in all_observations if o.speciesCode == obs.speciesCode
         ):
             confirmed.append(obs)
         else:
@@ -502,9 +498,7 @@ def check_for_new_year_lifers(
     for obs in new_lifers:
         _insert_species(hotspot_id, now.year, obs)
 
-    confirmed, provisional = _split_confirmed_provisional(
-        new_lifers, observations
-    )
+    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
 
     # Track provisional species for follow-up
     for obs in provisional:
@@ -539,9 +533,7 @@ def check_for_new_all_time_lifers(
     for obs in new_lifers:
         _insert_all_time_species(hotspot_id, obs.speciesCode)
 
-    confirmed, provisional = _split_confirmed_provisional(
-        new_lifers, observations
-    )
+    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
 
     # Track provisional species for follow-up
     for obs in provisional:
@@ -617,9 +609,7 @@ async def check_pending_provisionals(
     invalidated: list[PendingProvisional] = []
 
     for p in pending:
-        matching = [
-            o for o in all_observations if o.speciesCode == p.species_code
-        ]
+        matching = [o for o in all_observations if o.speciesCode == p.species_code]
         if not matching:
             # Observation gone — invalidated or transient API issue.
             age = (today - p.obs_date).days
@@ -750,12 +740,11 @@ def format_tentative_year_lifer_message(
             f"**{obs.comName}** — reported by "
             f"{obs.userDisplayName} ({date_str})\n"
             f"[View checklist]({checklist_url})\n"
-            f"-# Awaiting eBird review — we'll celebrate once confirmed!"
+            "-# Awaiting eBird review — we'll celebrate once confirmed!"
         )
 
     lines = [
-        f"👀 **{len(new_lifers)} Possible New Year Birds "
-        f"for {hotspot_name}!**",
+        f"👀 **{len(new_lifers)} Possible New Year Birds for {hotspot_name}!**",
         "",
     ]
     for obs in new_lifers:
@@ -765,9 +754,7 @@ def format_tentative_year_lifer_message(
             f"**{obs.comName}** — {obs.userDisplayName} "
             f"({date_str}) · [checklist]({checklist_url})"
         )
-    lines.append(
-        f"-# Awaiting eBird review — we'll celebrate once confirmed!"
-    )
+    lines.append("-# Awaiting eBird review — we'll celebrate once confirmed!")
     return "\n".join(lines)
 
 
@@ -784,12 +771,11 @@ def format_tentative_all_time_lifer_message(
             f"**{obs.comName}** — reported by "
             f"{obs.userDisplayName} ({date_str})\n"
             f"[View checklist]({checklist_url})\n"
-            f"-# Awaiting eBird review — we'll celebrate once confirmed!"
+            "-# Awaiting eBird review — we'll celebrate once confirmed!"
         )
 
     lines = [
-        f"👀 **{len(new_lifers)} Possible New Park Birds "
-        f"for {hotspot_name}!**",
+        f"👀 **{len(new_lifers)} Possible New Park Birds for {hotspot_name}!**",
         "",
     ]
     for obs in new_lifers:
@@ -799,9 +785,7 @@ def format_tentative_all_time_lifer_message(
             f"**{obs.comName}** — {obs.userDisplayName} "
             f"({date_str}) · [checklist]({checklist_url})"
         )
-    lines.append(
-        f"-# Awaiting eBird review — we'll celebrate once confirmed!"
-    )
+    lines.append("-# Awaiting eBird review — we'll celebrate once confirmed!")
     return "\n".join(lines)
 
 
@@ -832,10 +816,7 @@ def format_confirmed_year_lifer_message(
     lines = [header, ""]
     for p in confirmed:
         checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
-        lines.append(
-            f"**{p.common_name}** — confirmed! · "
-            f"[checklist]({checklist_url})"
-        )
+        lines.append(f"**{p.common_name}** — confirmed! · [checklist]({checklist_url})")
     return "\n".join(lines)
 
 
@@ -861,10 +842,7 @@ def format_confirmed_all_time_lifer_message(
     lines = [header, ""]
     for p in confirmed:
         checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
-        lines.append(
-            f"**{p.common_name}** — confirmed! · "
-            f"[checklist]({checklist_url})"
-        )
+        lines.append(f"**{p.common_name}** — confirmed! · [checklist]({checklist_url})")
     return "\n".join(lines)
 
 
@@ -879,8 +857,7 @@ def format_invalidated_lifer_message(
             f"after eBird review."
         )
     return (
-        f"**Update:** {names} at {hotspot_name} were not confirmed "
-        f"after eBird review."
+        f"**Update:** {names} at {hotspot_name} were not confirmed after eBird review."
     )
 
 
@@ -940,19 +917,25 @@ if __name__ == "__main__":
                 total = get_all_time_total(hotspot.id)
                 print(format_all_time_lifer_message(confirmed_at, hotspot.name, total))
             if provisional_at:
-                print(format_tentative_all_time_lifer_message(provisional_at, hotspot.name))
+                print(
+                    format_tentative_all_time_lifer_message(
+                        provisional_at, hotspot.name
+                    )
+                )
             if not confirmed_at and not provisional_at:
                 print("No new all-time lifers found")
 
             # Filter out all-time lifers from year lifer notifications
-            all_time_codes = {
-                o.speciesCode for o in confirmed_at + provisional_at
-            }
+            all_time_codes = {o.speciesCode for o in confirmed_at + provisional_at}
             confirmed_yr, provisional_yr = check_for_new_year_lifers(
                 hotspot.id, observations
             )
-            confirmed_yr = [o for o in confirmed_yr if o.speciesCode not in all_time_codes]
-            provisional_yr = [o for o in provisional_yr if o.speciesCode not in all_time_codes]
+            confirmed_yr = [
+                o for o in confirmed_yr if o.speciesCode not in all_time_codes
+            ]
+            provisional_yr = [
+                o for o in provisional_yr if o.speciesCode not in all_time_codes
+            ]
             if confirmed_yr:
                 total = get_year_total(hotspot.id)
                 print(format_year_lifer_message(confirmed_yr, hotspot.name, total))
@@ -966,14 +949,26 @@ if __name__ == "__main__":
                 hotspot.id, observations
             )
             if confirmed_pending:
-                year_confirmed = [p for p in confirmed_pending if p.lifer_type == "year"]
-                at_confirmed = [p for p in confirmed_pending if p.lifer_type == "all_time"]
+                year_confirmed = [
+                    p for p in confirmed_pending if p.lifer_type == "year"
+                ]
+                at_confirmed = [
+                    p for p in confirmed_pending if p.lifer_type == "all_time"
+                ]
                 if at_confirmed:
                     total = get_all_time_total(hotspot.id)
-                    print(format_confirmed_all_time_lifer_message(at_confirmed, hotspot.name, total))
+                    print(
+                        format_confirmed_all_time_lifer_message(
+                            at_confirmed, hotspot.name, total
+                        )
+                    )
                 if year_confirmed:
                     total = get_year_total(hotspot.id)
-                    print(format_confirmed_year_lifer_message(year_confirmed, hotspot.name, total))
+                    print(
+                        format_confirmed_year_lifer_message(
+                            year_confirmed, hotspot.name, total
+                        )
+                    )
             if invalidated:
                 print(format_invalidated_lifer_message(invalidated, hotspot.name))
 

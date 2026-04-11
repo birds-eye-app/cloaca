@@ -106,18 +106,10 @@ def patches(mock_channel):
         get_year_total=MagicMock(return_value=42),
         format_all_time_lifer_message=MagicMock(return_value="AT_MSG"),
         format_year_lifer_message=MagicMock(return_value="YR_MSG"),
-        format_tentative_all_time_lifer_message=MagicMock(
-            return_value="TENT_AT_MSG"
-        ),
-        format_tentative_year_lifer_message=MagicMock(
-            return_value="TENT_YR_MSG"
-        ),
-        format_confirmed_all_time_lifer_message=MagicMock(
-            return_value="CONF_AT_MSG"
-        ),
-        format_confirmed_year_lifer_message=MagicMock(
-            return_value="CONF_YR_MSG"
-        ),
+        format_tentative_all_time_lifer_message=MagicMock(return_value="TENT_AT_MSG"),
+        format_tentative_year_lifer_message=MagicMock(return_value="TENT_YR_MSG"),
+        format_confirmed_all_time_lifer_message=MagicMock(return_value="CONF_AT_MSG"),
+        format_confirmed_year_lifer_message=MagicMock(return_value="CONF_YR_MSG"),
         format_invalidated_lifer_message=MagicMock(return_value="INVAL_MSG"),
         all_time_list_link_view=MagicMock(return_value=None),
         year_list_link_view=MagicMock(return_value=None),
@@ -150,18 +142,10 @@ async def _run_check(mock_channel, **overrides):
         get_year_total=MagicMock(return_value=42),
         format_all_time_lifer_message=MagicMock(return_value="AT_MSG"),
         format_year_lifer_message=MagicMock(return_value="YR_MSG"),
-        format_tentative_all_time_lifer_message=MagicMock(
-            return_value="TENT_AT_MSG"
-        ),
-        format_tentative_year_lifer_message=MagicMock(
-            return_value="TENT_YR_MSG"
-        ),
-        format_confirmed_all_time_lifer_message=MagicMock(
-            return_value="CONF_AT_MSG"
-        ),
-        format_confirmed_year_lifer_message=MagicMock(
-            return_value="CONF_YR_MSG"
-        ),
+        format_tentative_all_time_lifer_message=MagicMock(return_value="TENT_AT_MSG"),
+        format_tentative_year_lifer_message=MagicMock(return_value="TENT_YR_MSG"),
+        format_confirmed_all_time_lifer_message=MagicMock(return_value="CONF_AT_MSG"),
+        format_confirmed_year_lifer_message=MagicMock(return_value="CONF_YR_MSG"),
         format_invalidated_lifer_message=MagicMock(return_value="INVAL_MSG"),
         all_time_list_link_view=MagicMock(return_value=None),
         year_list_link_view=MagicMock(return_value=None),
@@ -171,10 +155,13 @@ async def _run_check(mock_channel, **overrides):
     mock_bot = MagicMock()
     mock_bot.get_channel = MagicMock(return_value=mock_channel)
 
-    with patch.multiple(MODULE, **default_mocks), \
-         patch(f"{MODULE}.bot", mock_bot), \
-         patch(f"{MODULE}._last_year_lifer_check", None):
+    with (
+        patch.multiple(MODULE, **default_mocks),
+        patch(f"{MODULE}.bot", mock_bot),
+        patch(f"{MODULE}._last_year_lifer_check", None),
+    ):
         from cloaca.piper.main import check_year_lifers
+
         await check_year_lifers.coro()
 
 
@@ -185,19 +172,13 @@ async def _run_check(mock_channel, **overrides):
 
 class TestCheckYearLifersConfirmedAlerts:
     @pytest.mark.asyncio
-    async def test_confirmed_all_time_lifer_sends_full_alert(
-        self, mock_channel
-    ):
+    async def test_confirmed_all_time_lifer_sends_full_alert(self, mock_channel):
         obs = make_obs(obs_reviewed=True)
         await _run_check(
             mock_channel,
-            check_for_new_all_time_lifers=MagicMock(
-                return_value=([obs], [])
-            ),
+            check_for_new_all_time_lifers=MagicMock(return_value=([obs], [])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "AT_MSG" in messages
 
     @pytest.mark.asyncio
@@ -207,9 +188,7 @@ class TestCheckYearLifersConfirmedAlerts:
             mock_channel,
             check_for_new_year_lifers=MagicMock(return_value=([obs], [])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "YR_MSG" in messages
 
 
@@ -219,13 +198,9 @@ class TestCheckYearLifersTentativeAlerts:
         obs = make_obs(obs_reviewed=False)
         await _run_check(
             mock_channel,
-            check_for_new_all_time_lifers=MagicMock(
-                return_value=([], [obs])
-            ),
+            check_for_new_all_time_lifers=MagicMock(return_value=([], [obs])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "TENT_AT_MSG" in messages
 
     @pytest.mark.asyncio
@@ -235,9 +210,7 @@ class TestCheckYearLifersTentativeAlerts:
             mock_channel,
             check_for_new_year_lifers=MagicMock(return_value=([], [obs])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "TENT_YR_MSG" in messages
 
 
@@ -249,15 +222,11 @@ class TestCheckYearLifersYearExcludedWhenAllTime:
         obs = make_obs(obs_reviewed=True)
         await _run_check(
             mock_channel,
-            check_for_new_all_time_lifers=MagicMock(
-                return_value=([obs], [])
-            ),
+            check_for_new_all_time_lifers=MagicMock(return_value=([obs], [])),
             # Year check also returns the same species
             check_for_new_year_lifers=MagicMock(return_value=([obs], [])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "AT_MSG" in messages
         # Year message should NOT be sent because the species overlaps
         assert "YR_MSG" not in messages
@@ -269,14 +238,10 @@ class TestCheckYearLifersYearExcludedWhenAllTime:
         obs = make_obs(obs_reviewed=False)
         await _run_check(
             mock_channel,
-            check_for_new_all_time_lifers=MagicMock(
-                return_value=([], [obs])
-            ),
+            check_for_new_all_time_lifers=MagicMock(return_value=([], [obs])),
             check_for_new_year_lifers=MagicMock(return_value=([], [obs])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "TENT_AT_MSG" in messages
         assert "TENT_YR_MSG" not in messages
 
@@ -287,13 +252,9 @@ class TestCheckYearLifersPendingFollowUp:
         pending = make_pending(lifer_type="all_time")
         await _run_check(
             mock_channel,
-            check_pending_provisionals=AsyncMock(
-                return_value=([pending], [])
-            ),
+            check_pending_provisionals=AsyncMock(return_value=([pending], [])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "CONF_AT_MSG" in messages
 
     @pytest.mark.asyncio
@@ -301,13 +262,9 @@ class TestCheckYearLifersPendingFollowUp:
         pending = make_pending(lifer_type="year")
         await _run_check(
             mock_channel,
-            check_pending_provisionals=AsyncMock(
-                return_value=([pending], [])
-            ),
+            check_pending_provisionals=AsyncMock(return_value=([pending], [])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "CONF_YR_MSG" in messages
 
     @pytest.mark.asyncio
@@ -315,13 +272,9 @@ class TestCheckYearLifersPendingFollowUp:
         pending = make_pending()
         await _run_check(
             mock_channel,
-            check_pending_provisionals=AsyncMock(
-                return_value=([], [pending])
-            ),
+            check_pending_provisionals=AsyncMock(return_value=([], [pending])),
         )
-        messages = [
-            call.args[0] for call in mock_channel.send.call_args_list
-        ]
+        messages = [call.args[0] for call in mock_channel.send.call_args_list]
         assert "INVAL_MSG" in messages
 
 

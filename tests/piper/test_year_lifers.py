@@ -34,9 +34,7 @@ from cloaca.piper.year_lifers import (
 from cloaca.scripts.fetch_yearly_hotspot_data import eBirdHistoricFullObservation
 
 HOTSPOT_ID = "L1814508"
-YEAR = datetime.datetime.now(
-    datetime.timezone(datetime.timedelta(hours=-5))
-).year
+YEAR = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5))).year
 
 
 # ---------------------------------------------------------------------------
@@ -174,9 +172,7 @@ class TestSplitConfirmedProvisional:
         unreviewed = make_obs("yetwar", obs_reviewed=False)
         new_lifers = [reviewed, unreviewed]
         all_obs = [reviewed, unreviewed]
-        confirmed, provisional = _split_confirmed_provisional(
-            new_lifers, all_obs
-        )
+        confirmed, provisional = _split_confirmed_provisional(new_lifers, all_obs)
         assert [o.speciesCode for o in confirmed] == ["amrob"]
         assert [o.speciesCode for o in provisional] == ["yetwar"]
 
@@ -196,9 +192,7 @@ class TestSplitConfirmedProvisional:
         # _find_new_species would return the earliest
         new_lifers = [earliest]
         all_obs = [earliest, later_reviewed]
-        confirmed, provisional = _split_confirmed_provisional(
-            new_lifers, all_obs
-        )
+        confirmed, provisional = _split_confirmed_provisional(new_lifers, all_obs)
         assert len(confirmed) == 1
         assert len(provisional) == 0
 
@@ -359,17 +353,13 @@ class TestCheckForNewYearLifers:
 class TestCheckForNewAllTimeLifers:
     def test_confirmed_lifer(self):
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_all_time_lifers(
-            HOTSPOT_ID, obs
-        )
+        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
         assert len(confirmed) == 1
         assert "yetwar" in _get_known_all_time_species(HOTSPOT_ID)
 
     def test_provisional_lifer(self):
         obs = [make_obs(obs_reviewed=False)]
-        confirmed, provisional = check_for_new_all_time_lifers(
-            HOTSPOT_ID, obs
-        )
+        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
         assert len(provisional) == 1
         assert "yetwar" in _get_known_all_time_species(HOTSPOT_ID)
         pending = _get_pending_provisionals(HOTSPOT_ID)
@@ -379,9 +369,7 @@ class TestCheckForNewAllTimeLifers:
     def test_already_known_species_not_detected(self):
         _insert_all_time_species(HOTSPOT_ID, "yetwar")
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_all_time_lifers(
-            HOTSPOT_ID, obs
-        )
+        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
         assert confirmed == []
         assert provisional == []
 
@@ -394,9 +382,7 @@ class TestCheckForNewAllTimeLifers:
 class TestCheckPendingProvisionals:
     @pytest.mark.asyncio
     async def test_no_pending_returns_empty(self):
-        confirmed, invalidated = await check_pending_provisionals(
-            HOTSPOT_ID, []
-        )
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
         assert confirmed == []
         assert invalidated == []
 
@@ -408,11 +394,10 @@ class TestCheckPendingProvisionals:
         _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
         _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        now = datetime.datetime.now(
-            datetime.timezone(datetime.timedelta(hours=-5))
-        )
+        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5)))
         reviewed = make_obs(
-            obs_reviewed=True, obs_dt=now,
+            obs_reviewed=True,
+            obs_dt=now,
         )
 
         confirmed, invalidated = await check_pending_provisionals(
@@ -427,16 +412,12 @@ class TestCheckPendingProvisionals:
     @pytest.mark.asyncio
     async def test_still_pending_when_unreviewed(self):
         """Observation still unreviewed — no change."""
-        now = datetime.datetime.now(
-            datetime.timezone(datetime.timedelta(hours=-5))
-        )
+        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5)))
         obs = make_obs(obs_reviewed=False, obs_dt=now)
         _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
         _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        confirmed, invalidated = await check_pending_provisionals(
-            HOTSPOT_ID, [obs]
-        )
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [obs])
         assert confirmed == []
         assert invalidated == []
         # Still in pending table
@@ -447,9 +428,7 @@ class TestCheckPendingProvisionals:
         """Observation vanishes from API for >14 days → invalidated."""
         old_date = datetime.date.today() - datetime.timedelta(days=20)
         obs = make_obs(
-            obs_dt=datetime.datetime(
-                old_date.year, old_date.month, old_date.day, 8, 0
-            )
+            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
         )
         _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
         _insert_species(HOTSPOT_ID, YEAR, obs)
@@ -459,9 +438,7 @@ class TestCheckPendingProvisionals:
             new_callable=AsyncMock,
             return_value=[],  # observation gone
         ):
-            confirmed, invalidated = await check_pending_provisionals(
-                HOTSPOT_ID, []
-            )
+            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert confirmed == []
         assert len(invalidated) == 1
@@ -475,9 +452,7 @@ class TestCheckPendingProvisionals:
     async def test_invalidated_all_time_removes_from_known(self):
         old_date = datetime.date.today() - datetime.timedelta(days=20)
         obs = make_obs(
-            obs_dt=datetime.datetime(
-                old_date.year, old_date.month, old_date.day, 8, 0
-            )
+            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
         )
         _insert_pending_provisional(HOTSPOT_ID, obs, "all_time")
         _insert_all_time_species(HOTSPOT_ID, "yetwar")
@@ -487,9 +462,7 @@ class TestCheckPendingProvisionals:
             new_callable=AsyncMock,
             return_value=[],
         ):
-            confirmed, invalidated = await check_pending_provisionals(
-                HOTSPOT_ID, []
-            )
+            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert len(invalidated) == 1
         assert "yetwar" not in _get_known_all_time_species(HOTSPOT_ID)
@@ -511,9 +484,7 @@ class TestCheckPendingProvisionals:
             new_callable=AsyncMock,
             return_value=[],
         ):
-            confirmed, invalidated = await check_pending_provisionals(
-                HOTSPOT_ID, []
-            )
+            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert confirmed == []
         assert invalidated == []
@@ -526,18 +497,14 @@ class TestCheckPendingProvisionals:
         date rather than relying on today/yesterday only."""
         old_date = datetime.date.today() - datetime.timedelta(days=5)
         obs = make_obs(
-            obs_dt=datetime.datetime(
-                old_date.year, old_date.month, old_date.day, 8, 0
-            )
+            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
         )
         _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
         _insert_species(HOTSPOT_ID, YEAR, obs)
 
         reviewed = make_obs(
             obs_reviewed=True,
-            obs_dt=datetime.datetime(
-                old_date.year, old_date.month, old_date.day, 8, 0
-            ),
+            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0),
         )
 
         with patch(
@@ -546,7 +513,8 @@ class TestCheckPendingProvisionals:
             return_value=[reviewed],
         ) as mock_fetch:
             confirmed, invalidated = await check_pending_provisionals(
-                HOTSPOT_ID, []  # no recent observations
+                HOTSPOT_ID,
+                [],  # no recent observations
             )
 
         mock_fetch.assert_called_once_with(HOTSPOT_ID, old_date)
@@ -589,9 +557,7 @@ class TestFormatAllTimeLiferMessage:
     def test_multiple(self):
         obs1 = make_obs("amrob", "American Robin")
         obs2 = make_obs("yetwar", "Yellow-throated Warbler")
-        msg = format_all_time_lifer_message(
-            [obs1, obs2], "Franz Sigel Park", 100
-        )
+        msg = format_all_time_lifer_message([obs1, obs2], "Franz Sigel Park", 100)
         assert "2 New Park Birds" in msg
         assert "100 species all-time" in msg
 
@@ -613,17 +579,13 @@ class TestFormatTentativeMessages:
     def test_tentative_year_multiple(self):
         obs1 = make_obs("amrob", "American Robin")
         obs2 = make_obs("yetwar", "Yellow-throated Warbler")
-        msg = format_tentative_year_lifer_message(
-            [obs1, obs2], "Franz Sigel Park"
-        )
+        msg = format_tentative_year_lifer_message([obs1, obs2], "Franz Sigel Park")
         assert "2 Possible New Year Birds" in msg
         assert "Awaiting eBird review" in msg
 
     def test_tentative_all_time_single(self):
         obs = make_obs()
-        msg = format_tentative_all_time_lifer_message(
-            [obs], "Franz Sigel Park"
-        )
+        msg = format_tentative_all_time_lifer_message([obs], "Franz Sigel Park")
         assert "Possible New Park Bird" in msg
         assert "Yellow-throated Warbler" in msg
         assert "Awaiting eBird review" in msg
@@ -631,9 +593,7 @@ class TestFormatTentativeMessages:
     def test_tentative_all_time_multiple(self):
         obs1 = make_obs("amrob", "American Robin")
         obs2 = make_obs("yetwar", "Yellow-throated Warbler")
-        msg = format_tentative_all_time_lifer_message(
-            [obs1, obs2], "Franz Sigel Park"
-        )
+        msg = format_tentative_all_time_lifer_message([obs1, obs2], "Franz Sigel Park")
         assert "2 Possible New Park Birds" in msg
 
 
@@ -660,9 +620,7 @@ class TestFormatConfirmedMessages:
 
     def test_confirmed_year_single(self):
         p = self._pending()
-        msg = format_confirmed_year_lifer_message(
-            [p], "Franz Sigel Park", 42
-        )
+        msg = format_confirmed_year_lifer_message([p], "Franz Sigel Park", 42)
         assert "Confirmed!" in msg
         assert "Year Bird #42" in msg
         assert "Yellow-throated Warbler" in msg
@@ -671,17 +629,13 @@ class TestFormatConfirmedMessages:
     def test_confirmed_year_multiple(self):
         p1 = self._pending(species_code="amrob", common_name="American Robin")
         p2 = self._pending()
-        msg = format_confirmed_year_lifer_message(
-            [p1, p2], "Franz Sigel Park", 42
-        )
+        msg = format_confirmed_year_lifer_message([p1, p2], "Franz Sigel Park", 42)
         assert "2 Year Birds Confirmed" in msg
         assert "42 species" in msg
 
     def test_confirmed_all_time_single(self):
         p = self._pending(lifer_type="all_time")
-        msg = format_confirmed_all_time_lifer_message(
-            [p], "Franz Sigel Park", 100
-        )
+        msg = format_confirmed_all_time_lifer_message([p], "Franz Sigel Park", 100)
         assert "Confirmed!" in msg
         assert "New Park Bird" in msg
         assert "#100 all-time" in msg
@@ -693,9 +647,7 @@ class TestFormatConfirmedMessages:
             lifer_type="all_time",
         )
         p2 = self._pending(lifer_type="all_time")
-        msg = format_confirmed_all_time_lifer_message(
-            [p1, p2], "Franz Sigel Park", 100
-        )
+        msg = format_confirmed_all_time_lifer_message([p1, p2], "Franz Sigel Park", 100)
         assert "2 New Park Birds Confirmed" in msg
 
 
