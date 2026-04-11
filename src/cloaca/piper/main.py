@@ -22,6 +22,7 @@ from cloaca.piper.year_lifers import (
     check_for_new_all_time_lifers,
     check_for_new_year_lifers,
     check_pending_provisionals,
+    checklist_link_view,
     fetch_recent_observations,
     format_all_time_lifer_message,
     format_confirmed_all_time_lifer_message,
@@ -154,7 +155,12 @@ async def check_year_lifers():
             message = format_tentative_all_time_lifer_message(
                 provisional_at, hotspot.name
             )
-            await channel.send(message, view=all_time_list_link_view(hotspot.id))
+            await channel.send(
+                message,
+                view=checklist_link_view(
+                    [(o.comName, o.subId) for o in provisional_at]
+                ),
+            )
             logger.info(
                 "posted %d tentative all-time lifer(s) for %s",
                 len(provisional_at),
@@ -188,7 +194,12 @@ async def check_year_lifers():
 
         if provisional_yr:
             message = format_tentative_year_lifer_message(provisional_yr, hotspot.name)
-            await channel.send(message, view=year_list_link_view(hotspot.id))
+            await channel.send(
+                message,
+                view=checklist_link_view(
+                    [(o.comName, o.subId) for o in provisional_yr]
+                ),
+            )
             logger.info(
                 "posted %d tentative year lifer(s) for %s",
                 len(provisional_yr),
@@ -215,13 +226,23 @@ async def check_year_lifers():
                 message = format_confirmed_all_time_lifer_message(
                     at_confirmed, hotspot.name, total
                 )
-                await channel.send(message, view=all_time_list_link_view(hotspot.id))
+                await channel.send(
+                    message,
+                    view=checklist_link_view(
+                        [(p.common_name, p.sub_id) for p in at_confirmed]
+                    ),
+                )
             if yr_confirmed:
                 total = get_year_total(hotspot.id)
                 message = format_confirmed_year_lifer_message(
                     yr_confirmed, hotspot.name, total
                 )
-                await channel.send(message, view=year_list_link_view(hotspot.id))
+                await channel.send(
+                    message,
+                    view=checklist_link_view(
+                        [(p.common_name, p.sub_id) for p in yr_confirmed]
+                    ),
+                )
 
         if pend_invalidated:
             message = format_invalidated_lifer_message(pend_invalidated, hotspot.name)

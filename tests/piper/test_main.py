@@ -70,7 +70,7 @@ def make_pending(
         scientific_name="Setophaga dominica",
         obs_date=datetime.date(2026, 4, 11),
         observer_name="Jane Doe",
-        checklist_id="S100001",
+        sub_id="S100001",
         lifer_type=lifer_type,
         year=2026 if lifer_type == "year" else None,
     )
@@ -113,6 +113,7 @@ def patches(mock_channel):
         format_invalidated_lifer_message=MagicMock(return_value="INVAL_MSG"),
         all_time_list_link_view=MagicMock(return_value=None),
         year_list_link_view=MagicMock(return_value=None),
+        checklist_link_view=MagicMock(return_value=None),
     )
     with p as patched:
         mocks.update(patched)
@@ -149,6 +150,7 @@ async def _run_check(mock_channel, **overrides):
         format_invalidated_lifer_message=MagicMock(return_value="INVAL_MSG"),
         all_time_list_link_view=MagicMock(return_value=None),
         year_list_link_view=MagicMock(return_value=None),
+        checklist_link_view=MagicMock(return_value=None),
     )
     default_mocks.update(overrides)
 
