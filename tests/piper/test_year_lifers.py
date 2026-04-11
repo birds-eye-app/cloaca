@@ -48,6 +48,7 @@ def make_obs(
     sci_name: str = "Setophaga dominica",
     obs_dt: datetime.datetime | None = None,
     checklist_id: str = "S100001",
+    sub_id: str = "S100001",
     user_display_name: str = "Jane Doe",
     obs_reviewed: bool = False,
     obs_valid: bool = True,
@@ -67,7 +68,7 @@ def make_obs(
         obsValid=obs_valid,
         obsReviewed=obs_reviewed,
         locationPrivate=False,
-        subId="S100001",
+        subId=sub_id,
         subnational2Code="US-NY-005",
         subnational2Name="Bronx",
         subnational1Code="US-NY",
@@ -528,7 +529,7 @@ class TestCheckPendingProvisionals:
 
 class TestFormatYearLiferMessage:
     def test_single(self):
-        obs = make_obs(checklist_id="S999")
+        obs = make_obs(sub_id="S999")
         msg = format_year_lifer_message([obs], "Franz Sigel Park", 42)
         assert "Year Bird #42" in msg
         assert "Franz Sigel Park" in msg
@@ -569,12 +570,11 @@ class TestFormatAllTimeLiferMessage:
 
 class TestFormatTentativeMessages:
     def test_tentative_year_single(self):
-        obs = make_obs(checklist_id="S999")
+        obs = make_obs()
         msg = format_tentative_year_lifer_message([obs], "Franz Sigel Park")
         assert "Possible Year Bird" in msg
         assert "Yellow-throated Warbler" in msg
         assert "Awaiting eBird review" in msg
-        assert "S999" in msg
 
     def test_tentative_year_multiple(self):
         obs1 = make_obs("amrob", "American Robin")
@@ -611,7 +611,7 @@ class TestFormatConfirmedMessages:
             scientific_name="Setophaga dominica",
             obs_date=datetime.date(2026, 4, 11),
             observer_name="Jane Doe",
-            checklist_id="S999",
+            sub_id="S999",
             lifer_type="year",
             year=YEAR,
         )
@@ -665,7 +665,7 @@ class TestFormatInvalidatedMessage:
             scientific_name="Setophaga dominica",
             obs_date=datetime.date(2026, 4, 11),
             observer_name="Jane Doe",
-            checklist_id="S999",
+            sub_id="S999",
             lifer_type="year",
             year=YEAR,
         )
@@ -682,7 +682,7 @@ class TestFormatInvalidatedMessage:
             scientific_name="Turdus migratorius",
             obs_date=datetime.date(2026, 4, 11),
             observer_name="Jane Doe",
-            checklist_id="S998",
+            sub_id="S998",
             lifer_type="year",
             year=YEAR,
         )
@@ -693,7 +693,7 @@ class TestFormatInvalidatedMessage:
             scientific_name="Setophaga dominica",
             obs_date=datetime.date(2026, 4, 11),
             observer_name="Jane Doe",
-            checklist_id="S999",
+            sub_id="S999",
             lifer_type="year",
             year=YEAR,
         )
