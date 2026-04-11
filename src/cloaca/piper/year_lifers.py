@@ -34,7 +34,7 @@ class PendingProvisional:
     scientific_name: str
     obs_date: datetime.date
     observer_name: str
-    checklist_id: str
+    sub_id: str
     lifer_type: str  # 'year' or 'all_time'
     year: int | None  # set for year lifers
     created_at: datetime.datetime | None = None
@@ -105,7 +105,7 @@ def _ensure_tables(con: duckdb.DuckDBPyConnection):
             scientific_name VARCHAR NOT NULL,
             obs_date DATE NOT NULL,
             observer_name VARCHAR NOT NULL,
-            checklist_id VARCHAR NOT NULL,
+            sub_id VARCHAR NOT NULL,
             lifer_type VARCHAR NOT NULL,
             year INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -206,7 +206,7 @@ def _get_pending_provisionals(hotspot_id: str) -> list[PendingProvisional]:
         get_state_db()
         .execute(
             """SELECT hotspot_id, species_code, common_name, scientific_name,
-                      obs_date, observer_name, checklist_id, lifer_type, year,
+                      obs_date, observer_name, sub_id, lifer_type, year,
                       created_at
                FROM pending_provisional_lifers
                WHERE hotspot_id = ?""",
@@ -222,7 +222,7 @@ def _get_pending_provisionals(hotspot_id: str) -> list[PendingProvisional]:
             scientific_name=r[3],
             obs_date=r[4].date() if isinstance(r[4], datetime.datetime) else r[4],
             observer_name=r[5],
-            checklist_id=r[6],
+            sub_id=r[6],
             lifer_type=r[7],
             year=r[8],
             created_at=r[9],
@@ -240,7 +240,7 @@ def _insert_pending_provisional(
     get_state_db().execute(
         """INSERT INTO pending_provisional_lifers
            (hotspot_id, species_code, common_name, scientific_name,
-            obs_date, observer_name, checklist_id, lifer_type, year)
+            obs_date, observer_name, sub_id, lifer_type, year)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT DO NOTHING""",
         [
@@ -250,7 +250,7 @@ def _insert_pending_provisional(
             obs.sciName,
             obs.obsDt.date(),
             obs.userDisplayName,
-            obs.checklistId,
+            obs.subId,
             lifer_type,
             year,
         ],
@@ -666,7 +666,7 @@ def format_year_lifer_message(
         obs = new_lifers[0]
         date_str = obs.obsDt.strftime("%b %-d")
         header = f"{birds[0]} **Year Bird #{year_total} for {hotspot_name}!**"
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        checklist_url = f"https://ebird.org/checklist/{obs.subId}"
         body = (
             f"**{obs.comName}** — first spotted by "
             f"{obs.userDisplayName} ({date_str})\n"
@@ -682,7 +682,7 @@ def format_year_lifer_message(
     lines = [header, ""]
     for obs in new_lifers:
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        checklist_url = f"https://ebird.org/checklist/{obs.subId}"
         lines.append(
             f"**{obs.comName}** — {obs.userDisplayName} "
             f"({date_str}) · [checklist]({checklist_url})"
@@ -701,7 +701,7 @@ def format_all_time_lifer_message(
         header = (
             f"🎉🥳 **New Park Bird for {hotspot_name}!** (#{all_time_total} all-time)"
         )
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        checklist_url = f"https://ebird.org/checklist/{obs.subId}"
         body = (
             f"**{obs.comName}** — first spotted by "
             f"{obs.userDisplayName} ({date_str})\n"
@@ -716,7 +716,7 @@ def format_all_time_lifer_message(
     lines = [header, ""]
     for obs in new_lifers:
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
+        checklist_url = f"https://ebird.org/checklist/{obs.subId}"
         lines.append(
             f"**{obs.comName}** — {obs.userDisplayName} "
             f"({date_str}) · [checklist]({checklist_url})"
@@ -734,12 +734,10 @@ def format_tentative_year_lifer_message(
     if len(new_lifers) == 1:
         obs = new_lifers[0]
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
         return (
             f"👀 **Possible Year Bird for {hotspot_name}!**\n\n"
             f"**{obs.comName}** — reported by "
             f"{obs.userDisplayName} ({date_str})\n"
-            f"[View checklist]({checklist_url})\n"
             "-# Awaiting eBird review — we'll celebrate once confirmed!"
         )
 
@@ -749,11 +747,7 @@ def format_tentative_year_lifer_message(
     ]
     for obs in new_lifers:
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
-        lines.append(
-            f"**{obs.comName}** — {obs.userDisplayName} "
-            f"({date_str}) · [checklist]({checklist_url})"
-        )
+        lines.append(f"**{obs.comName}** — {obs.userDisplayName} ({date_str})")
     lines.append("-# Awaiting eBird review — we'll celebrate once confirmed!")
     return "\n".join(lines)
 
@@ -765,12 +759,10 @@ def format_tentative_all_time_lifer_message(
     if len(new_lifers) == 1:
         obs = new_lifers[0]
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
         return (
             f"👀 **Possible New Park Bird for {hotspot_name}!**\n\n"
             f"**{obs.comName}** — reported by "
             f"{obs.userDisplayName} ({date_str})\n"
-            f"[View checklist]({checklist_url})\n"
             "-# Awaiting eBird review — we'll celebrate once confirmed!"
         )
 
@@ -780,11 +772,7 @@ def format_tentative_all_time_lifer_message(
     ]
     for obs in new_lifers:
         date_str = obs.obsDt.strftime("%b %-d")
-        checklist_url = f"https://ebird.org/checklist/{obs.checklistId}"
-        lines.append(
-            f"**{obs.comName}** — {obs.userDisplayName} "
-            f"({date_str}) · [checklist]({checklist_url})"
-        )
+        lines.append(f"**{obs.comName}** — {obs.userDisplayName} ({date_str})")
     lines.append("-# Awaiting eBird review — we'll celebrate once confirmed!")
     return "\n".join(lines)
 
@@ -801,12 +789,10 @@ def format_confirmed_year_lifer_message(
 
     if len(confirmed) == 1:
         p = confirmed[0]
-        checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
         return (
             f"{birds[0]} **Confirmed! Year Bird #{year_total} "
             f"for {hotspot_name}!**\n\n"
-            f"**{p.common_name}** has been reviewed and confirmed on eBird!\n"
-            f"[View checklist]({checklist_url})"
+            f"**{p.common_name}** has been reviewed and confirmed on eBird!"
         )
 
     header = (
@@ -815,8 +801,7 @@ def format_confirmed_year_lifer_message(
     )
     lines = [header, ""]
     for p in confirmed:
-        checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
-        lines.append(f"**{p.common_name}** — confirmed! · [checklist]({checklist_url})")
+        lines.append(f"**{p.common_name}** — confirmed!")
     return "\n".join(lines)
 
 
@@ -827,12 +812,10 @@ def format_confirmed_all_time_lifer_message(
 ) -> str:
     if len(confirmed) == 1:
         p = confirmed[0]
-        checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
         return (
             f"🎉🥳 **Confirmed! New Park Bird for {hotspot_name}!** "
             f"(#{all_time_total} all-time)\n\n"
-            f"**{p.common_name}** has been reviewed and confirmed on eBird!\n"
-            f"[View checklist]({checklist_url})"
+            f"**{p.common_name}** has been reviewed and confirmed on eBird!"
         )
 
     header = (
@@ -841,8 +824,7 @@ def format_confirmed_all_time_lifer_message(
     )
     lines = [header, ""]
     for p in confirmed:
-        checklist_url = f"https://ebird.org/checklist/{p.checklist_id}"
-        lines.append(f"**{p.common_name}** — confirmed! · [checklist]({checklist_url})")
+        lines.append(f"**{p.common_name}** — confirmed!")
     return "\n".join(lines)
 
 
@@ -859,6 +841,35 @@ def format_invalidated_lifer_message(
     return (
         f"**Update:** {names} at {hotspot_name} were not confirmed after eBird review."
     )
+
+
+def checklist_link_view(
+    checklists: list[tuple[str, str]],
+) -> discord.ui.View:
+    """Button view linking to one or more eBird checklists.
+
+    *checklists* is a list of ``(species_name, sub_id)`` tuples.
+    """
+    view = discord.ui.View()
+    if len(checklists) == 1:
+        _, sub_id = checklists[0]
+        view.add_item(
+            discord.ui.Button(
+                style=discord.ButtonStyle.link,
+                label="View Checklist on eBird",
+                url=f"https://ebird.org/checklist/{sub_id}",
+            )
+        )
+    else:
+        for name, sub_id in checklists:
+            view.add_item(
+                discord.ui.Button(
+                    style=discord.ButtonStyle.link,
+                    label=f"{name} checklist",
+                    url=f"https://ebird.org/checklist/{sub_id}",
+                )
+            )
+    return view
 
 
 def all_time_list_link_view(hotspot_id: str) -> discord.ui.View:
