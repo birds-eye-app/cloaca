@@ -220,8 +220,7 @@ def _get_pending_provisionals(hotspot_id: str) -> list[PendingProvisional]:
             species_code=r[1],
             common_name=r[2],
             scientific_name=r[3],
-            obs_date=r[4] if isinstance(r[4], datetime.date) else r[4].date()
-            if isinstance(r[4], datetime.datetime) else r[4],
+            obs_date=r[4].date() if isinstance(r[4], datetime.datetime) else r[4],
             observer_name=r[5],
             checklist_id=r[6],
             lifer_type=r[7],
