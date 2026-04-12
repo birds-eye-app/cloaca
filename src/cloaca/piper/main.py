@@ -423,10 +423,31 @@ async def on_message(message: discord.Message):
                 "cache miss for message %d, built context from reply chain", ref_msg.id
             )
 
-    async with message.channel.typing():
-        response, stats, updated_messages = await ask_bird_query(
-            query, prior_messages=prior_messages, prior_context=prior_context
-        )
+    status_msg = await message.reply("*Thinking...*")
+
+    async def update_progress(status: str):
+        try:
+            await status_msg.edit(content=f"*{status}*")
+        except discord.HTTPException:
+            pass
+
+    try:
+        async with message.channel.typing():
+            response, stats, updated_messages = await ask_bird_query(
+                query,
+                prior_messages=prior_messages,
+                prior_context=prior_context,
+                on_progress=update_progress,
+            )
+    except Exception:
+        logger.exception("ask_bird_query failed")
+        try:
+            await status_msg.edit(
+                content="Sorry, something went wrong. Please try again!"
+            )
+        except discord.HTTPException:
+            pass
+        return
 
     footer = (
         f"-# {stats.elapsed_s:.0f}s · "
@@ -435,8 +456,8 @@ async def on_message(message: discord.Message):
         f"{stats.tool_calls} tool call{'s' if stats.tool_calls != 1 else ''}"
     )
     body = response or "Sorry, I couldn't find anything on that."
-    reply = await message.reply(f"{body}\n\n{footer}")
-    cache_put(reply.id, updated_messages)
+    await status_msg.edit(content=f"{body}\n\n{footer}")
+    cache_put(status_msg.id, updated_messages)
 
 
 async def start():
@@ -445,5 +466,14 @@ async def start():
 
 if __name__ == "__main__":
     import asyncio
+
+    from dotenv import load_dotenv
+
+    load_dotenv(override=True)
+
+    # Reload module-level env vars that were read before dotenv
+    import cloaca.piper.bird_query as _bq
+
+    _bq.EBIRD_MCP_URL = os.environ.get("EBIRD_MCP_URL", "")
 
     asyncio.run(start())
