@@ -1,5 +1,5 @@
 ---
-name: committing-merging-and-deploying-changes
+name: get-it-out-the-door
 description: Full workflow for committing changes, opening a PR, watching CI, merging, and monitoring the deploy to Render.
 ---
 
