@@ -1,12 +1,15 @@
 .git
 .github
 .claude
+.env
+.env*
+.mcp.json
 .ruff_cache
 .pytest_cache
 __pycache__
 *.pyc
-tests
-scripts
+/tests
+/scripts
 docker-compose.yml
 render.yaml
 sqlc.yaml
