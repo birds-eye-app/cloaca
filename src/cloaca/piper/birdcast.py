@@ -222,10 +222,7 @@ async def fetch_migration_traffic(
         return None
 
 
-def format_migration_traffic_message(
-    traffic: MigrationTraffic,
-    night_date: datetime.date,
-) -> str:
+def format_migration_traffic_message(traffic: MigrationTraffic) -> str:
     birds = random.sample(BIRD_EMOJIS, 4)
     header = f"{birds[0]}{birds[1]} **Last Night's Migration** {birds[2]}{birds[3]}"
 
@@ -234,28 +231,30 @@ def format_migration_traffic_message(
     total = traffic.cumulativeBirds
     lines.append(f"\U0001f4ca **{total:,} birds** crossed Kings County")
 
-    if traffic.nightSeries:
-        first = traffic.nightSeries[0]
-        last = traffic.nightSeries[-1]
-        start_dt = datetime.datetime.fromisoformat(first.localTime)
-        end_dt = datetime.datetime.fromisoformat(last.localTime)
-        night_str = start_dt.strftime("%a %b %-d")
-        start_str = start_dt.strftime("%-I:%M %p")
-        end_str = end_dt.strftime("%-I:%M %p")
-        lines.append(f"\u23f0 {night_str}, {start_str} \u2013 {end_str}")
+    if not traffic.nightSeries:
+        lines.append("\nNo migration data available for last night.")
+        return "\n".join(lines)
 
-    if traffic.nightSeries:
-        peak = max(traffic.nightSeries, key=lambda e: e.numAloft)
-        if peak.numAloft > 0:
-            peak_time = datetime.datetime.fromisoformat(peak.localTime)
-            peak_str = peak_time.strftime("%-I:%M %p")
-            peak_line = f"\n\U0001f4c8 **Peak:** {peak.numAloft:,} birds at {peak_str}"
-            if peak.avgDirection is not None:
-                direction = _compass_direction(peak.avgDirection)
-                peak_line += f" heading {direction}"
-            lines.append(peak_line)
-        else:
-            lines.append("\nA quiet night \u2014 no significant migration detected.")
+    first = traffic.nightSeries[0]
+    last = traffic.nightSeries[-1]
+    start_dt = datetime.datetime.fromisoformat(first.localTime)
+    end_dt = datetime.datetime.fromisoformat(last.localTime)
+    night_str = start_dt.strftime("%a %b %-d")
+    start_str = start_dt.strftime("%-I:%M %p")
+    end_str = end_dt.strftime("%-I:%M %p")
+    lines.append(f"\u23f0 {night_str}, {start_str} \u2013 {end_str}")
+
+    peak = max(traffic.nightSeries, key=lambda e: e.numAloft)
+    if peak.numAloft > 0:
+        peak_time = datetime.datetime.fromisoformat(peak.localTime)
+        peak_str = peak_time.strftime("%-I:%M %p")
+        peak_line = f"\n\U0001f4c8 **Peak:** {peak.numAloft:,} birds at {peak_str}"
+        if peak.avgDirection is not None:
+            direction = _compass_direction(peak.avgDirection)
+            peak_line += f" heading {direction}"
+        lines.append(peak_line)
+    else:
+        lines.append("\nA quiet night \u2014 no significant migration detected.")
 
     return "\n".join(lines)
 

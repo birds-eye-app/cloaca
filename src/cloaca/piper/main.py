@@ -323,7 +323,7 @@ async def post_migration_traffic():
         logger.warning("could not find birdcast channel %d", BIRDCAST_CHANNEL_ID)
         return
 
-    message = format_migration_traffic_message(traffic, yesterday)
+    message = format_migration_traffic_message(traffic)
     await channel.send(message, view=migration_dashboard_link_view())
     logger.info("posted migration traffic for %s", yesterday)
 
