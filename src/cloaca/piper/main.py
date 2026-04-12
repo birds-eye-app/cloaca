@@ -23,6 +23,7 @@ from cloaca.piper.year_lifers import (
     check_for_new_year_lifers,
     check_pending_provisionals,
     checklist_link_view,
+    fetch_notable_observations,
     fetch_recent_observations,
     format_all_time_lifer_message,
     format_confirmed_all_time_lifer_message,
@@ -130,12 +131,20 @@ async def check_year_lifers():
             logger.exception("failed to fetch observations for %s", hotspot.name)
             continue
 
+        try:
+            notable = await fetch_notable_observations(hotspot.id)
+        except Exception:
+            logger.exception(
+                "failed to fetch notable observations for %s", hotspot.name
+            )
+            notable = []
+
         # ---- Detect new lifers (confirmed + provisional) ----
 
         # All-time lifers first (takes priority over year lifers)
         try:
             confirmed_at, provisional_at = await check_for_new_all_time_lifers(
-                hotspot.id, observations
+                hotspot.id, observations, notable
             )
         except Exception:
             logger.exception("failed to check all-time lifers for %s", hotspot.name)
@@ -170,7 +179,7 @@ async def check_year_lifers():
         # Year lifers, excluding any that were all-time lifers
         try:
             confirmed_yr, provisional_yr = await check_for_new_year_lifers(
-                hotspot.id, observations
+                hotspot.id, observations, notable
             )
         except Exception:
             logger.exception("failed to check year lifers for %s", hotspot.name)
@@ -210,7 +219,7 @@ async def check_year_lifers():
 
         try:
             pend_confirmed, pend_invalidated = await check_pending_provisionals(
-                hotspot.id, observations
+                hotspot.id, notable
             )
         except Exception:
             logger.exception(

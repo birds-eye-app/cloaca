@@ -212,6 +212,26 @@ async def fetch_observations_for_date(
     return [o for o in observations if o.exoticCategory != "X"]
 
 
+async def fetch_notable_observations(
+    hotspot_id: str,
+) -> list:
+    """Fetch recent notable (rare/unusual) observations for a hotspot.
+
+    Unlike the historic endpoint which returns one observation per species,
+    the notable endpoint returns every individual report with full review
+    status (obs_valid, obs_reviewed). This lets us distinguish between:
+    - Confirmed rarities (obs_valid=True)
+    - Unconfirmed rarities awaiting review (obs_valid=False)
+
+    Common species never appear in notable results.
+    """
+    return await get_phoebe_client().data.observations.recent.notable.list(
+        region_code=hotspot_id,
+        back=10,
+        detail="full",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Backfill
 # ---------------------------------------------------------------------------
@@ -357,28 +377,47 @@ def _find_new_species(
 
 def _split_confirmed_provisional(
     new_lifers: list[eBirdHistoricFullObservation],
-    all_observations: list[eBirdHistoricFullObservation],
+    notable_observations: list,
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
-    """Split new lifers into confirmed (reviewed) and provisional (unreviewed).
+    """Split new lifers into confirmed and provisional (awaiting review).
 
-    A species is confirmed if ANY observation of it is reviewed (not just the
-    earliest one returned by _find_new_species).
+    Uses the notable/rarities endpoint data which returns every individual
+    report for rare species with full review status.
+
+    A species is provisional only if it appears in notable with NO confirmed
+    (obs_valid=True) reports — meaning it's a rarity that's still awaiting
+    eBird reviewer approval.
+
+    Common species never appear in notable and are automatically confirmed.
     """
+    # Build sets of species codes from notable observations
+    confirmed_notable: set[str] = set()
+    unconfirmed_notable: set[str] = set()
+    for o in notable_observations:
+        if o.obs_valid:
+            confirmed_notable.add(o.species_code)
+        else:
+            unconfirmed_notable.add(o.species_code)
+
     confirmed: list[eBirdHistoricFullObservation] = []
     provisional: list[eBirdHistoricFullObservation] = []
     for obs in new_lifers:
-        if any(
-            o.obsReviewed for o in all_observations if o.speciesCode == obs.speciesCode
-        ):
+        if obs.speciesCode in confirmed_notable:
+            # Rarity with at least one confirmed report
             confirmed.append(obs)
-        else:
+        elif obs.speciesCode in unconfirmed_notable:
+            # Rarity with only unconfirmed reports
             provisional.append(obs)
+        else:
+            # Common species (not in notable at all) — confirmed
+            confirmed.append(obs)
     return confirmed, provisional
 
 
 async def check_for_new_year_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
+    notable_observations: list,
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new year lifers."""
     now = datetime.datetime.now(EASTERN)
@@ -396,7 +435,9 @@ async def check_for_new_year_lifers(
     for obs in new_lifers:
         await _insert_species(hotspot_id, now.year, obs)
 
-    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
+    confirmed, provisional = _split_confirmed_provisional(
+        new_lifers, notable_observations
+    )
 
     # Track provisional species for follow-up
     for obs in provisional:
@@ -416,6 +457,7 @@ async def check_for_new_year_lifers(
 async def check_for_new_all_time_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
+    notable_observations: list,
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new all-time lifers."""
     if not observations:
@@ -431,7 +473,9 @@ async def check_for_new_all_time_lifers(
     for obs in new_lifers:
         await _insert_all_time_species(hotspot_id, obs.speciesCode)
 
-    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
+    confirmed, provisional = _split_confirmed_provisional(
+        new_lifers, notable_observations
+    )
 
     # Track provisional species for follow-up
     for obs in provisional:
@@ -460,20 +504,20 @@ _PROVISIONAL_STALE_DAYS = 14
 
 async def check_pending_provisionals(
     hotspot_id: str,
-    recent_observations: list[eBirdHistoricFullObservation],
+    notable_observations: list,
 ) -> tuple[list[PendingProvisional], list[PendingProvisional]]:
     """Re-check pending provisional observations for review-status changes.
 
-    *recent_observations* should already contain today + yesterday (the normal
-    poll data).  For any pending provisional whose obs_date falls outside that
-    window we issue an extra API call so we can see its current review status.
+    Uses the notable endpoint which returns every individual report for rare
+    species with full review status. This avoids the historic endpoint's
+    one-per-species deduplication.
 
     Returns ``(confirmed, invalidated)`` lists.
 
-    Confirmed = a reviewed observation of the species now exists (eBird only
-    returns ``obsValid=True`` records, so presence + ``obsReviewed`` is enough).
+    Confirmed = at least one observation of the species now has obs_valid=True
+    (a reviewer approved it).
 
-    Invalidated = the observation has vanished from the API for longer than
+    Invalidated = the species has disappeared from notable for longer than
     ``_PROVISIONAL_STALE_DAYS``, meaning the reviewer rejected it or the
     checklist was deleted.
     """
@@ -483,41 +527,21 @@ async def check_pending_provisionals(
 
     now = datetime.datetime.now(EASTERN)
     today = now.date()
-    yesterday = today - datetime.timedelta(days=1)
-    covered_dates = {today, yesterday}
-
-    # Collect extra dates we need to fetch
-    extra_dates = {p.obs_date for p in pending} - covered_dates
-    extra_observations: list[eBirdHistoricFullObservation] = []
-    for date in extra_dates:
-        try:
-            extra_observations.extend(
-                await fetch_observations_for_date(hotspot_id, date)
-            )
-        except Exception:
-            logger.exception(
-                "failed to fetch observations for pending check %s on %s",
-                hotspot_id,
-                date,
-            )
-
-    all_observations = list(recent_observations) + extra_observations
 
     confirmed: list[PendingProvisional] = []
     invalidated: list[PendingProvisional] = []
 
     for p in pending:
-        matching = [o for o in all_observations if o.speciesCode == p.species_code]
+        matching = [o for o in notable_observations if o.species_code == p.species_code]
         if not matching:
-            # Observation gone — invalidated or transient API issue.
+            # Species gone from notable — invalidated or transient API issue.
             age = (today - p.obs_date).days
             if age >= _PROVISIONAL_STALE_DAYS:
                 invalidated.append(p)
             continue
 
-        if any(o.obsReviewed for o in matching):
-            # Reviewed observations in the API are always valid (invalid ones
-            # are removed entirely), so this means confirmed.
+        if any(o.obs_valid for o in matching):
+            # At least one report has been confirmed by a reviewer.
             confirmed.append(p)
 
     # Apply DB changes
@@ -819,9 +843,10 @@ if __name__ == "__main__":
             print(f"All-time total: {await get_all_time_total(hotspot.id)}")
 
             observations = await fetch_recent_observations(hotspot.id)
+            notable = await fetch_notable_observations(hotspot.id)
 
             confirmed_at, provisional_at = await check_for_new_all_time_lifers(
-                hotspot.id, observations
+                hotspot.id, observations, notable
             )
             if confirmed_at:
                 total = await get_all_time_total(hotspot.id)
@@ -838,7 +863,7 @@ if __name__ == "__main__":
             # Filter out all-time lifers from year lifer notifications
             all_time_codes = {o.speciesCode for o in confirmed_at + provisional_at}
             confirmed_yr, provisional_yr = await check_for_new_year_lifers(
-                hotspot.id, observations
+                hotspot.id, observations, notable
             )
             confirmed_yr = [
                 o for o in confirmed_yr if o.speciesCode not in all_time_codes
@@ -856,7 +881,7 @@ if __name__ == "__main__":
 
             # Check pending provisionals
             confirmed_pending, invalidated = await check_pending_provisionals(
-                hotspot.id, observations
+                hotspot.id, notable
             )
             if confirmed_pending:
                 year_confirmed = [

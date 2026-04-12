@@ -99,6 +99,7 @@ def patches(mock_channel):
     p = patch.multiple(
         MODULE,
         fetch_recent_observations=AsyncMock(return_value=[]),
+        fetch_notable_observations=AsyncMock(return_value=[]),
         check_for_new_all_time_lifers=AsyncMock(return_value=([], [])),
         check_for_new_year_lifers=AsyncMock(return_value=([], [])),
         check_pending_provisionals=AsyncMock(return_value=([], [])),
@@ -136,6 +137,7 @@ async def _run_check(mock_channel, **overrides):
     """Run check_year_lifers.coro() with all dependencies mocked."""
     default_mocks = dict(
         fetch_recent_observations=AsyncMock(return_value=[make_obs()]),
+        fetch_notable_observations=AsyncMock(return_value=[]),
         check_for_new_all_time_lifers=AsyncMock(return_value=([], [])),
         check_for_new_year_lifers=AsyncMock(return_value=([], [])),
         check_pending_provisionals=AsyncMock(return_value=([], [])),
