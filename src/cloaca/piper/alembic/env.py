@@ -13,7 +13,9 @@ target_metadata = None
 
 
 def get_url() -> str:
-    url = os.environ.get("PIPER_POSTGRES_DB_URL") or os.environ.get("DATABASE_URL", "")
+    url = os.environ.get("PIPER_POSTGRES_DB_URL") or os.environ.get("DATABASE_URL")
+    if not url:
+        raise RuntimeError("Set PIPER_POSTGRES_DB_URL or DATABASE_URL")
     # Render uses postgres:// but SQLAlchemy needs postgresql://
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
 import discord
+from phoebe_bird.types.data.observation import Observation
 
 from cloaca.api.shared import get_phoebe_client
 from cloaca.piper.birdcast import BIRD_EMOJIS
@@ -214,7 +215,7 @@ async def fetch_observations_for_date(
 
 async def fetch_notable_observations(
     hotspot_id: str,
-) -> list:
+) -> list[Observation]:
     """Fetch recent notable (rare/unusual) observations for a hotspot.
 
     Unlike the historic endpoint which returns one observation per species,
@@ -377,7 +378,7 @@ def _find_new_species(
 
 def _split_confirmed_provisional(
     new_lifers: list[eBirdHistoricFullObservation],
-    notable_observations: list,
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Split new lifers into confirmed and provisional (awaiting review).
 
@@ -417,7 +418,7 @@ def _split_confirmed_provisional(
 async def check_for_new_year_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
-    notable_observations: list,
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new year lifers."""
     now = datetime.datetime.now(EASTERN)
@@ -457,7 +458,7 @@ async def check_for_new_year_lifers(
 async def check_for_new_all_time_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
-    notable_observations: list,
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new all-time lifers."""
     if not observations:
@@ -504,7 +505,7 @@ _PROVISIONAL_STALE_DAYS = 14
 
 async def check_pending_provisionals(
     hotspot_id: str,
-    notable_observations: list,
+    notable_observations: list[Observation],
 ) -> tuple[list[PendingProvisional], list[PendingProvisional]]:
     """Re-check pending provisional observations for review-status changes.
 
