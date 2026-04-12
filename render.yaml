@@ -21,7 +21,7 @@ projects:
         sync: false
       - key: PIPER_DUCK_DB_PATH
         value: /var/data/ebd_nyc.db
-      - key: DATABASE_URL
+      - key: PIPER_POSTGRES_DB_URL
         fromDatabase:
           name: piper-state-db
           property: connectionString

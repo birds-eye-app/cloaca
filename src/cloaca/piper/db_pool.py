@@ -8,7 +8,7 @@ _engine: AsyncEngine | None = None
 def get_engine() -> AsyncEngine:
     global _engine
     if _engine is None:
-        url = os.environ["DATABASE_URL"]
+        url = os.environ.get("PIPER_POSTGRES_DB_URL") or os.environ["DATABASE_URL"]
         # Render uses postgres:// but SQLAlchemy needs postgresql+asyncpg://
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
