@@ -13,6 +13,12 @@ class BackfillStatus(pydantic.BaseModel):
     species_count: int
 
 
+class BirdcastPostLog(pydantic.BaseModel):
+    location: str
+    forecast_date: datetime.date
+    posted_at: datetime.datetime
+
+
 class HotspotAllTimeSpecy(pydantic.BaseModel):
     hotspot_id: str
     species_code: str

@@ -58,6 +58,7 @@ async def state_db(pg_url, monkeypatch):
     # Drop and recreate tables for full isolation
     async with engine.begin() as conn:
         for table in [
+            "birdcast_post_log",
             "pending_provisional_lifers",
             "hotspot_all_time_species",
             "backfill_status",
