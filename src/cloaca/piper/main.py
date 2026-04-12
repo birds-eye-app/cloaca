@@ -229,7 +229,14 @@ async def check_year_lifers():
 
         if pend_confirmed:
             at_confirmed = [p for p in pend_confirmed if p.lifer_type == "all_time"]
-            yr_confirmed = [p for p in pend_confirmed if p.lifer_type == "year"]
+            # Skip year confirmation messages for species that were also
+            # confirmed as all-time lifers (all-time takes priority).
+            at_codes = {p.species_code for p in at_confirmed}
+            yr_confirmed = [
+                p
+                for p in pend_confirmed
+                if p.lifer_type == "year" and p.species_code not in at_codes
+            ]
             if at_confirmed:
                 total = await get_all_time_total(hotspot.id)
                 message = format_confirmed_all_time_lifer_message(
