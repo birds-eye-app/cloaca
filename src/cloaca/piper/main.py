@@ -284,16 +284,16 @@ async def post_birdcast_forecast():
     now = datetime.datetime.now(_EASTERN)
     if now.hour < 7 or now.hour >= 12:
         return
+    today = now.date()
+    if await is_forecast_posted(today):
+        logger.info("birdcast forecast already posted for %s", today)
+        return
     forecast = await fetch_birdcast_forecast()
     if forecast is None or not forecast.forecastNights:
         logger.info("no birdcast forecast available, skipping")
         return
     if not is_todays_forecast(forecast):
         logger.info("birdcast forecast not yet updated for today, will retry")
-        return
-    today = now.date()
-    if await is_forecast_posted(today):
-        logger.info("birdcast forecast already posted for %s", today)
         return
     channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
     if channel is None:
