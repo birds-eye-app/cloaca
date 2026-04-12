@@ -134,7 +134,7 @@ async def check_year_lifers():
 
         # All-time lifers first (takes priority over year lifers)
         try:
-            confirmed_at, provisional_at = check_for_new_all_time_lifers(
+            confirmed_at, provisional_at = await check_for_new_all_time_lifers(
                 hotspot.id, observations
             )
         except Exception:
@@ -142,7 +142,7 @@ async def check_year_lifers():
             confirmed_at, provisional_at = [], []
 
         if confirmed_at:
-            total = get_all_time_total(hotspot.id)
+            total = await get_all_time_total(hotspot.id)
             message = format_all_time_lifer_message(confirmed_at, hotspot.name, total)
             await channel.send(message, view=all_time_list_link_view(hotspot.id))
             logger.info(
@@ -169,7 +169,7 @@ async def check_year_lifers():
 
         # Year lifers, excluding any that were all-time lifers
         try:
-            confirmed_yr, provisional_yr = check_for_new_year_lifers(
+            confirmed_yr, provisional_yr = await check_for_new_year_lifers(
                 hotspot.id, observations
             )
         except Exception:
@@ -183,7 +183,7 @@ async def check_year_lifers():
         ]
 
         if confirmed_yr:
-            total = get_year_total(hotspot.id)
+            total = await get_year_total(hotspot.id)
             message = format_year_lifer_message(confirmed_yr, hotspot.name, total)
             await channel.send(message, view=year_list_link_view(hotspot.id))
             logger.info(
@@ -222,7 +222,7 @@ async def check_year_lifers():
             at_confirmed = [p for p in pend_confirmed if p.lifer_type == "all_time"]
             yr_confirmed = [p for p in pend_confirmed if p.lifer_type == "year"]
             if at_confirmed:
-                total = get_all_time_total(hotspot.id)
+                total = await get_all_time_total(hotspot.id)
                 message = format_confirmed_all_time_lifer_message(
                     at_confirmed, hotspot.name, total
                 )
@@ -233,7 +233,7 @@ async def check_year_lifers():
                     ),
                 )
             if yr_confirmed:
-                total = get_year_total(hotspot.id)
+                total = await get_year_total(hotspot.id)
                 message = format_confirmed_year_lifer_message(
                     yr_confirmed, hotspot.name, total
                 )

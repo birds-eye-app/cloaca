@@ -21,8 +21,10 @@ projects:
         sync: false
       - key: PIPER_DUCK_DB_PATH
         value: /var/data/ebd_nyc.db
-      - key: PIPER_STATE_DB_PATH
-        value: /var/data/piper_state.db
+      - key: DATABASE_URL
+        fromDatabase:
+          name: piper-state-db
+          property: connectionString
       - key: EBIRD_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
@@ -32,6 +34,7 @@ projects:
       - key: EBIRD_MCP_URL
         sync: false
       region: oregon
+      preDeployCommand: "uv run alembic upgrade head"
       healthCheckPath: /v1/health
       dockerContext: .
       dockerfilePath: ./Dockerfile
@@ -40,3 +43,9 @@ projects:
         mountPath: /var/data
         sizeGB: 1
       autoDeployTrigger: checksPass
+    databases:
+    - name: piper-state-db
+      plan: starter
+      region: oregon
+      databaseName: piper_state
+      user: piper
