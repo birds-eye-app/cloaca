@@ -2,12 +2,19 @@ import datetime
 import logging
 import os
 import random
+from zoneinfo import ZoneInfo
 
 import aiohttp
 import discord
 from pydantic import BaseModel
 
+from cloaca.piper.db.queries import AsyncQuerier
+from cloaca.piper.db_pool import get_engine
+
 logger = logging.getLogger(__name__)
+
+EASTERN = ZoneInfo("America/New_York")
+BIRDCAST_LOCATION = "nyc"
 
 BIRDCAST_API_BASE = (
     "https://alert.birdcast.org/api/is-birdcast-alert-api"
@@ -68,6 +75,31 @@ async def fetch_birdcast_forecast() -> BirdcastForecast | None:
     except Exception:
         logger.exception("failed to parse BirdCast response")
         return None
+
+
+def is_todays_forecast(forecast: BirdcastForecast) -> bool:
+    """True if the first forecast night's date is today (Eastern time)."""
+    if not forecast.forecastNights:
+        return False
+    today = datetime.datetime.now(EASTERN).date()
+    return forecast.forecastNights[0].date.date() == today
+
+
+async def is_forecast_posted(date: datetime.date) -> bool:
+    engine = get_engine()
+    async with engine.connect() as conn:
+        q = AsyncQuerier(conn)
+        return (
+            await q.is_birdcast_posted(location=BIRDCAST_LOCATION, forecast_date=date)
+            is not None
+        )
+
+
+async def mark_forecast_posted(date: datetime.date) -> None:
+    engine = get_engine()
+    async with engine.begin() as conn:
+        q = AsyncQuerier(conn)
+        await q.insert_birdcast_post(location=BIRDCAST_LOCATION, forecast_date=date)
 
 
 def format_forecast_message(forecast: BirdcastForecast) -> str:

@@ -59,3 +59,12 @@ WHERE hotspot_id = $1 AND year = $2 AND species_code = $3;
 -- name: RemoveAllTimeSpecies :exec
 DELETE FROM hotspot_all_time_species
 WHERE hotspot_id = $1 AND species_code = $2;
+
+-- name: IsBirdcastPosted :one
+SELECT 1 FROM birdcast_post_log
+WHERE location = $1 AND forecast_date = $2;
+
+-- name: InsertBirdcastPost :exec
+INSERT INTO birdcast_post_log (location, forecast_date)
+VALUES ($1, $2)
+ON CONFLICT DO NOTHING;

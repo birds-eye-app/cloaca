@@ -38,3 +38,10 @@ CREATE TABLE pending_provisional_lifers (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (hotspot_id, species_code, lifer_type)
 );
+
+CREATE TABLE birdcast_post_log (
+    location TEXT NOT NULL,
+    forecast_date DATE NOT NULL,
+    posted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (location, forecast_date)
+);

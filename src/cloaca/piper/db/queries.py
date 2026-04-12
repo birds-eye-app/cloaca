@@ -51,6 +51,13 @@ ON CONFLICT DO NOTHING
 """
 
 
+INSERT_BIRDCAST_POST = """-- name: insert_birdcast_post \\:exec
+INSERT INTO birdcast_post_log (location, forecast_date)
+VALUES (:p1, :p2)
+ON CONFLICT DO NOTHING
+"""
+
+
 INSERT_PENDING_PROVISIONAL = """-- name: insert_pending_provisional \\:exec
 INSERT INTO pending_provisional_lifers
     (hotspot_id, species_code, common_name, scientific_name,
@@ -95,6 +102,12 @@ class InsertSpeciesParams(pydantic.BaseModel):
 IS_BACKFILL_COMPLETE = """-- name: is_backfill_complete \\:one
 SELECT 1 FROM backfill_status
 WHERE hotspot_id = :p1 AND year = :p2
+"""
+
+
+IS_BIRDCAST_POSTED = """-- name: is_birdcast_posted \\:one
+SELECT 1 FROM birdcast_post_log
+WHERE location = :p1 AND forecast_date = :p2
 """
 
 
@@ -193,6 +206,13 @@ class AsyncQuerier:
             {"p1": hotspot_id, "p2": species_code},
         )
 
+    async def insert_birdcast_post(
+        self, *, location: str, forecast_date: datetime.date
+    ) -> None:
+        await self._conn.execute(
+            sqlalchemy.text(INSERT_BIRDCAST_POST), {"p1": location, "p2": forecast_date}
+        )
+
     async def insert_pending_provisional(
         self, arg: InsertPendingProvisionalParams
     ) -> None:
@@ -232,6 +252,19 @@ class AsyncQuerier:
         row = (
             await self._conn.execute(
                 sqlalchemy.text(IS_BACKFILL_COMPLETE), {"p1": hotspot_id, "p2": year}
+            )
+        ).first()
+        if row is None:
+            return None
+        return row[0]
+
+    async def is_birdcast_posted(
+        self, *, location: str, forecast_date: datetime.date
+    ) -> Optional[int]:
+        row = (
+            await self._conn.execute(
+                sqlalchemy.text(IS_BIRDCAST_POSTED),
+                {"p1": location, "p2": forecast_date},
             )
         ).first()
         if row is None:
