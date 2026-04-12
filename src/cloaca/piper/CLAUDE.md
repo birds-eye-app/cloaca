@@ -62,7 +62,7 @@ To add a new hotspot, append a `Hotspot` entry to the list.
 
 **All-time backfill**: Single API call to `product/spplist/{hotspot_id}` returns all species codes ever recorded. Tracked in `backfill_status` with `year=0`.
 
-**Polling**: Every 15 minutes, fetches observations for today and yesterday (2 API calls per hotspot). The same observations are checked against both the year list and all-time list — no extra API calls. During night hours (10pm–6am ET), enforces at least 1 hour between checks. New species are inserted and posted to the hotspot's Discord channel. All-time lifers take priority: if a species is both a year lifer and an all-time lifer, only the all-time notification is posted.
+**Polling**: Every 15 minutes, fetches observations for today and yesterday via the historic endpoint (2 API calls per hotspot), plus the notable/rarities endpoint (1 API call per hotspot). The historic endpoint detects new species (one record per species, deduplicated). The notable endpoint provides full review status for rare species — every individual report with `obsValid` and `obsReviewed`. Common species (not in notable) are auto-confirmed. Rare species with only `obsValid=False` reports are provisional (awaiting eBird reviewer approval). During night hours (10pm–6am ET), enforces at least 1 hour between checks. New species are inserted and posted to the hotspot's Discord channel. All-time lifers take priority: if a species is both a year lifer and an all-time lifer, only the all-time notification is posted.
 
 **Year rollover**: On Jan 1, the table is empty for the new year, triggering a backfill of 0 days. The regular poll picks up the first species naturally.
 
@@ -78,7 +78,7 @@ Both are started in `on_ready()` via `discord.ext.tasks.loop`.
 ## Environment variables
 
 - `PIPER_DISCORD_BOT_TOKEN` — Discord bot token (required for piper to start)
-- `DATABASE_URL` — Postgres connection string for lifer state (required)
+- `PIPER_POSTGRES_DB_URL` — Postgres connection string for lifer state (required; falls back to `DATABASE_URL`)
 - `EBIRD_MCP_URL` — SSE endpoint for the eBird MCP server
 - `ANTHROPIC_API_KEY` — Claude API key
 - `PIPER_DUCK_DB_PATH` — Path to the ebd_nyc.db DuckDB file (optional; enables historical queries)
@@ -93,9 +93,9 @@ Start Postgres locally:
 docker compose up -d
 ```
 
-Set `DATABASE_URL` in your `.env`:
+Set `PIPER_POSTGRES_DB_URL` (or `DATABASE_URL`) in your `.env`:
 ```
-DATABASE_URL=postgresql://piper:piper@localhost:5432/piper_state
+PIPER_POSTGRES_DB_URL=postgresql://piper:piper@localhost:5432/piper_state
 ```
 
 Run the Alembic migration:
