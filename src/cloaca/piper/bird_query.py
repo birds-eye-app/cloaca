@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import time
+from collections.abc import Awaitable, Callable
 from contextlib import AsyncExitStack
 from dataclasses import dataclass
 
@@ -157,11 +158,29 @@ logger = logging.getLogger(__name__)
 
 client = AsyncAnthropic()
 
+ProgressCallback = Callable[[str], Awaitable[None]]
+
+
+def _tool_status(tool_name: str) -> str:
+    """Map MCP tool names to human-friendly status messages."""
+    if tool_name == "execute_query":
+        return "Querying historical database..."
+    if "hotspot" in tool_name:
+        return "Looking up hotspots..."
+    if "notable" in tool_name:
+        return "Checking notable sightings..."
+    if "taxonomy" in tool_name:
+        return "Looking up taxonomy..."
+    if "species_list" in tool_name:
+        return "Fetching species list..."
+    return "Searching eBird..."
+
 
 async def ask_bird_query(
     query: str,
     prior_messages: list[dict] | None = None,
     prior_context: str | None = None,
+    on_progress: ProgressCallback | None = None,
 ) -> tuple[str, QueryStats, list[dict]]:
     if not EBIRD_MCP_URL:
         raise RuntimeError("EBIRD_MCP_URL is not set")
@@ -215,6 +234,7 @@ async def ask_bird_query(
             )
 
             async for message_stream in runner:
+                text_started_this_turn = False
                 async for event in message_stream:
                     if event.type == "content_block_stop":
                         if event.content_block.type == "tool_use":
@@ -224,7 +244,14 @@ async def ask_bird_query(
                                 event.content_block.name,
                                 event.content_block.input,
                             )
+                            if on_progress:
+                                await on_progress(
+                                    _tool_status(event.content_block.name)
+                                )
                     elif event.type == "text":
+                        if not text_started_this_turn and on_progress:
+                            await on_progress("Writing response...")
+                            text_started_this_turn = True
                         chunks.append(event.text)
 
                 final = await message_stream.get_final_message()
