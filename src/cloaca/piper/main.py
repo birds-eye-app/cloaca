@@ -23,6 +23,7 @@ from cloaca.piper.year_lifers import (
     check_for_new_year_lifers,
     check_pending_provisionals,
     checklist_link_view,
+    fetch_notable_observations,
     fetch_recent_observations,
     format_all_time_lifer_message,
     format_confirmed_all_time_lifer_message,
@@ -130,19 +131,27 @@ async def check_year_lifers():
             logger.exception("failed to fetch observations for %s", hotspot.name)
             continue
 
+        try:
+            notable = await fetch_notable_observations(hotspot.id)
+        except Exception:
+            logger.exception(
+                "failed to fetch notable observations for %s", hotspot.name
+            )
+            notable = []
+
         # ---- Detect new lifers (confirmed + provisional) ----
 
         # All-time lifers first (takes priority over year lifers)
         try:
-            confirmed_at, provisional_at = check_for_new_all_time_lifers(
-                hotspot.id, observations
+            confirmed_at, provisional_at = await check_for_new_all_time_lifers(
+                hotspot.id, observations, notable
             )
         except Exception:
             logger.exception("failed to check all-time lifers for %s", hotspot.name)
             confirmed_at, provisional_at = [], []
 
         if confirmed_at:
-            total = get_all_time_total(hotspot.id)
+            total = await get_all_time_total(hotspot.id)
             message = format_all_time_lifer_message(confirmed_at, hotspot.name, total)
             await channel.send(message, view=all_time_list_link_view(hotspot.id))
             logger.info(
@@ -169,8 +178,8 @@ async def check_year_lifers():
 
         # Year lifers, excluding any that were all-time lifers
         try:
-            confirmed_yr, provisional_yr = check_for_new_year_lifers(
-                hotspot.id, observations
+            confirmed_yr, provisional_yr = await check_for_new_year_lifers(
+                hotspot.id, observations, notable
             )
         except Exception:
             logger.exception("failed to check year lifers for %s", hotspot.name)
@@ -183,7 +192,7 @@ async def check_year_lifers():
         ]
 
         if confirmed_yr:
-            total = get_year_total(hotspot.id)
+            total = await get_year_total(hotspot.id)
             message = format_year_lifer_message(confirmed_yr, hotspot.name, total)
             await channel.send(message, view=year_list_link_view(hotspot.id))
             logger.info(
@@ -210,7 +219,7 @@ async def check_year_lifers():
 
         try:
             pend_confirmed, pend_invalidated = await check_pending_provisionals(
-                hotspot.id, observations
+                hotspot.id, notable
             )
         except Exception:
             logger.exception(
@@ -222,7 +231,7 @@ async def check_year_lifers():
             at_confirmed = [p for p in pend_confirmed if p.lifer_type == "all_time"]
             yr_confirmed = [p for p in pend_confirmed if p.lifer_type == "year"]
             if at_confirmed:
-                total = get_all_time_total(hotspot.id)
+                total = await get_all_time_total(hotspot.id)
                 message = format_confirmed_all_time_lifer_message(
                     at_confirmed, hotspot.name, total
                 )
@@ -233,7 +242,7 @@ async def check_year_lifers():
                     ),
                 )
             if yr_confirmed:
-                total = get_year_total(hotspot.id)
+                total = await get_year_total(hotspot.id)
                 message = format_confirmed_year_lifer_message(
                     yr_confirmed, hotspot.name, total
                 )
