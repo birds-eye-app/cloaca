@@ -66,9 +66,6 @@ render logs -r <service-id> --start "$(date -u -v-5M +%Y-%m-%dT%H:%M:%SZ)" -o te
 
 Cloaca has a 1GB persistent disk mounted at `/var/data`. This holds:
 - `ebd_nyc.db` — read-only eBird observation database used by piper via MCP
-- `piper_state.db` — writable state DB for year lifer tracking (auto-created on first startup)
-
-DuckDB note: only one process can hold a write connection. The year lifers code runs `FORCE CHECKPOINT` after writes so SSH readers (using `read_only=True`) can see the data.
 
 To upload files to the disk, use `scp` via Render SSH (see memory for the exact command).
 
@@ -79,5 +76,5 @@ Managed per-service in the Render dashboard. Key ones for cloaca+piper:
 - `PIPER_DISCORD_BOT_TOKEN` -- Discord bot token
 - `EBIRD_MCP_URL` -- eBird MCP server endpoint
 - `PIPER_DUCK_DB_PATH` -- path to the eBird observation database on the Render disk (`/var/data/ebd_nyc.db`), used by piper via MCP
-- `PIPER_STATE_DB_PATH` -- writable DuckDB for piper state (year lifers tracking) on the Render disk (`/var/data/piper_state.db`)
+- `PIPER_POSTGRES_DB_URL` -- Postgres connection string for piper state (year lifers tracking), managed Render Postgres DB
 - `DUCK_DB_PATH` -- path to cloaca's own DuckDB for hotspot queries (separate database from piper's)
