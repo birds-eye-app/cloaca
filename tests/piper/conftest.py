@@ -52,7 +52,6 @@ async def state_db(pg_url, monkeypatch):
     monkeypatch.setenv("DATABASE_URL", pg_url)
     # Reset any cached engine from a prior test
     await db_pool.close_engine()
-    db_pool._engine = None
 
     engine = create_async_engine(pg_url)
 

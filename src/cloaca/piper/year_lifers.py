@@ -815,8 +815,8 @@ if __name__ == "__main__":
             all_time_count = await backfill_all_time_species(hotspot.id)
             print(f"Backfilled {all_time_count} all-time species")
 
-            print(f"Year total: {get_year_total(hotspot.id)}")
-            print(f"All-time total: {get_all_time_total(hotspot.id)}")
+            print(f"Year total: {await get_year_total(hotspot.id)}")
+            print(f"All-time total: {await get_all_time_total(hotspot.id)}")
 
             observations = await fetch_recent_observations(hotspot.id)
 
