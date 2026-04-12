@@ -10,7 +10,7 @@ Piper runs inside the cloaca FastAPI server as an asyncio background task (not a
 
 - `main.py` — Discord bot event handlers (`on_ready`, `on_message`), conversation cache, reply-chain context builder. Entry point is the `start()` coroutine.
 - `bird_query.py` — Core query logic. Connects to two MCP servers (eBird API via SSE, DuckDB via stdio), builds a tool-augmented Claude conversation, and streams the response. Contains the system prompt and the cached DuckDB connection pool.
-- `birdcast.py` — Daily BirdCast migration forecast. Fetches a 3-night forecast from the BirdCast API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Scheduled via `discord.ext.tasks.loop` at 7:00 AM Eastern. Response is validated with Pydantic models (`BirdcastForecast`, `ForecastNight`).
+- `birdcast.py` — Daily BirdCast migration forecast. Fetches a 3-night forecast from the BirdCast API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Polls every 15 minutes starting at 7:00 AM Eastern until the forecast updates for today (detected by checking if the first forecast night's date is today rather than yesterday), then stops retrying until the next day. Posts are deduplicated via the `birdcast_post_log` table. Response is validated with Pydantic models (`BirdcastForecast`, `ForecastNight`).
 - `cli.py` — Standalone CLI for testing queries without Discord: `uv run python -m cloaca.piper.cli "what warblers are in prospect park?"`
 - `year_lifers.py` — Year lifer and all-time park lifer tracking for multiple hotspots. Polls the eBird historic observations API every 15 minutes (hourly at night) to detect new species. Observations are fetched once per hotspot and checked against both the year list and all-time list. Stores state in Postgres (`DATABASE_URL`). On first run, backfills the current year day-by-day from the historic API, and backfills all-time species via the `product/spplist` endpoint (single API call per hotspot). Posts Discord notifications per hotspot channel — celebratory 🎉🥳 for all-time lifers, bird emojis for year lifers. If a species is both a year lifer and an all-time lifer, only the all-time notification is posted. Hotspots are configured via the `WATCHED_HOTSPOTS` list of `Hotspot` dataclasses. Reuses `eBirdHistoricFullObservation` from `scripts/fetch_yearly_hotspot_data.py` and `get_phoebe_client()` from `api/shared.py`.
 - `db_pool.py` — SQLAlchemy async engine management for the Postgres connection pool. Provides `get_engine()` and `close_engine()`.
@@ -55,6 +55,7 @@ To add a new hotspot, append a `Hotspot` entry to the list.
 - `hotspot_all_time_species` — all-time park species (species code only). PK: `(hotspot_id, species_code)`. Backfilled via the eBird `product/spplist` API.
 - `backfill_status` — tracks backfill completion per hotspot. PK: `(hotspot_id, year)`. Uses `year=0` as sentinel for all-time backfills.
 - `pending_provisional_lifers` — provisional observations awaiting eBird review. PK: `(hotspot_id, species_code, lifer_type)`.
+- `birdcast_post_log` — tracks which forecast dates have been posted per location, to prevent duplicate posts. PK: `(location, forecast_date)`.
 
 **Changing the schema**: Edit `sql/schema.sql` and `sql/queries.sql`, run `sqlc generate`, fix the import in `db/queries.py` (`from db import models` → `from cloaca.piper.db import models`), and create a new Alembic migration.
 
@@ -70,7 +71,7 @@ To add a new hotspot, append a `Hotspot` entry to the list.
 
 | Task | Schedule | Channel | Module |
 |------|----------|---------|--------|
-| BirdCast forecast | Daily at 7:00 AM Eastern | #bird-cast-updates | `birdcast.py` |
+| BirdCast forecast | Every 15 min, 7 AM–noon Eastern (stops after posting) | #bird-cast-updates | `birdcast.py` |
 | Lifer check (year + all-time) | Every 15 min (hourly at night) | Per hotspot (see `WATCHED_HOTSPOTS`) | `year_lifers.py` |
 
 Both are started in `on_ready()` via `discord.ext.tasks.loop`.

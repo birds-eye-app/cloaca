@@ -13,6 +13,9 @@ from cloaca.piper.birdcast import (
     birdcast_link_view,
     fetch_birdcast_forecast,
     format_forecast_message,
+    is_forecast_posted,
+    is_todays_forecast,
+    mark_forecast_posted,
 )
 from cloaca.piper.year_lifers import (
     WATCHED_HOTSPOTS,
@@ -276,19 +279,30 @@ async def check_year_lifers():
             logger.info("no new lifers at %s", hotspot.name)
 
 
-@tasks.loop(time=datetime.time(hour=7, minute=0, tzinfo=_EASTERN))
+@tasks.loop(minutes=15)
 async def post_birdcast_forecast():
-    channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
-    if channel is None:
-        logger.warning("could not find birdcast channel %d", BIRDCAST_CHANNEL_ID)
+    now = datetime.datetime.now(_EASTERN)
+    if now.hour < 7 or now.hour >= 12:
+        return
+    today = now.date()
+    if await is_forecast_posted(today):
+        logger.info("birdcast forecast already posted for %s", today)
         return
     forecast = await fetch_birdcast_forecast()
     if forecast is None or not forecast.forecastNights:
         logger.info("no birdcast forecast available, skipping")
         return
+    if not is_todays_forecast(forecast):
+        logger.info("birdcast forecast not yet updated for today, will retry")
+        return
+    channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
+    if channel is None:
+        logger.warning("could not find birdcast channel %d", BIRDCAST_CHANNEL_ID)
+        return
     message = format_forecast_message(forecast)
     await channel.send(message, view=birdcast_link_view())
-    logger.info("posted birdcast forecast")
+    await mark_forecast_posted(today)
+    logger.info("posted birdcast forecast for %s", today)
 
 
 @bot.event
