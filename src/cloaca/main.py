@@ -206,7 +206,7 @@ async def shutdown_event():
         except asyncio.CancelledError:
             pass
         await close_duck_conn()
-        from cloaca.piper.year_lifers import close_state_db
+        from cloaca.piper.db_pool import close_engine
 
-        close_state_db()
+        await close_engine()
         print("piper stopped")

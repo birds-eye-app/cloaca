@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import AsyncMock, patch
+from dataclasses import dataclass
 
 import pytest
 
@@ -19,7 +19,6 @@ from cloaca.piper.year_lifers import (
     check_for_new_all_time_lifers,
     check_for_new_year_lifers,
     check_pending_provisionals,
-    close_state_db,
     format_all_time_lifer_message,
     format_confirmed_all_time_lifer_message,
     format_confirmed_year_lifer_message,
@@ -28,7 +27,6 @@ from cloaca.piper.year_lifers import (
     format_tentative_year_lifer_message,
     format_year_lifer_message,
     get_all_time_total,
-    get_state_db,
     get_year_total,
 )
 from cloaca.scripts.fetch_yearly_hotspot_data import eBirdHistoricFullObservation
@@ -88,23 +86,7 @@ def make_obs(
 
 
 # ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture(autouse=True)
-def state_db(tmp_path, monkeypatch):
-    """Provide a fresh DuckDB state DB for each test."""
-    db_path = str(tmp_path / "test_state.db")
-    monkeypatch.setenv("PIPER_STATE_DB_PATH", db_path)
-    close_state_db()
-    db = get_state_db()
-    yield db
-    close_state_db()
-
-
-# ---------------------------------------------------------------------------
-# _find_new_species
+# _find_new_species (pure function, no DB)
 # ---------------------------------------------------------------------------
 
 
@@ -151,49 +133,71 @@ class TestFindNewSpecies:
 
 
 # ---------------------------------------------------------------------------
-# _split_confirmed_provisional
+# Notable observation helper (mimics phoebe Observation for split logic)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class NotableObs:
+    """Minimal mock of a phoebe Observation from the notable endpoint."""
+
+    species_code: str
+    obs_valid: bool
+    obs_reviewed: bool = False
+
+
+def make_notable(species_code: str = "yetwar", obs_valid: bool = True) -> NotableObs:
+    return NotableObs(
+        species_code=species_code, obs_valid=obs_valid, obs_reviewed=obs_valid
+    )
+
+
+# ---------------------------------------------------------------------------
+# _split_confirmed_provisional (pure function, no DB)
 # ---------------------------------------------------------------------------
 
 
 class TestSplitConfirmedProvisional:
-    def test_all_reviewed(self):
-        obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = _split_confirmed_provisional(obs, obs)
+    def test_common_species_not_in_notable_is_confirmed(self):
+        """Common species never appear in notable — automatically confirmed."""
+        obs = [make_obs("amerob", "American Robin")]
+        confirmed, provisional = _split_confirmed_provisional(obs, [])
         assert len(confirmed) == 1
         assert len(provisional) == 0
 
-    def test_all_unreviewed(self):
-        obs = [make_obs(obs_reviewed=False)]
-        confirmed, provisional = _split_confirmed_provisional(obs, obs)
+    def test_rarity_with_confirmed_report(self):
+        """Species in notable with obs_valid=True is confirmed."""
+        obs = [make_obs()]
+        notable = [make_notable("yetwar", obs_valid=True)]
+        confirmed, provisional = _split_confirmed_provisional(obs, notable)
+        assert len(confirmed) == 1
+        assert len(provisional) == 0
+
+    def test_rarity_with_only_unconfirmed_reports(self):
+        """Species in notable with only obs_valid=False is provisional."""
+        obs = [make_obs()]
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, provisional = _split_confirmed_provisional(obs, notable)
         assert len(confirmed) == 0
         assert len(provisional) == 1
 
-    def test_mixed(self):
-        reviewed = make_obs("amrob", "American Robin", obs_reviewed=True)
-        unreviewed = make_obs("yetwar", obs_reviewed=False)
-        new_lifers = [reviewed, unreviewed]
-        all_obs = [reviewed, unreviewed]
-        confirmed, provisional = _split_confirmed_provisional(new_lifers, all_obs)
-        assert [o.speciesCode for o in confirmed] == ["amrob"]
+    def test_mixed_confirmed_and_provisional(self):
+        common = make_obs("amerob", "American Robin")
+        rarity = make_obs("yetwar")
+        new_lifers = [common, rarity]
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, provisional = _split_confirmed_provisional(new_lifers, notable)
+        assert [o.speciesCode for o in confirmed] == ["amerob"]
         assert [o.speciesCode for o in provisional] == ["yetwar"]
 
-    def test_confirmed_if_any_observation_of_species_reviewed(self):
-        """Even if the earliest obs is unreviewed, if another observer's
-        record is reviewed, the species counts as confirmed."""
-        earliest = make_obs(
-            obs_reviewed=False,
-            checklist_id="S_unreviewed",
-            obs_dt=datetime.datetime(2026, 4, 11, 7, 0),
-        )
-        later_reviewed = make_obs(
-            obs_reviewed=True,
-            checklist_id="S_reviewed",
-            obs_dt=datetime.datetime(2026, 4, 11, 9, 0),
-        )
-        # _find_new_species would return the earliest
-        new_lifers = [earliest]
-        all_obs = [earliest, later_reviewed]
-        confirmed, provisional = _split_confirmed_provisional(new_lifers, all_obs)
+    def test_confirmed_if_any_notable_report_is_valid(self):
+        """Multiple notable reports — one confirmed is enough."""
+        obs = [make_obs()]
+        notable = [
+            make_notable("yetwar", obs_valid=False),
+            make_notable("yetwar", obs_valid=True),
+        ]
+        confirmed, provisional = _split_confirmed_provisional(obs, notable)
         assert len(confirmed) == 1
         assert len(provisional) == 0
 
@@ -204,29 +208,33 @@ class TestSplitConfirmedProvisional:
 
 
 class TestYearSpeciesDB:
-    def test_insert_and_get_known(self):
+    @pytest.mark.asyncio
+    async def test_insert_and_get_known(self):
         obs = make_obs()
-        _insert_species(HOTSPOT_ID, YEAR, obs)
-        known = _get_known_species(HOTSPOT_ID, YEAR)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
+        known = await _get_known_species(HOTSPOT_ID, YEAR)
         assert "yetwar" in known
 
-    def test_get_year_total(self):
-        assert get_year_total(HOTSPOT_ID) == 0
-        _insert_species(HOTSPOT_ID, YEAR, make_obs("amrob", "American Robin"))
-        _insert_species(HOTSPOT_ID, YEAR, make_obs("yetwar"))
-        assert get_year_total(HOTSPOT_ID) == 2
+    @pytest.mark.asyncio
+    async def test_get_year_total(self):
+        assert await get_year_total(HOTSPOT_ID) == 0
+        await _insert_species(HOTSPOT_ID, YEAR, make_obs("amrob", "American Robin"))
+        await _insert_species(HOTSPOT_ID, YEAR, make_obs("yetwar"))
+        assert await get_year_total(HOTSPOT_ID) == 2
 
-    def test_remove_year_species(self):
-        _insert_species(HOTSPOT_ID, YEAR, make_obs())
-        assert get_year_total(HOTSPOT_ID) == 1
-        _remove_year_species(HOTSPOT_ID, YEAR, "yetwar")
-        assert get_year_total(HOTSPOT_ID) == 0
+    @pytest.mark.asyncio
+    async def test_remove_year_species(self):
+        await _insert_species(HOTSPOT_ID, YEAR, make_obs())
+        assert await get_year_total(HOTSPOT_ID) == 1
+        await _remove_year_species(HOTSPOT_ID, YEAR, "yetwar")
+        assert await get_year_total(HOTSPOT_ID) == 0
 
-    def test_insert_duplicate_is_noop(self):
+    @pytest.mark.asyncio
+    async def test_insert_duplicate_is_noop(self):
         obs = make_obs()
-        _insert_species(HOTSPOT_ID, YEAR, obs)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
-        assert get_year_total(HOTSPOT_ID) == 1
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
+        assert await get_year_total(HOTSPOT_ID) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -235,22 +243,25 @@ class TestYearSpeciesDB:
 
 
 class TestAllTimeSpeciesDB:
-    def test_insert_and_get_known(self):
-        _insert_all_time_species(HOTSPOT_ID, "yetwar")
-        known = _get_known_all_time_species(HOTSPOT_ID)
+    @pytest.mark.asyncio
+    async def test_insert_and_get_known(self):
+        await _insert_all_time_species(HOTSPOT_ID, "yetwar")
+        known = await _get_known_all_time_species(HOTSPOT_ID)
         assert "yetwar" in known
 
-    def test_get_all_time_total(self):
-        assert get_all_time_total(HOTSPOT_ID) == 0
-        _insert_all_time_species(HOTSPOT_ID, "amrob")
-        _insert_all_time_species(HOTSPOT_ID, "yetwar")
-        assert get_all_time_total(HOTSPOT_ID) == 2
+    @pytest.mark.asyncio
+    async def test_get_all_time_total(self):
+        assert await get_all_time_total(HOTSPOT_ID) == 0
+        await _insert_all_time_species(HOTSPOT_ID, "amrob")
+        await _insert_all_time_species(HOTSPOT_ID, "yetwar")
+        assert await get_all_time_total(HOTSPOT_ID) == 2
 
-    def test_remove_all_time_species(self):
-        _insert_all_time_species(HOTSPOT_ID, "yetwar")
-        assert get_all_time_total(HOTSPOT_ID) == 1
-        _remove_all_time_species(HOTSPOT_ID, "yetwar")
-        assert get_all_time_total(HOTSPOT_ID) == 0
+    @pytest.mark.asyncio
+    async def test_remove_all_time_species(self):
+        await _insert_all_time_species(HOTSPOT_ID, "yetwar")
+        assert await get_all_time_total(HOTSPOT_ID) == 1
+        await _remove_all_time_species(HOTSPOT_ID, "yetwar")
+        assert await get_all_time_total(HOTSPOT_ID) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -259,10 +270,11 @@ class TestAllTimeSpeciesDB:
 
 
 class TestPendingProvisionalDB:
-    def test_insert_and_get(self):
+    @pytest.mark.asyncio
+    async def test_insert_and_get(self):
         obs = make_obs()
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        pending = _get_pending_provisionals(HOTSPOT_ID)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        pending = await _get_pending_provisionals(HOTSPOT_ID)
         assert len(pending) == 1
         p = pending[0]
         assert p.species_code == "yetwar"
@@ -271,26 +283,30 @@ class TestPendingProvisionalDB:
         assert p.year == YEAR
         assert isinstance(p.obs_date, datetime.date)
 
-    def test_remove(self):
+    @pytest.mark.asyncio
+    async def test_remove(self):
         obs = make_obs()
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _remove_pending_provisional(HOTSPOT_ID, "yetwar", "year")
-        assert _get_pending_provisionals(HOTSPOT_ID) == []
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _remove_pending_provisional(HOTSPOT_ID, "yetwar", "year")
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
 
-    def test_empty_when_no_records(self):
-        assert _get_pending_provisionals(HOTSPOT_ID) == []
+    @pytest.mark.asyncio
+    async def test_empty_when_no_records(self):
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
 
-    def test_duplicate_insert_is_noop(self):
+    @pytest.mark.asyncio
+    async def test_duplicate_insert_is_noop(self):
         obs = make_obs()
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        assert len(_get_pending_provisionals(HOTSPOT_ID)) == 1
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        assert len(await _get_pending_provisionals(HOTSPOT_ID)) == 1
 
-    def test_same_species_different_lifer_types(self):
+    @pytest.mark.asyncio
+    async def test_same_species_different_lifer_types(self):
         obs = make_obs()
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_pending_provisional(HOTSPOT_ID, obs, "all_time")
-        pending = _get_pending_provisionals(HOTSPOT_ID)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "all_time")
+        pending = await _get_pending_provisionals(HOTSPOT_ID)
         assert len(pending) == 2
         types = {p.lifer_type for p in pending}
         assert types == {"year", "all_time"}
@@ -302,44 +318,55 @@ class TestPendingProvisionalDB:
 
 
 class TestCheckForNewYearLifers:
-    def test_confirmed_lifer(self):
+    @pytest.mark.asyncio
+    async def test_confirmed_lifer(self):
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_year_lifers(HOTSPOT_ID, obs)
+        confirmed, provisional = await check_for_new_year_lifers(HOTSPOT_ID, obs, [])
         assert len(confirmed) == 1
         assert len(provisional) == 0
         # Should be inserted into known species
-        assert "yetwar" in _get_known_species(HOTSPOT_ID, YEAR)
+        assert "yetwar" in await _get_known_species(HOTSPOT_ID, YEAR)
 
-    def test_provisional_lifer(self):
-        obs = [make_obs(obs_reviewed=False)]
-        confirmed, provisional = check_for_new_year_lifers(HOTSPOT_ID, obs)
+    @pytest.mark.asyncio
+    async def test_provisional_lifer(self):
+        obs = [make_obs()]
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, provisional = await check_for_new_year_lifers(
+            HOTSPOT_ID, obs, notable
+        )
         assert len(confirmed) == 0
         assert len(provisional) == 1
         # Should still be inserted into known species
-        assert "yetwar" in _get_known_species(HOTSPOT_ID, YEAR)
+        assert "yetwar" in await _get_known_species(HOTSPOT_ID, YEAR)
         # Should create a pending provisional
-        pending = _get_pending_provisionals(HOTSPOT_ID)
+        pending = await _get_pending_provisionals(HOTSPOT_ID)
         assert len(pending) == 1
         assert pending[0].lifer_type == "year"
 
-    def test_empty_observations(self):
-        confirmed, provisional = check_for_new_year_lifers(HOTSPOT_ID, [])
+    @pytest.mark.asyncio
+    async def test_empty_observations(self):
+        confirmed, provisional = await check_for_new_year_lifers(HOTSPOT_ID, [], [])
         assert confirmed == []
         assert provisional == []
 
-    def test_already_known_species_not_detected(self):
-        _insert_species(HOTSPOT_ID, YEAR, make_obs())
+    @pytest.mark.asyncio
+    async def test_already_known_species_not_detected(self):
+        await _insert_species(HOTSPOT_ID, YEAR, make_obs())
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_year_lifers(HOTSPOT_ID, obs)
+        confirmed, provisional = await check_for_new_year_lifers(HOTSPOT_ID, obs, [])
         assert confirmed == []
         assert provisional == []
 
-    def test_mixed_confirmed_and_provisional(self):
+    @pytest.mark.asyncio
+    async def test_mixed_confirmed_and_provisional(self):
         obs = [
-            make_obs("amrob", "American Robin", obs_reviewed=True),
-            make_obs("yetwar", "Yellow-throated Warbler", obs_reviewed=False),
+            make_obs("amrob", "American Robin"),
+            make_obs("yetwar", "Yellow-throated Warbler"),
         ]
-        confirmed, provisional = check_for_new_year_lifers(HOTSPOT_ID, obs)
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, provisional = await check_for_new_year_lifers(
+            HOTSPOT_ID, obs, notable
+        )
         assert len(confirmed) == 1
         assert confirmed[0].speciesCode == "amrob"
         assert len(provisional) == 1
@@ -352,25 +379,35 @@ class TestCheckForNewYearLifers:
 
 
 class TestCheckForNewAllTimeLifers:
-    def test_confirmed_lifer(self):
+    @pytest.mark.asyncio
+    async def test_confirmed_lifer(self):
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
+        confirmed, provisional = await check_for_new_all_time_lifers(
+            HOTSPOT_ID, obs, []
+        )
         assert len(confirmed) == 1
-        assert "yetwar" in _get_known_all_time_species(HOTSPOT_ID)
+        assert "yetwar" in await _get_known_all_time_species(HOTSPOT_ID)
 
-    def test_provisional_lifer(self):
-        obs = [make_obs(obs_reviewed=False)]
-        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
+    @pytest.mark.asyncio
+    async def test_provisional_lifer(self):
+        obs = [make_obs()]
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, provisional = await check_for_new_all_time_lifers(
+            HOTSPOT_ID, obs, notable
+        )
         assert len(provisional) == 1
-        assert "yetwar" in _get_known_all_time_species(HOTSPOT_ID)
-        pending = _get_pending_provisionals(HOTSPOT_ID)
+        assert "yetwar" in await _get_known_all_time_species(HOTSPOT_ID)
+        pending = await _get_pending_provisionals(HOTSPOT_ID)
         assert len(pending) == 1
         assert pending[0].lifer_type == "all_time"
 
-    def test_already_known_species_not_detected(self):
-        _insert_all_time_species(HOTSPOT_ID, "yetwar")
+    @pytest.mark.asyncio
+    async def test_already_known_species_not_detected(self):
+        await _insert_all_time_species(HOTSPOT_ID, "yetwar")
         obs = [make_obs(obs_reviewed=True)]
-        confirmed, provisional = check_for_new_all_time_lifers(HOTSPOT_ID, obs)
+        confirmed, provisional = await check_for_new_all_time_lifers(
+            HOTSPOT_ID, obs, []
+        )
         assert confirmed == []
         assert provisional == []
 
@@ -388,66 +425,55 @@ class TestCheckPendingProvisionals:
         assert invalidated == []
 
     @pytest.mark.asyncio
-    async def test_confirmed_when_reviewed_in_recent_obs(self):
-        """Pending provisional is confirmed when its species appears reviewed
-        in the recent observations (today/yesterday)."""
-        obs = make_obs(obs_reviewed=False)
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
+    async def test_confirmed_when_notable_shows_valid(self):
+        """Pending provisional is confirmed when the notable endpoint shows
+        obs_valid=True for the species (reviewer approved it)."""
+        obs = make_obs()
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5)))
-        reviewed = make_obs(
-            obs_reviewed=True,
-            obs_dt=now,
-        )
-
-        confirmed, invalidated = await check_pending_provisionals(
-            HOTSPOT_ID, [reviewed]
-        )
+        notable = [make_notable("yetwar", obs_valid=True)]
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, notable)
         assert len(confirmed) == 1
         assert confirmed[0].species_code == "yetwar"
         assert invalidated == []
         # Pending record should be cleaned up
-        assert _get_pending_provisionals(HOTSPOT_ID) == []
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
 
     @pytest.mark.asyncio
-    async def test_still_pending_when_unreviewed(self):
-        """Observation still unreviewed — no change."""
-        now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5)))
-        obs = make_obs(obs_reviewed=False, obs_dt=now)
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
+    async def test_still_pending_when_unconfirmed(self):
+        """Species still in notable but only with obs_valid=False — no change."""
+        obs = make_obs()
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [obs])
+        notable = [make_notable("yetwar", obs_valid=False)]
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, notable)
         assert confirmed == []
         assert invalidated == []
         # Still in pending table
-        assert len(_get_pending_provisionals(HOTSPOT_ID)) == 1
+        assert len(await _get_pending_provisionals(HOTSPOT_ID)) == 1
 
     @pytest.mark.asyncio
     async def test_invalidated_after_stale_period(self):
-        """Observation vanishes from API for >14 days → invalidated."""
+        """Species vanishes from notable for >14 days → invalidated."""
         old_date = datetime.date.today() - datetime.timedelta(days=20)
         obs = make_obs(
             obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
         )
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        with patch(
-            "cloaca.piper.year_lifers.fetch_observations_for_date",
-            new_callable=AsyncMock,
-            return_value=[],  # observation gone
-        ):
-            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
+        # Empty notable = species gone
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert confirmed == []
         assert len(invalidated) == 1
         assert invalidated[0].species_code == "yetwar"
         # Cleaned up from pending
-        assert _get_pending_provisionals(HOTSPOT_ID) == []
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
         # Also removed from known year species
-        assert "yetwar" not in _get_known_species(HOTSPOT_ID, YEAR)
+        assert "yetwar" not in await _get_known_species(HOTSPOT_ID, YEAR)
 
     @pytest.mark.asyncio
     async def test_invalidated_all_time_removes_from_known(self):
@@ -455,71 +481,195 @@ class TestCheckPendingProvisionals:
         obs = make_obs(
             obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
         )
-        _insert_pending_provisional(HOTSPOT_ID, obs, "all_time")
-        _insert_all_time_species(HOTSPOT_ID, "yetwar")
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "all_time")
+        await _insert_all_time_species(HOTSPOT_ID, "yetwar")
 
-        with patch(
-            "cloaca.piper.year_lifers.fetch_observations_for_date",
-            new_callable=AsyncMock,
-            return_value=[],
-        ):
-            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert len(invalidated) == 1
-        assert "yetwar" not in _get_known_all_time_species(HOTSPOT_ID)
+        assert "yetwar" not in await _get_known_all_time_species(HOTSPOT_ID)
 
     @pytest.mark.asyncio
     async def test_not_invalidated_before_stale_period(self):
-        """Observation gone but only 5 days old — don't invalidate yet."""
+        """Species gone from notable but only 5 days old — don't invalidate yet."""
         recent_date = datetime.date.today() - datetime.timedelta(days=5)
         obs = make_obs(
             obs_dt=datetime.datetime(
                 recent_date.year, recent_date.month, recent_date.day, 8, 0
             )
         )
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
+        await _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
+        await _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        with patch(
-            "cloaca.piper.year_lifers.fetch_observations_for_date",
-            new_callable=AsyncMock,
-            return_value=[],
-        ):
-            confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
+        confirmed, invalidated = await check_pending_provisionals(HOTSPOT_ID, [])
 
         assert confirmed == []
         assert invalidated == []
         # Still pending
-        assert len(_get_pending_provisionals(HOTSPOT_ID)) == 1
+        assert len(await _get_pending_provisionals(HOTSPOT_ID)) == 1
+
+
+# ---------------------------------------------------------------------------
+# Integration tests: realistic end-to-end flows
+#
+# Based on real observations at Franz Sigel Park (L1814508), Apr 11 2026.
+# User names anonymized.
+# ---------------------------------------------------------------------------
+
+
+class TestIntegrationCommonSpeciesLifer:
+    """A common species (American Robin) is detected as a new year lifer.
+    It's never flagged for review so it should be immediately confirmed."""
 
     @pytest.mark.asyncio
-    async def test_fetches_extra_dates_for_old_pending(self):
-        """Pending from an older date triggers an extra API call for that
-        date rather than relying on today/yesterday only."""
-        old_date = datetime.date.today() - datetime.timedelta(days=5)
-        obs = make_obs(
-            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0)
+    async def test_common_species_is_immediately_confirmed(self):
+        # Historic endpoint returns American Robin (obsValid=True, never flagged)
+        observations = [
+            make_obs(
+                "amerob",
+                "American Robin",
+                obs_reviewed=False,
+                obs_valid=True,
+                obs_dt=datetime.datetime(2026, 4, 11, 7, 52),
+                checklist_id="CL001",
+                sub_id="S001",
+            ),
+        ]
+        # Notable endpoint returns nothing for common species
+        notable = []
+
+        confirmed, provisional = await check_for_new_year_lifers(
+            HOTSPOT_ID, observations, notable
         )
-        _insert_pending_provisional(HOTSPOT_ID, obs, "year", YEAR)
-        _insert_species(HOTSPOT_ID, YEAR, obs)
 
-        reviewed = make_obs(
-            obs_reviewed=True,
-            obs_dt=datetime.datetime(old_date.year, old_date.month, old_date.day, 8, 0),
-        )
-
-        with patch(
-            "cloaca.piper.year_lifers.fetch_observations_for_date",
-            new_callable=AsyncMock,
-            return_value=[reviewed],
-        ) as mock_fetch:
-            confirmed, invalidated = await check_pending_provisionals(
-                HOTSPOT_ID,
-                [],  # no recent observations
-            )
-
-        mock_fetch.assert_called_once_with(HOTSPOT_ID, old_date)
         assert len(confirmed) == 1
+        assert confirmed[0].speciesCode == "amerob"
+        assert len(provisional) == 0
+        # No pending provisional created
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
+
+
+class TestIntegrationRarityUnconfirmedThenConfirmed:
+    """A rare species (Yellow-throated Warbler) appears with only unconfirmed
+    reports, then gets confirmed by a reviewer on a subsequent poll."""
+
+    @pytest.mark.asyncio
+    async def test_rarity_detected_as_provisional_then_confirmed(self):
+        # --- Poll 1: species detected, only unconfirmed reports ---
+        observations = [
+            make_obs(
+                "yetwar",
+                "Yellow-throated Warbler",
+                obs_dt=datetime.datetime(2026, 4, 11, 8, 47),
+                checklist_id="CL002",
+                sub_id="S002",
+            ),
+        ]
+        # Notable shows only unconfirmed reports
+        notable_poll1 = [
+            make_notable("yetwar", obs_valid=False),
+        ]
+
+        confirmed, provisional = await check_for_new_all_time_lifers(
+            HOTSPOT_ID, observations, notable_poll1
+        )
+        assert len(confirmed) == 0
+        assert len(provisional) == 1
+        assert provisional[0].speciesCode == "yetwar"
+
+        # Pending provisional should be created
+        pending = await _get_pending_provisionals(HOTSPOT_ID)
+        assert len(pending) == 1
+        assert pending[0].lifer_type == "all_time"
+
+        # --- Poll 2: reviewer approved it ---
+        notable_poll2 = [
+            make_notable("yetwar", obs_valid=False),  # unconfirmed report still there
+            make_notable("yetwar", obs_valid=True),  # but now there's a confirmed one
+        ]
+
+        pend_confirmed, pend_invalidated = await check_pending_provisionals(
+            HOTSPOT_ID, notable_poll2
+        )
+        assert len(pend_confirmed) == 1
+        assert pend_confirmed[0].species_code == "yetwar"
+        assert pend_invalidated == []
+
+        # Pending should be cleaned up
+        assert await _get_pending_provisionals(HOTSPOT_ID) == []
+
+
+class TestIntegrationMixedCommonAndRarity:
+    """A poll returns both common species (confirmed) and a rarity
+    (provisional). The common species gets the full celebration, the
+    rarity gets the tentative message."""
+
+    @pytest.mark.asyncio
+    async def test_mixed_poll(self):
+        observations = [
+            make_obs(
+                "amerob",
+                "American Robin",
+                obs_dt=datetime.datetime(2026, 4, 11, 7, 52),
+                checklist_id="CL001",
+                sub_id="S001",
+            ),
+            make_obs(
+                "houwre",
+                "Northern House Wren",
+                obs_dt=datetime.datetime(2026, 4, 12, 9, 22),
+                checklist_id="CL003",
+                sub_id="S003",
+            ),
+        ]
+        # Only the wren is in notable (it's unusual for this location)
+        notable = [
+            make_notable("houwre", obs_valid=False),
+        ]
+
+        confirmed, provisional = await check_for_new_year_lifers(
+            HOTSPOT_ID, observations, notable
+        )
+
+        assert len(confirmed) == 1
+        assert confirmed[0].speciesCode == "amerob"
+        assert len(provisional) == 1
+        assert provisional[0].speciesCode == "houwre"
+
+
+class TestIntegrationRarityInvalidated:
+    """A rare species appears, is never confirmed, and eventually disappears
+    from the notable endpoint after the stale period."""
+
+    @pytest.mark.asyncio
+    async def test_rarity_invalidated_after_stale_period(self):
+        old_date = datetime.date.today() - datetime.timedelta(days=20)
+        observations = [
+            make_obs(
+                "yetwar",
+                "Yellow-throated Warbler",
+                obs_dt=datetime.datetime(
+                    old_date.year, old_date.month, old_date.day, 8, 47
+                ),
+                checklist_id="CL002",
+                sub_id="S002",
+            ),
+        ]
+        notable_poll1 = [make_notable("yetwar", obs_valid=False)]
+
+        await check_for_new_all_time_lifers(HOTSPOT_ID, observations, notable_poll1)
+
+        # Later poll: species vanished from notable (reviewer rejected it)
+        pend_confirmed, pend_invalidated = await check_pending_provisionals(
+            HOTSPOT_ID, []
+        )
+
+        assert pend_confirmed == []
+        assert len(pend_invalidated) == 1
+        assert pend_invalidated[0].species_code == "yetwar"
+
+        # Should be removed from known species
+        assert "yetwar" not in await _get_known_all_time_species(HOTSPOT_ID)
 
 
 # ---------------------------------------------------------------------------

@@ -1,16 +1,21 @@
 import asyncio
 import datetime
 import logging
-import os
 import random
 from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
-import duckdb
 import discord
+from phoebe_bird.types.data.observation import Observation
 
 from cloaca.api.shared import get_phoebe_client
 from cloaca.piper.birdcast import BIRD_EMOJIS
+from cloaca.piper.db.queries import (
+    AsyncQuerier,
+    InsertPendingProvisionalParams,
+    InsertSpeciesParams,
+)
+from cloaca.piper.db_pool import close_engine, get_engine
 from cloaca.scripts.fetch_yearly_hotspot_data import (
     eBirdHistoricFullObservation,
     parse_historic_observations_json_text,
@@ -47,153 +52,67 @@ WATCHED_HOTSPOTS = [
 
 EASTERN = ZoneInfo("America/New_York")
 
-_state_db: duckdb.DuckDBPyConnection | None = None
 
-
-def get_state_db() -> duckdb.DuckDBPyConnection:
-    global _state_db
-    if _state_db is None:
-        path = os.environ.get("PIPER_STATE_DB_PATH", "piper_state.db")
-        _state_db = duckdb.connect(path, read_only=False)
-        _ensure_tables(_state_db)
-    return _state_db
-
-
-def close_state_db():
-    global _state_db
-    if _state_db is not None:
-        _state_db.close()
-        _state_db = None
-
-
-def _ensure_tables(con: duckdb.DuckDBPyConnection):
-    con.execute("""
-        CREATE TABLE IF NOT EXISTS hotspot_year_species (
-            hotspot_id VARCHAR NOT NULL,
-            year INTEGER NOT NULL,
-            species_code VARCHAR NOT NULL,
-            common_name VARCHAR NOT NULL,
-            scientific_name VARCHAR NOT NULL,
-            first_obs_date DATE NOT NULL,
-            observer_name VARCHAR NOT NULL,
-            checklist_id VARCHAR NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (hotspot_id, year, species_code)
-        );
-    """)
-    con.execute("""
-        CREATE TABLE IF NOT EXISTS backfill_status (
-            hotspot_id VARCHAR NOT NULL,
-            year INTEGER NOT NULL,
-            completed_at TIMESTAMP NOT NULL,
-            species_count INTEGER NOT NULL,
-            PRIMARY KEY (hotspot_id, year)
-        );
-    """)
-    con.execute("""
-        CREATE TABLE IF NOT EXISTS hotspot_all_time_species (
-            hotspot_id VARCHAR NOT NULL,
-            species_code VARCHAR NOT NULL,
-            PRIMARY KEY (hotspot_id, species_code)
-        );
-    """)
-    con.execute("""
-        CREATE TABLE IF NOT EXISTS pending_provisional_lifers (
-            hotspot_id VARCHAR NOT NULL,
-            species_code VARCHAR NOT NULL,
-            common_name VARCHAR NOT NULL,
-            scientific_name VARCHAR NOT NULL,
-            obs_date DATE NOT NULL,
-            observer_name VARCHAR NOT NULL,
-            sub_id VARCHAR NOT NULL,
-            lifer_type VARCHAR NOT NULL,
-            year INTEGER,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (hotspot_id, species_code, lifer_type)
-        );
-    """)
-
-
-def get_year_total(hotspot_id: str) -> int:
+async def get_year_total(hotspot_id: str) -> int:
     now = datetime.datetime.now(EASTERN)
-    rows = (
-        get_state_db()
-        .execute(
-            "SELECT COUNT(*) FROM hotspot_year_species WHERE hotspot_id = ? AND year = ?",
-            [hotspot_id, now.year],
+    async with get_engine().connect() as conn:
+        result = await AsyncQuerier(conn).get_year_total(
+            hotspot_id=hotspot_id, year=now.year
         )
-        .fetchone()
-    )
-    return rows[0] if rows else 0
+        return result or 0
 
 
-def _get_known_species(hotspot_id: str, year: int) -> set[str]:
-    rows = (
-        get_state_db()
-        .execute(
-            "SELECT species_code FROM hotspot_year_species WHERE hotspot_id = ? AND year = ?",
-            [hotspot_id, year],
+async def _get_known_species(hotspot_id: str, year: int) -> set[str]:
+    async with get_engine().connect() as conn:
+        return {
+            code
+            async for code in AsyncQuerier(conn).get_known_species(
+                hotspot_id=hotspot_id, year=year
+            )
+        }
+
+
+async def get_all_time_total(hotspot_id: str) -> int:
+    async with get_engine().connect() as conn:
+        result = await AsyncQuerier(conn).get_all_time_total(hotspot_id=hotspot_id)
+        return result or 0
+
+
+async def _get_known_all_time_species(hotspot_id: str) -> set[str]:
+    async with get_engine().connect() as conn:
+        return {
+            code
+            async for code in AsyncQuerier(conn).get_known_all_time_species(
+                hotspot_id=hotspot_id
+            )
+        }
+
+
+async def _insert_all_time_species(hotspot_id: str, species_code: str):
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).insert_all_time_species(
+            hotspot_id=hotspot_id, species_code=species_code
         )
-        .fetchall()
-    )
-    return {row[0] for row in rows}
 
 
-def get_all_time_total(hotspot_id: str) -> int:
-    rows = (
-        get_state_db()
-        .execute(
-            "SELECT COUNT(*) FROM hotspot_all_time_species WHERE hotspot_id = ?",
-            [hotspot_id],
-        )
-        .fetchone()
-    )
-    return rows[0] if rows else 0
-
-
-def _get_known_all_time_species(hotspot_id: str) -> set[str]:
-    rows = (
-        get_state_db()
-        .execute(
-            "SELECT species_code FROM hotspot_all_time_species WHERE hotspot_id = ?",
-            [hotspot_id],
-        )
-        .fetchall()
-    )
-    return {row[0] for row in rows}
-
-
-def _insert_all_time_species(hotspot_id: str, species_code: str):
-    get_state_db().execute(
-        """INSERT INTO hotspot_all_time_species (hotspot_id, species_code)
-           VALUES (?, ?)
-           ON CONFLICT DO NOTHING""",
-        [hotspot_id, species_code],
-    )
-
-
-def _insert_species(
+async def _insert_species(
     hotspot_id: str,
     year: int,
     obs: eBirdHistoricFullObservation,
 ):
-    get_state_db().execute(
-        """INSERT INTO hotspot_year_species
-           (hotspot_id, year, species_code, common_name, scientific_name,
-            first_obs_date, observer_name, checklist_id)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT DO NOTHING""",
-        [
-            hotspot_id,
-            year,
-            obs.speciesCode,
-            obs.comName,
-            obs.sciName,
-            obs.obsDt.date(),
-            obs.userDisplayName,
-            obs.checklistId,
-        ],
-    )
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).insert_species(
+            InsertSpeciesParams(
+                hotspot_id=hotspot_id,
+                year=year,
+                species_code=obs.speciesCode,
+                common_name=obs.comName,
+                scientific_name=obs.sciName,
+                first_obs_date=obs.obsDt.date(),
+                observer_name=obs.userDisplayName,
+                checklist_id=obs.checklistId,
+            )
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -201,84 +120,70 @@ def _insert_species(
 # ---------------------------------------------------------------------------
 
 
-def _get_pending_provisionals(hotspot_id: str) -> list[PendingProvisional]:
-    rows = (
-        get_state_db()
-        .execute(
-            """SELECT hotspot_id, species_code, common_name, scientific_name,
-                      obs_date, observer_name, sub_id, lifer_type, year,
-                      created_at
-               FROM pending_provisional_lifers
-               WHERE hotspot_id = ?""",
-            [hotspot_id],
-        )
-        .fetchall()
-    )
-    return [
-        PendingProvisional(
-            hotspot_id=r[0],
-            species_code=r[1],
-            common_name=r[2],
-            scientific_name=r[3],
-            obs_date=r[4].date() if isinstance(r[4], datetime.datetime) else r[4],
-            observer_name=r[5],
-            sub_id=r[6],
-            lifer_type=r[7],
-            year=r[8],
-            created_at=r[9],
-        )
-        for r in rows
-    ]
+async def _get_pending_provisionals(hotspot_id: str) -> list[PendingProvisional]:
+    async with get_engine().connect() as conn:
+        return [
+            PendingProvisional(
+                hotspot_id=r.hotspot_id,
+                species_code=r.species_code,
+                common_name=r.common_name,
+                scientific_name=r.scientific_name,
+                obs_date=r.obs_date,
+                observer_name=r.observer_name,
+                sub_id=r.sub_id,
+                lifer_type=r.lifer_type,
+                year=r.year,
+                created_at=r.created_at,
+            )
+            async for r in AsyncQuerier(conn).get_pending_provisionals(
+                hotspot_id=hotspot_id
+            )
+        ]
 
 
-def _insert_pending_provisional(
+async def _insert_pending_provisional(
     hotspot_id: str,
     obs: eBirdHistoricFullObservation,
     lifer_type: str,
     year: int | None = None,
 ):
-    get_state_db().execute(
-        """INSERT INTO pending_provisional_lifers
-           (hotspot_id, species_code, common_name, scientific_name,
-            obs_date, observer_name, sub_id, lifer_type, year)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT DO NOTHING""",
-        [
-            hotspot_id,
-            obs.speciesCode,
-            obs.comName,
-            obs.sciName,
-            obs.obsDt.date(),
-            obs.userDisplayName,
-            obs.subId,
-            lifer_type,
-            year,
-        ],
-    )
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).insert_pending_provisional(
+            InsertPendingProvisionalParams(
+                hotspot_id=hotspot_id,
+                species_code=obs.speciesCode,
+                common_name=obs.comName,
+                scientific_name=obs.sciName,
+                obs_date=obs.obsDt.date(),
+                observer_name=obs.userDisplayName,
+                sub_id=obs.subId,
+                lifer_type=lifer_type,
+                year=year,
+            )
+        )
 
 
-def _remove_pending_provisional(hotspot_id: str, species_code: str, lifer_type: str):
-    get_state_db().execute(
-        """DELETE FROM pending_provisional_lifers
-           WHERE hotspot_id = ? AND species_code = ? AND lifer_type = ?""",
-        [hotspot_id, species_code, lifer_type],
-    )
+async def _remove_pending_provisional(
+    hotspot_id: str, species_code: str, lifer_type: str
+):
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).remove_pending_provisional(
+            hotspot_id=hotspot_id, species_code=species_code, lifer_type=lifer_type
+        )
 
 
-def _remove_year_species(hotspot_id: str, year: int, species_code: str):
-    get_state_db().execute(
-        """DELETE FROM hotspot_year_species
-           WHERE hotspot_id = ? AND year = ? AND species_code = ?""",
-        [hotspot_id, year, species_code],
-    )
+async def _remove_year_species(hotspot_id: str, year: int, species_code: str):
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).remove_year_species(
+            hotspot_id=hotspot_id, year=year, species_code=species_code
+        )
 
 
-def _remove_all_time_species(hotspot_id: str, species_code: str):
-    get_state_db().execute(
-        """DELETE FROM hotspot_all_time_species
-           WHERE hotspot_id = ? AND species_code = ?""",
-        [hotspot_id, species_code],
-    )
+async def _remove_all_time_species(hotspot_id: str, species_code: str):
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).remove_all_time_species(
+            hotspot_id=hotspot_id, species_code=species_code
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -308,37 +213,51 @@ async def fetch_observations_for_date(
     return [o for o in observations if o.exoticCategory != "X"]
 
 
+async def fetch_notable_observations(
+    hotspot_id: str,
+) -> list[Observation]:
+    """Fetch recent notable (rare/unusual) observations for a hotspot.
+
+    Unlike the historic endpoint which returns one observation per species,
+    the notable endpoint returns every individual report with full review
+    status (obs_valid, obs_reviewed). This lets us distinguish between:
+    - Confirmed rarities (obs_valid=True)
+    - Unconfirmed rarities awaiting review (obs_valid=False)
+
+    Common species never appear in notable results.
+    """
+    return await get_phoebe_client().data.observations.recent.notable.list(
+        region_code=hotspot_id,
+        back=10,
+        detail="full",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Backfill
 # ---------------------------------------------------------------------------
 
 
-def _is_backfill_complete(hotspot_id: str, year: int) -> bool:
-    row = (
-        get_state_db()
-        .execute(
-            "SELECT 1 FROM backfill_status WHERE hotspot_id = ? AND year = ?",
-            [hotspot_id, year],
+async def _is_backfill_complete(hotspot_id: str, year: int) -> bool:
+    async with get_engine().connect() as conn:
+        result = await AsyncQuerier(conn).is_backfill_complete(
+            hotspot_id=hotspot_id, year=year
         )
-        .fetchone()
-    )
-    return row is not None
+        return result is not None
 
 
-def _mark_backfill_complete(hotspot_id: str, year: int, species_count: int):
-    get_state_db().execute(
-        """INSERT INTO backfill_status (hotspot_id, year, completed_at, species_count)
-           VALUES (?, ?, CURRENT_TIMESTAMP, ?)
-           ON CONFLICT DO NOTHING""",
-        [hotspot_id, year, species_count],
-    )
+async def _mark_backfill_complete(hotspot_id: str, year: int, species_count: int):
+    async with get_engine().begin() as conn:
+        await AsyncQuerier(conn).mark_backfill_complete(
+            hotspot_id=hotspot_id, year=year, species_count=species_count
+        )
 
 
 async def backfill_year_species(hotspot_id: str) -> int:
     now = datetime.datetime.now(EASTERN)
     year = now.year
 
-    if _is_backfill_complete(hotspot_id, year):
+    if await _is_backfill_complete(hotspot_id, year):
         logger.info(
             "skipping backfill for %s/%d — already complete",
             hotspot_id,
@@ -373,10 +292,10 @@ async def backfill_year_species(hotspot_id: str) -> int:
 
     # Bulk insert
     for obs in earliest_per_species.values():
-        _insert_species(hotspot_id, year, obs)
+        await _insert_species(hotspot_id, year, obs)
 
     count = len(earliest_per_species)
-    _mark_backfill_complete(hotspot_id, year, count)
+    await _mark_backfill_complete(hotspot_id, year, count)
 
     logger.info(
         "backfill complete for %s/%d: %d species (%d failed days)",
@@ -392,7 +311,7 @@ ALL_TIME_BACKFILL_YEAR = 0
 
 
 async def backfill_all_time_species(hotspot_id: str) -> int:
-    if _is_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR):
+    if await _is_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR):
         logger.info("skipping all-time backfill for %s — already complete", hotspot_id)
         return 0
 
@@ -403,10 +322,10 @@ async def backfill_all_time_species(hotspot_id: str) -> int:
     )
 
     for code in species_codes:
-        _insert_all_time_species(hotspot_id, code)
+        await _insert_all_time_species(hotspot_id, code)
 
     count = len(species_codes)
-    _mark_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR, count)
+    await _mark_backfill_complete(hotspot_id, ALL_TIME_BACKFILL_YEAR, count)
     logger.info("all-time backfill complete for %s: %d species", hotspot_id, count)
     return count
 
@@ -459,28 +378,47 @@ def _find_new_species(
 
 def _split_confirmed_provisional(
     new_lifers: list[eBirdHistoricFullObservation],
-    all_observations: list[eBirdHistoricFullObservation],
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
-    """Split new lifers into confirmed (reviewed) and provisional (unreviewed).
+    """Split new lifers into confirmed and provisional (awaiting review).
 
-    A species is confirmed if ANY observation of it is reviewed (not just the
-    earliest one returned by _find_new_species).
+    Uses the notable/rarities endpoint data which returns every individual
+    report for rare species with full review status.
+
+    A species is provisional only if it appears in notable with NO confirmed
+    (obs_valid=True) reports — meaning it's a rarity that's still awaiting
+    eBird reviewer approval.
+
+    Common species never appear in notable and are automatically confirmed.
     """
+    # Build sets of species codes from notable observations
+    confirmed_notable: set[str] = set()
+    unconfirmed_notable: set[str] = set()
+    for o in notable_observations:
+        if o.obs_valid:
+            confirmed_notable.add(o.species_code)
+        else:
+            unconfirmed_notable.add(o.species_code)
+
     confirmed: list[eBirdHistoricFullObservation] = []
     provisional: list[eBirdHistoricFullObservation] = []
     for obs in new_lifers:
-        if any(
-            o.obsReviewed for o in all_observations if o.speciesCode == obs.speciesCode
-        ):
+        if obs.speciesCode in confirmed_notable:
+            # Rarity with at least one confirmed report
             confirmed.append(obs)
-        else:
+        elif obs.speciesCode in unconfirmed_notable:
+            # Rarity with only unconfirmed reports
             provisional.append(obs)
+        else:
+            # Common species (not in notable at all) — confirmed
+            confirmed.append(obs)
     return confirmed, provisional
 
 
-def check_for_new_year_lifers(
+async def check_for_new_year_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new year lifers."""
     now = datetime.datetime.now(EASTERN)
@@ -488,7 +426,7 @@ def check_for_new_year_lifers(
     if not observations:
         return [], []
 
-    known = _get_known_species(hotspot_id, now.year)
+    known = await _get_known_species(hotspot_id, now.year)
     new_lifers = _find_new_species(observations, known)
 
     if not new_lifers:
@@ -496,13 +434,15 @@ def check_for_new_year_lifers(
 
     # Insert all into known set (prevents re-alerting on next poll)
     for obs in new_lifers:
-        _insert_species(hotspot_id, now.year, obs)
+        await _insert_species(hotspot_id, now.year, obs)
 
-    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
+    confirmed, provisional = _split_confirmed_provisional(
+        new_lifers, notable_observations
+    )
 
     # Track provisional species for follow-up
     for obs in provisional:
-        _insert_pending_provisional(hotspot_id, obs, "year", now.year)
+        await _insert_pending_provisional(hotspot_id, obs, "year", now.year)
 
     logger.info(
         "found %d new year lifer(s) at %s (%d confirmed, %d provisional): %s",
@@ -515,15 +455,16 @@ def check_for_new_year_lifers(
     return confirmed, provisional
 
 
-def check_for_new_all_time_lifers(
+async def check_for_new_all_time_lifers(
     hotspot_id: str,
     observations: list[eBirdHistoricFullObservation],
+    notable_observations: list[Observation],
 ) -> tuple[list[eBirdHistoricFullObservation], list[eBirdHistoricFullObservation]]:
     """Returns (confirmed, provisional) new all-time lifers."""
     if not observations:
         return [], []
 
-    known = _get_known_all_time_species(hotspot_id)
+    known = await _get_known_all_time_species(hotspot_id)
     new_lifers = _find_new_species(observations, known)
 
     if not new_lifers:
@@ -531,13 +472,15 @@ def check_for_new_all_time_lifers(
 
     # Insert all into known set (prevents re-alerting on next poll)
     for obs in new_lifers:
-        _insert_all_time_species(hotspot_id, obs.speciesCode)
+        await _insert_all_time_species(hotspot_id, obs.speciesCode)
 
-    confirmed, provisional = _split_confirmed_provisional(new_lifers, observations)
+    confirmed, provisional = _split_confirmed_provisional(
+        new_lifers, notable_observations
+    )
 
     # Track provisional species for follow-up
     for obs in provisional:
-        _insert_pending_provisional(hotspot_id, obs, "all_time")
+        await _insert_pending_provisional(hotspot_id, obs, "all_time")
 
     logger.info(
         "found %d new all-time lifer(s) at %s (%d confirmed, %d provisional): %s",
@@ -562,69 +505,49 @@ _PROVISIONAL_STALE_DAYS = 14
 
 async def check_pending_provisionals(
     hotspot_id: str,
-    recent_observations: list[eBirdHistoricFullObservation],
+    notable_observations: list[Observation],
 ) -> tuple[list[PendingProvisional], list[PendingProvisional]]:
     """Re-check pending provisional observations for review-status changes.
 
-    *recent_observations* should already contain today + yesterday (the normal
-    poll data).  For any pending provisional whose obs_date falls outside that
-    window we issue an extra API call so we can see its current review status.
+    Uses the notable endpoint which returns every individual report for rare
+    species with full review status. This avoids the historic endpoint's
+    one-per-species deduplication.
 
     Returns ``(confirmed, invalidated)`` lists.
 
-    Confirmed = a reviewed observation of the species now exists (eBird only
-    returns ``obsValid=True`` records, so presence + ``obsReviewed`` is enough).
+    Confirmed = at least one observation of the species now has obs_valid=True
+    (a reviewer approved it).
 
-    Invalidated = the observation has vanished from the API for longer than
+    Invalidated = the species has disappeared from notable for longer than
     ``_PROVISIONAL_STALE_DAYS``, meaning the reviewer rejected it or the
     checklist was deleted.
     """
-    pending = _get_pending_provisionals(hotspot_id)
+    pending = await _get_pending_provisionals(hotspot_id)
     if not pending:
         return [], []
 
     now = datetime.datetime.now(EASTERN)
     today = now.date()
-    yesterday = today - datetime.timedelta(days=1)
-    covered_dates = {today, yesterday}
-
-    # Collect extra dates we need to fetch
-    extra_dates = {p.obs_date for p in pending} - covered_dates
-    extra_observations: list[eBirdHistoricFullObservation] = []
-    for date in extra_dates:
-        try:
-            extra_observations.extend(
-                await fetch_observations_for_date(hotspot_id, date)
-            )
-        except Exception:
-            logger.exception(
-                "failed to fetch observations for pending check %s on %s",
-                hotspot_id,
-                date,
-            )
-
-    all_observations = list(recent_observations) + extra_observations
 
     confirmed: list[PendingProvisional] = []
     invalidated: list[PendingProvisional] = []
 
     for p in pending:
-        matching = [o for o in all_observations if o.speciesCode == p.species_code]
+        matching = [o for o in notable_observations if o.species_code == p.species_code]
         if not matching:
-            # Observation gone — invalidated or transient API issue.
+            # Species gone from notable — invalidated or transient API issue.
             age = (today - p.obs_date).days
             if age >= _PROVISIONAL_STALE_DAYS:
                 invalidated.append(p)
             continue
 
-        if any(o.obsReviewed for o in matching):
-            # Reviewed observations in the API are always valid (invalid ones
-            # are removed entirely), so this means confirmed.
+        if any(o.obs_valid for o in matching):
+            # At least one report has been confirmed by a reviewer.
             confirmed.append(p)
 
     # Apply DB changes
     for p in confirmed:
-        _remove_pending_provisional(p.hotspot_id, p.species_code, p.lifer_type)
+        await _remove_pending_provisional(p.hotspot_id, p.species_code, p.lifer_type)
         logger.info(
             "pending provisional confirmed: %s at %s (%s)",
             p.common_name,
@@ -633,13 +556,13 @@ async def check_pending_provisionals(
         )
 
     for p in invalidated:
-        _remove_pending_provisional(p.hotspot_id, p.species_code, p.lifer_type)
+        await _remove_pending_provisional(p.hotspot_id, p.species_code, p.lifer_type)
         # Remove from known species so a future valid observation can trigger
         # a fresh alert.
         if p.lifer_type == "year" and p.year is not None:
-            _remove_year_species(p.hotspot_id, p.year, p.species_code)
+            await _remove_year_species(p.hotspot_id, p.year, p.species_code)
         elif p.lifer_type == "all_time":
-            _remove_all_time_species(p.hotspot_id, p.species_code)
+            await _remove_all_time_species(p.hotspot_id, p.species_code)
         logger.info(
             "pending provisional invalidated: %s at %s (%s)",
             p.common_name,
@@ -861,7 +784,8 @@ def checklist_link_view(
             )
         )
     else:
-        for name, sub_id in checklists:
+        # Discord views support max 25 items
+        for name, sub_id in checklists[:25]:
             view.add_item(
                 discord.ui.Button(
                     style=discord.ButtonStyle.link,
@@ -916,16 +840,17 @@ if __name__ == "__main__":
             all_time_count = await backfill_all_time_species(hotspot.id)
             print(f"Backfilled {all_time_count} all-time species")
 
-            print(f"Year total: {get_year_total(hotspot.id)}")
-            print(f"All-time total: {get_all_time_total(hotspot.id)}")
+            print(f"Year total: {await get_year_total(hotspot.id)}")
+            print(f"All-time total: {await get_all_time_total(hotspot.id)}")
 
             observations = await fetch_recent_observations(hotspot.id)
+            notable = await fetch_notable_observations(hotspot.id)
 
-            confirmed_at, provisional_at = check_for_new_all_time_lifers(
-                hotspot.id, observations
+            confirmed_at, provisional_at = await check_for_new_all_time_lifers(
+                hotspot.id, observations, notable
             )
             if confirmed_at:
-                total = get_all_time_total(hotspot.id)
+                total = await get_all_time_total(hotspot.id)
                 print(format_all_time_lifer_message(confirmed_at, hotspot.name, total))
             if provisional_at:
                 print(
@@ -938,8 +863,8 @@ if __name__ == "__main__":
 
             # Filter out all-time lifers from year lifer notifications
             all_time_codes = {o.speciesCode for o in confirmed_at + provisional_at}
-            confirmed_yr, provisional_yr = check_for_new_year_lifers(
-                hotspot.id, observations
+            confirmed_yr, provisional_yr = await check_for_new_year_lifers(
+                hotspot.id, observations, notable
             )
             confirmed_yr = [
                 o for o in confirmed_yr if o.speciesCode not in all_time_codes
@@ -948,7 +873,7 @@ if __name__ == "__main__":
                 o for o in provisional_yr if o.speciesCode not in all_time_codes
             ]
             if confirmed_yr:
-                total = get_year_total(hotspot.id)
+                total = await get_year_total(hotspot.id)
                 print(format_year_lifer_message(confirmed_yr, hotspot.name, total))
             if provisional_yr:
                 print(format_tentative_year_lifer_message(provisional_yr, hotspot.name))
@@ -957,7 +882,7 @@ if __name__ == "__main__":
 
             # Check pending provisionals
             confirmed_pending, invalidated = await check_pending_provisionals(
-                hotspot.id, observations
+                hotspot.id, notable
             )
             if confirmed_pending:
                 year_confirmed = [
@@ -967,14 +892,14 @@ if __name__ == "__main__":
                     p for p in confirmed_pending if p.lifer_type == "all_time"
                 ]
                 if at_confirmed:
-                    total = get_all_time_total(hotspot.id)
+                    total = await get_all_time_total(hotspot.id)
                     print(
                         format_confirmed_all_time_lifer_message(
                             at_confirmed, hotspot.name, total
                         )
                     )
                 if year_confirmed:
-                    total = get_year_total(hotspot.id)
+                    total = await get_year_total(hotspot.id)
                     print(
                         format_confirmed_year_lifer_message(
                             year_confirmed, hotspot.name, total
@@ -983,6 +908,6 @@ if __name__ == "__main__":
             if invalidated:
                 print(format_invalidated_lifer_message(invalidated, hotspot.name))
 
-        close_state_db()
+        await close_engine()
 
     asyncio.run(_main())
