@@ -15,4 +15,6 @@ sql:
           package: "db"
           emit_async_querier: true
           emit_sync_querier: false
+          emit_str_enum: true
+          emit_pydantic_models: true
           query_parameter_limit: 3

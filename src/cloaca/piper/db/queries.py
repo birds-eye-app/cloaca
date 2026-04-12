@@ -2,8 +2,8 @@
 # versions:
 #   sqlc v1.30.0
 # source: queries.sql
-import dataclasses
 import datetime
+import pydantic
 from typing import AsyncIterator, Optional
 
 import sqlalchemy
@@ -60,8 +60,7 @@ ON CONFLICT DO NOTHING
 """
 
 
-@dataclasses.dataclass()
-class InsertPendingProvisionalParams:
+class InsertPendingProvisionalParams(pydantic.BaseModel):
     hotspot_id: str
     species_code: str
     common_name: str
@@ -82,8 +81,7 @@ ON CONFLICT DO NOTHING
 """
 
 
-@dataclasses.dataclass()
-class InsertSpeciesParams:
+class InsertSpeciesParams(pydantic.BaseModel):
     hotspot_id: str
     year: int
     species_code: str
