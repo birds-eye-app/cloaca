@@ -18,8 +18,9 @@ health_url="${3:-https://cloaca.onrender.com/v1/health}"
 
 # Allow matching on short SHAs
 sha_len=${#commit_sha}
+short_sha="${commit_sha:0:7}"
 
-echo "Waiting for deploy of ${commit_sha:0:12} on service ${service_id}..."
+echo "Deploy ${short_sha}: waiting for deploy to be created..."
 
 while true; do
   result=$(render deploys list "$service_id" --output json --confirm 2>/dev/null \
@@ -38,23 +39,22 @@ print('not_found not_found')
   deploy_status="${result#* }"
 
   if [ "$deploy_id" = "not_found" ]; then
-    echo "No deploy yet for ${commit_sha:0:12}, waiting..."
     sleep 30
     continue
   fi
 
-  echo "Deploy ${deploy_id}: ${deploy_status}"
-
   case "$deploy_status" in
     live)
-      echo "DEPLOY SUCCEEDED"
       health=$(curl -sf "$health_url" 2>/dev/null) || health="unreachable"
-      echo "Health: $health"
+      echo "Deploy ${short_sha}: LIVE — health: ${health}"
       exit 0
       ;;
     deactivated|build_failed|update_failed|canceled)
-      echo "DEPLOY FAILED: $deploy_status"
+      echo "Deploy ${short_sha}: FAILED (${deploy_status})"
       exit 1
+      ;;
+    *)
+      echo "Deploy ${short_sha}: ${deploy_status}"
       ;;
   esac
 
