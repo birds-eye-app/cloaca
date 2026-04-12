@@ -1,12 +1,12 @@
 FROM python:3.12-slim-bookworm
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
+COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /bin/
 
 WORKDIR /app
-COPY uv.lock .
-COPY pyproject.toml .
-COPY README.md .
-RUN uv sync --frozen
+COPY uv.lock pyproject.toml README.md ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project
 
 COPY . .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-editable
 CMD ["uv", "run", "fastapi", "run", "src/cloaca/main.py"]
