@@ -1,0 +1,44 @@
+{
+  "generatedDate": "2026-04-12T17:33:00",
+  "forecastNights": [
+    {
+      "date": "2026-04-12T00:00:00",
+      "total": 4012,
+      "totalMin": 3236,
+      "totalMax": 6445,
+      "raw": 19.86,
+      "code": 2,
+      "isAlert": false
+    },
+    {
+      "date": "2026-04-13T00:00:00",
+      "total": 1826,
+      "totalMin": 0,
+      "totalMax": 3236,
+      "raw": 9.04,
+      "code": 1,
+      "isAlert": false
+    },
+    {
+      "date": "2026-04-14T00:00:00",
+      "total": 2406,
+      "totalMin": 0,
+      "totalMax": 3236,
+      "raw": 11.91,
+      "code": 1,
+      "isAlert": false
+    }
+  ],
+  "forecastLocation": {
+    "latLng": "40.7127753,-74.0059728",
+    "regionCode": "GRID_LCEA_MOD_20KM_10972905",
+    "forecastPeriods": [
+      {
+        "dateStart": "2026-03-01T00:00:00",
+        "dateEnd": "2026-06-15T00:00:00"
+      }
+    ]
+  },
+  "forecastLocationStatus": null,
+  "project": "BIRDCAST"
+}

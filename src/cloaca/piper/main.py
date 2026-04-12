@@ -12,10 +12,13 @@ from cloaca.piper.birdcast import (
     BIRDCAST_CHANNEL_ID,
     birdcast_link_view,
     fetch_birdcast_forecast,
+    fetch_migration_traffic,
     format_forecast_message,
+    format_migration_traffic_message,
     is_forecast_posted,
     is_todays_forecast,
     mark_forecast_posted,
+    migration_dashboard_link_view,
 )
 from cloaca.piper.year_lifers import (
     WATCHED_HOTSPOTS,
@@ -305,6 +308,26 @@ async def post_birdcast_forecast():
     logger.info("posted birdcast forecast for %s", today)
 
 
+@tasks.loop(time=datetime.time(hour=6, minute=0, tzinfo=_EASTERN))
+async def post_migration_traffic():
+    now = datetime.datetime.now(_EASTERN)
+    yesterday = (now - datetime.timedelta(days=1)).date()
+
+    traffic = await fetch_migration_traffic(yesterday)
+    if traffic is None:
+        logger.warning("failed to fetch migration traffic for %s", yesterday)
+        return
+
+    channel = bot.get_channel(BIRDCAST_CHANNEL_ID)
+    if channel is None:
+        logger.warning("could not find birdcast channel %d", BIRDCAST_CHANNEL_ID)
+        return
+
+    message = format_migration_traffic_message(traffic)
+    await channel.send(message, view=migration_dashboard_link_view())
+    logger.info("posted migration traffic for %s", yesterday)
+
+
 @bot.event
 async def on_ready():
     logger.info("online as %s", bot.user)
@@ -317,6 +340,8 @@ async def on_ready():
         )
     if not post_birdcast_forecast.is_running():
         post_birdcast_forecast.start()
+    if not post_migration_traffic.is_running():
+        post_migration_traffic.start()
     if not check_year_lifers.is_running():
         for hotspot in WATCHED_HOTSPOTS:
             try:
