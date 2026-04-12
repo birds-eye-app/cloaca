@@ -1,6 +1,8 @@
 """Tests for piper birdcast forecast polling and posting."""
 
 import datetime
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 from zoneinfo import ZoneInfo
 
@@ -9,11 +11,19 @@ import pytest
 from cloaca.piper.birdcast import (
     BirdcastForecast,
     ForecastNight,
+    MigrationSeason,
+    MigrationTraffic,
+    NightSeriesEntry,
+    fetch_birdcast_forecast,
+    fetch_migration_traffic,
     format_forecast_message,
+    format_migration_traffic_message,
     is_forecast_posted,
     is_todays_forecast,
     mark_forecast_posted,
 )
+
+FIXTURES = Path(__file__).parent / "fixtures"
 
 EASTERN = ZoneInfo("America/New_York")
 MODULE = "cloaca.piper.main"
@@ -84,10 +94,10 @@ class TestIsTodaysForecast:
 
 
 class TestFormatForecastMessage:
-    def test_contains_migration_update_header(self):
+    def test_contains_forecast_update_header(self):
         forecast = make_forecast()
         msg = format_forecast_message(forecast)
-        assert "**Migration Update**" in msg
+        assert "**Forecast Update**" in msg
 
     def test_contains_tonight_and_tomorrow(self):
         forecast = make_forecast()
@@ -110,6 +120,82 @@ class TestFormatForecastMessage:
         assert "Low" in msg
         assert "Medium" in msg
         assert "High" in msg
+
+
+# ---------------------------------------------------------------------------
+# Integration tests — mock HTTP, feed real API JSON, assert full message
+# ---------------------------------------------------------------------------
+
+
+def _mock_aiohttp_get(fixture_json):
+    """Return a mock that replaces aiohttp.ClientSession context with fixture data."""
+    mock_resp = AsyncMock()
+    mock_resp.status = 200
+    mock_resp.json = AsyncMock(return_value=fixture_json)
+
+    mock_session = AsyncMock()
+    mock_session.get = MagicMock(
+        return_value=AsyncMock(__aenter__=AsyncMock(return_value=mock_resp))
+    )
+    mock_session_cls = MagicMock(
+        return_value=AsyncMock(__aenter__=AsyncMock(return_value=mock_session))
+    )
+    return mock_session_cls
+
+
+FIXED_EMOJIS = ["\U0001f426", "\U0001f985", "\U0001f989", "\U0001f99c"]
+
+
+class TestForecastIntegration:
+    """Feed real forecast API JSON through the full pipeline."""
+
+    @pytest.mark.asyncio
+    async def test_fetch_and_format(self, monkeypatch):
+        monkeypatch.setenv("BIRDCAST_API_KEY", "test-key")
+        fixture = json.loads((FIXTURES / "forecast_2026_04_12.json").read_text())
+        with patch(
+            f"{BIRDCAST_MODULE}.aiohttp.ClientSession", _mock_aiohttp_get(fixture)
+        ):
+            forecast = await fetch_birdcast_forecast()
+
+        assert forecast is not None
+        with patch(f"{BIRDCAST_MODULE}.random.sample", return_value=FIXED_EMOJIS):
+            msg = format_forecast_message(forecast)
+        assert msg == (
+            "\U0001f426\U0001f985 **Forecast Update** \U0001f989\U0001f99c\n"
+            "\n"
+            "\U0001f7e1 **Tonight (Apr 12):** Medium\n"
+            "\U0001f535 **Tomorrow (Apr 13):** Low\n"
+            "\U0001f535 **Tuesday (Apr 14):** Low"
+        )
+
+
+class TestTrafficIntegration:
+    """Feed real livemigration API JSON through the full pipeline."""
+
+    @pytest.mark.asyncio
+    async def test_fetch_and_format(self, monkeypatch):
+        monkeypatch.setenv("BIRDCAST_API_KEY", "test-key")
+        fixture = json.loads((FIXTURES / "livemigration_2026_04_11.json").read_text())
+        with patch(
+            f"{BIRDCAST_MODULE}.aiohttp.ClientSession", _mock_aiohttp_get(fixture)
+        ):
+            traffic = await fetch_migration_traffic(datetime.date(2026, 4, 11))
+
+        assert traffic is not None
+        assert traffic.cumulativeBirds == 158
+        assert len(traffic.nightSeries) == 66
+
+        with patch(f"{BIRDCAST_MODULE}.random.sample", return_value=FIXED_EMOJIS):
+            msg = format_migration_traffic_message(traffic)
+        assert msg == (
+            "\U0001f426\U0001f985 **Last Night's Migration** \U0001f989\U0001f99c\n"
+            "\n"
+            "\U0001f4ca **158 birds** crossed Kings County\n"
+            "\u23f0 Sat Apr 11, 7:30 PM \u2013 6:20 AM\n"
+            "\n"
+            "\U0001f4c8 **Peak:** 106 birds at 10:10 PM heading NE"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -243,3 +329,205 @@ class TestPostBirdcastForecast:
         forecast = make_forecast(first_date=today_dt)
         await _run_forecast(mock_channel, now=now, forecast=forecast)
         assert await is_forecast_posted(now.date()) is True
+
+
+# ---------------------------------------------------------------------------
+# Migration traffic helpers
+# ---------------------------------------------------------------------------
+
+
+def make_night_series(
+    *,
+    start_hour: int = 19,
+    start_minute: int = 30,
+    intervals: int = 6,
+    peak_idx: int = 3,
+    peak_aloft: int = 500,
+    base_date: str = "2026-04-11",
+) -> list[NightSeriesEntry]:
+    entries = []
+    for i in range(intervals):
+        hour = start_hour + (start_minute + i * 10) // 60
+        minute = (start_minute + i * 10) % 60
+        aloft = (
+            peak_aloft
+            if i == peak_idx
+            else max(10, peak_aloft // (abs(i - peak_idx) + 1))
+        )
+        entries.append(
+            NightSeriesEntry(
+                localTime=f"{base_date}T{hour:02d}:{minute:02d}:00",
+                utc=f"{base_date}T{hour + 4:02d}:{minute:02d}:00Z",
+                numAloft=aloft,
+                avgDirection=55.0 if i == peak_idx else None,
+                avgSpeed=12.5 if i == peak_idx else None,
+                meanHeight=1500.0 if i == peak_idx else None,
+            )
+        )
+    return entries
+
+
+def make_traffic(
+    *,
+    cumulative: int = 1200,
+    night_series: list[NightSeriesEntry] | None = None,
+) -> MigrationTraffic:
+    if night_series is None:
+        night_series = make_night_series()
+    return MigrationTraffic(
+        lastUpdated="2026-04-12T10:20:00Z",
+        regionCode="US-NY-047",
+        timezoneName="America/New_York",
+        cumulativeBirds=cumulative,
+        isHigh=False,
+        season=MigrationSeason(code="SP", startDate="20260301", endDate="20260615"),
+        nightSeries=night_series,
+    )
+
+
+# ---------------------------------------------------------------------------
+# format_migration_traffic_message (pure function)
+# ---------------------------------------------------------------------------
+
+
+class TestFormatMigrationTrafficMessage:
+    def test_contains_header(self):
+        traffic = make_traffic()
+        msg = format_migration_traffic_message(traffic)
+        assert "**Last Night's Migration**" in msg
+
+    def test_contains_total_birds(self):
+        traffic = make_traffic(cumulative=1200)
+        msg = format_migration_traffic_message(traffic)
+        assert "1,200 birds" in msg
+
+    def test_contains_peak_info(self):
+        traffic = make_traffic()
+        msg = format_migration_traffic_message(traffic)
+        assert "**Peak:**" in msg
+        assert "500 birds" in msg
+
+    def test_peak_includes_direction_when_available(self):
+        traffic = make_traffic()
+        msg = format_migration_traffic_message(traffic)
+        assert "heading NE" in msg
+
+    def test_contains_night_timespan(self):
+        traffic = make_traffic()
+        msg = format_migration_traffic_message(traffic)
+        assert "7:30 PM" in msg
+
+    def test_quiet_night_message(self):
+        series = [
+            NightSeriesEntry(
+                localTime="2026-04-11T19:30:00",
+                utc="2026-04-11T23:30:00Z",
+                numAloft=0,
+            )
+        ]
+        traffic = make_traffic(cumulative=0, night_series=series)
+        msg = format_migration_traffic_message(traffic)
+        assert "quiet night" in msg
+
+    def test_empty_night_series(self):
+        traffic = make_traffic(cumulative=0, night_series=[])
+        msg = format_migration_traffic_message(traffic)
+        assert "No migration data available" in msg
+
+    def test_no_direction_when_null(self):
+        series = [
+            NightSeriesEntry(
+                localTime="2026-04-11T22:00:00",
+                utc="2026-04-12T02:00:00Z",
+                numAloft=50,
+                avgDirection=None,
+            )
+        ]
+        traffic = make_traffic(night_series=series)
+        msg = format_migration_traffic_message(traffic)
+        assert "heading" not in msg
+
+
+# ---------------------------------------------------------------------------
+# post_migration_traffic task loop orchestration
+# ---------------------------------------------------------------------------
+
+
+async def _run_traffic(mock_channel, *, now, traffic=None):
+    mock_bot = MagicMock()
+    mock_bot.get_channel = MagicMock(return_value=mock_channel)
+
+    with (
+        patch(f"{MODULE}.bot", mock_bot),
+        patch(f"{MODULE}.datetime") as mock_dt,
+        patch(
+            f"{MODULE}.fetch_migration_traffic",
+            AsyncMock(return_value=traffic),
+        ),
+        patch(
+            f"{MODULE}.format_migration_traffic_message",
+            MagicMock(return_value="TRAFFIC_MSG"),
+        ),
+        patch(f"{MODULE}.migration_dashboard_link_view", MagicMock(return_value=None)),
+    ):
+        mock_dt.datetime.now.return_value = now
+        mock_dt.time = datetime.time
+        mock_dt.timedelta = datetime.timedelta
+
+        from cloaca.piper.main import post_migration_traffic
+
+        await post_migration_traffic.coro()
+
+
+class TestPostMigrationTraffic:
+    @pytest.fixture
+    def mock_channel(self):
+        ch = AsyncMock()
+        ch.send = AsyncMock()
+        return ch
+
+    @pytest.mark.asyncio
+    async def test_posts_when_data_available(self, mock_channel):
+        now = datetime.datetime(2026, 4, 12, 6, 0, tzinfo=EASTERN)
+        traffic = make_traffic()
+        await _run_traffic(mock_channel, now=now, traffic=traffic)
+        mock_channel.send.assert_called_once_with("TRAFFIC_MSG", view=None)
+
+    @pytest.mark.asyncio
+    async def test_skips_when_no_data(self, mock_channel):
+        now = datetime.datetime(2026, 4, 12, 6, 0, tzinfo=EASTERN)
+        await _run_traffic(mock_channel, now=now, traffic=None)
+        mock_channel.send.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_uses_yesterday_as_night_date(self, mock_channel):
+        """The traffic API date should be yesterday (the night that started)."""
+        now = datetime.datetime(2026, 4, 12, 6, 0, tzinfo=EASTERN)
+        traffic = make_traffic()
+
+        mock_fetch = AsyncMock(return_value=traffic)
+        mock_bot = MagicMock()
+        mock_bot.get_channel = MagicMock(return_value=mock_channel)
+
+        with (
+            patch(f"{MODULE}.bot", mock_bot),
+            patch(f"{MODULE}.datetime") as mock_dt,
+            patch(f"{MODULE}.fetch_migration_traffic", mock_fetch),
+            patch(
+                f"{MODULE}.format_migration_traffic_message",
+                MagicMock(return_value="TRAFFIC_MSG"),
+            ),
+            patch(
+                f"{MODULE}.migration_dashboard_link_view",
+                MagicMock(return_value=None),
+            ),
+        ):
+            mock_dt.datetime.now.return_value = now
+            mock_dt.time = datetime.time
+            mock_dt.timedelta = datetime.timedelta
+
+            from cloaca.piper.main import post_migration_traffic
+
+            await post_migration_traffic.coro()
+
+        mock_fetch.assert_called_once_with(datetime.date(2026, 4, 11))
