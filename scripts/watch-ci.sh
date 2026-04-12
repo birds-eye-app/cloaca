@@ -16,7 +16,7 @@ if [ -z "$pr" ]; then
   }
 fi
 
-echo "Watching CI for PR #${pr}..."
+echo "CI #${pr}: watching..."
 
 while true; do
   # Get check status summary
@@ -28,18 +28,17 @@ while true; do
   failed=$(echo "$output" | grep -c 'fail' || true)
   pending=$(echo "$output" | grep -c 'pending' || true)
 
-  echo "PR #${pr} checks: ${passed} passed, ${failed} failed, ${pending} pending (${total} total)"
-
   if [ "$failed" -gt 0 ]; then
-    echo "CI FAILED"
+    echo "CI #${pr}: FAILED (${passed}/${total} passed, ${failed} failed)"
     echo "$output"
     exit 1
   fi
 
   if [ "$pending" -eq 0 ] && [ "$total" -gt 0 ]; then
-    echo "CI PASSED — all ${total} checks green"
+    echo "CI #${pr}: ALL GREEN (${total}/${total} passed)"
     exit 0
   fi
 
+  echo "CI #${pr}: ${passed}/${total} passed, ${pending} pending"
   sleep 30
 done
