@@ -19,6 +19,21 @@ All services run in the **Oregon** region under the "Birds Eye" project in David
 
 To find service IDs, run: `render services --confirm -o json` or check memory.
 
+## Blueprint (render.yaml)
+
+`render.yaml` defines services, databases, env var references, and the pre-deploy command (`uv run alembic upgrade head`).
+
+**Changes to `render.yaml` are NOT automatically applied.** After merging render.yaml changes, manually sync the blueprint in the Render dashboard:
+
+1. Go to the "Birds Eye" project in the Render dashboard
+2. Settings → Blueprint → Sync
+3. Review the proposed changes before applying
+
+Validate locally before pushing:
+```bash
+render blueprints validate --confirm -o text
+```
+
 ## Deploying from a branch
 
 To deploy a specific branch/commit to a service without merging to main:
@@ -60,6 +75,15 @@ curl -s https://cloaca.onrender.com/v1/health
 
 # Tail recent logs (last 5 minutes)
 render logs -r <service-id> --start "$(date -u -v-5M +%Y-%m-%dT%H:%M:%SZ)" -o text --confirm
+```
+
+## Database (Postgres)
+
+Piper's state is stored in a managed Render Postgres instance (`piper-state-db`, basic-256mb plan). Migrations are managed by Alembic and run automatically via the pre-deploy command on each deploy.
+
+To query production Postgres (get the database ID from memory or `render postgres list`):
+```bash
+render psql <postgres-id> -c "SELECT ..." -o text
 ```
 
 ## Render disk
