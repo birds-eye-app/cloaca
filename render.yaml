@@ -45,7 +45,7 @@ projects:
       autoDeployTrigger: checksPass
     databases:
     - name: piper-state-db
-      plan: starter
+      plan: basic-256mb
       region: oregon
-      databaseName: piper_state
-      user: piper
+      databaseName: piper_state_db
+      user: piper_state_db_user
