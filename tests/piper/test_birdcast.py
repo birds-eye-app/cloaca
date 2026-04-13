@@ -236,7 +236,7 @@ class TestBirdcastPostLog:
 # ---------------------------------------------------------------------------
 
 
-async def _run_forecast(mock_channel, *, now, forecast=None):
+async def _run_forecast(mock_channel, *, now, forecast=None, is_today=True):
     """Run post_birdcast_forecast.coro() with dependencies mocked."""
     mock_bot = MagicMock()
     mock_bot.get_channel = MagicMock(return_value=mock_channel)
@@ -247,6 +247,10 @@ async def _run_forecast(mock_channel, *, now, forecast=None):
         patch(
             f"{MODULE}.fetch_birdcast_forecast",
             AsyncMock(return_value=forecast),
+        ),
+        patch(
+            f"{MODULE}.is_todays_forecast",
+            MagicMock(return_value=is_today),
         ),
         patch(
             f"{MODULE}.format_forecast_message",
@@ -300,7 +304,7 @@ class TestPostBirdcastForecast:
             hour=0, minute=0, second=0, microsecond=0
         ) - datetime.timedelta(days=1)
         forecast = make_forecast(first_date=yesterday)
-        await _run_forecast(mock_channel, now=now, forecast=forecast)
+        await _run_forecast(mock_channel, now=now, forecast=forecast, is_today=False)
         mock_channel.send.assert_not_called()
 
     @pytest.mark.asyncio
