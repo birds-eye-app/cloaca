@@ -191,6 +191,61 @@ async def _remove_all_time_species(hotspot_id: str, species_code: str):
 # ---------------------------------------------------------------------------
 
 
+async def fetch_year_species_list(
+    hotspot_id: str, year: int
+) -> list[str] | None:
+    """Try to fetch species codes for a specific year via the spplist endpoint.
+
+    The eBird API's ``/v2/product/spplist/{regionCode}`` is documented as
+    all-time only.  However the eBird *website* supports a ``?yr=cur`` /
+    ``?yr=YYYY`` filter.  This function attempts to pass that parameter via
+    ``extra_query`` and validates whether the API actually honored it by
+    comparing against the all-time list.
+
+    Returns the year-filtered species codes if the filter appears to work
+    (i.e. fewer species than all-time), or ``None`` if the filter was
+    ignored or the call failed.
+    """
+    try:
+        client = get_phoebe_client()
+        all_time_codes = await client.product.species_list.list(
+            region_code=hotspot_id,
+        )
+        year_codes = await client.product.species_list.list(
+            region_code=hotspot_id,
+            extra_query={"yr": str(year)},
+        )
+
+        if len(year_codes) < len(all_time_codes):
+            logger.info(
+                "spplist yr=%d filter working for %s: %d year vs %d all-time",
+                year,
+                hotspot_id,
+                len(year_codes),
+                len(all_time_codes),
+            )
+            return year_codes
+
+        logger.info(
+            "spplist yr=%d filter not confirmed for %s: "
+            "%d year vs %d all-time (counts match — filter may be ignored)",
+            year,
+            hotspot_id,
+            len(year_codes),
+            len(all_time_codes),
+        )
+        return None
+    except Exception:
+        logger.warning(
+            "failed to probe spplist yr filter for %s/%d, "
+            "falling back to day-by-day backfill",
+            hotspot_id,
+            year,
+            exc_info=True,
+        )
+        return None
+
+
 async def fetch_observations_for_date(
     hotspot_id: str, date: datetime.date
 ) -> list[eBirdHistoricFullObservation]:
