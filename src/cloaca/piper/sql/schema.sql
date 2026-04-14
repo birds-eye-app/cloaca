@@ -45,3 +45,16 @@ CREATE TABLE birdcast_post_log (
     posted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (location, forecast_date)
 );
+
+CREATE TABLE rare_bird_alerts (
+    species_code TEXT NOT NULL,
+    region_code TEXT NOT NULL,
+    common_name TEXT NOT NULL,
+    aba_code INTEGER NOT NULL,
+    obs_date DATE NOT NULL,
+    observer_name TEXT NOT NULL,
+    sub_id TEXT NOT NULL,
+    location_name TEXT NOT NULL,
+    alerted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (species_code, region_code, obs_date)
+);

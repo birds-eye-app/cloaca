@@ -13,6 +13,8 @@ Piper runs inside the cloaca FastAPI server as an asyncio background task (not a
 - `birdcast.py` — Daily BirdCast migration forecast and nightly migration traffic report. The **forecast** fetches a 3-night forecast from the BirdCast alert API for NYC, formats a color-coded Discord message (🔵 Low, 🟡 Medium, 🔴 High), and posts to #bird-cast-updates. Polls every 15 minutes starting at 7:00 AM Eastern until the forecast updates for today, then stops retrying. Posts are deduplicated via the `birdcast_post_log` table. The **migration traffic report** fetches last night's live migration data from the BirdCast dashboard API (`livemigration` endpoint for Kings County / US-NY-047), and posts a summary (total birds crossed, peak traffic with compass direction) to the same channel at 6:00 AM Eastern daily.
 - `cli.py` — Standalone CLI for testing queries without Discord: `uv run python -m cloaca.piper.cli "what warblers are in prospect park?"`
 - `year_lifers.py` — Year lifer and all-time park lifer tracking for multiple hotspots. Polls the eBird historic observations API every 15 minutes (hourly at night) to detect new species. Observations are fetched once per hotspot and checked against both the year list and all-time list. Stores state in Postgres (`DATABASE_URL`). On first run, backfills the current year day-by-day from the historic API, and backfills all-time species via the `product/spplist` endpoint (single API call per hotspot). Posts Discord notifications per hotspot channel — celebratory 🎉🥳 for all-time lifers, bird emojis for year lifers. If a species is both a year lifer and an all-time lifer, only the all-time notification is posted. Hotspots are configured via the `WATCHED_HOTSPOTS` list of `Hotspot` dataclasses. Reuses `eBirdHistoricFullObservation` from `scripts/fetch_yearly_hotspot_data.py` and `get_phoebe_client()` from `api/shared.py`.
+- `rare_bird_alert.py` — Automated rare bird alert for NYC. Polls the eBird notable observations endpoint for all 5 NYC counties (Bronx, Brooklyn, Manhattan, Queens, Staten Island) every 15 minutes. Cross-references observations against a static ABA code lookup table (`data/aba_codes.csv`) and only alerts on species with ABA Code >= 3 (Rare, Casual, Accidental). Deduplicates via the `rare_bird_alerts` Postgres table — same species + region won't re-alert within 7 days. Posts to a dedicated Discord channel with ABA code label and emoji severity (🔔 Rare, ❗ Casual, 🚨 Accidental). Can be tested standalone: `uv run python -m cloaca.piper.rare_bird_alert`.
+- `data/aba_codes.csv` — Static mapping of eBird species codes to ABA rarity codes (Code 3–6 only). Update this file when the ABA publishes checklist revisions. Download the latest from https://www.aba.org/aba-checklist/.
 - `db_pool.py` — SQLAlchemy async engine management for the Postgres connection pool. Provides `get_engine()` and `close_engine()`.
 - `dry_run.py` — Local dev mode. Runs the full lifer-check loop (backfill + poll + provisional review) against a local Postgres, printing Discord messages to stdout instead of posting them. Run with `uv run python -m cloaca.piper.dry_run`.
 - `sql/schema.sql` — Postgres table definitions (source of truth for sqlc codegen).
@@ -56,6 +58,7 @@ To add a new hotspot, append a `Hotspot` entry to the list.
 - `backfill_status` — tracks backfill completion per hotspot. PK: `(hotspot_id, year)`. Uses `year=0` as sentinel for all-time backfills.
 - `pending_provisional_lifers` — provisional observations awaiting eBird review. PK: `(hotspot_id, species_code, lifer_type)`.
 - `birdcast_post_log` — tracks which forecast dates have been posted per location, to prevent duplicate posts. PK: `(location, forecast_date)`.
+- `rare_bird_alerts` — deduplication for rare bird alerts. Tracks which species+region combos have been alerted recently. PK: `(species_code, region_code, obs_date)`. A 7-day lookback window prevents re-alerting on the same species.
 
 **Changing the schema**: Edit `sql/schema.sql` and `sql/queries.sql`, run `sqlc generate`, fix the import in `db/queries.py` (`from db import models` → `from cloaca.piper.db import models`), and create a new Alembic migration.
 
@@ -74,8 +77,9 @@ To add a new hotspot, append a `Hotspot` entry to the list.
 | BirdCast forecast | Every 15 min, 7 AM–noon Eastern (stops after posting) | #bird-cast-updates | `birdcast.py` |
 | Migration traffic report | Daily at 6:00 AM Eastern | #bird-cast-updates | `birdcast.py` |
 | Lifer check (year + all-time) | Every 15 min (hourly at night) | Per hotspot (see `WATCHED_HOTSPOTS`) | `year_lifers.py` |
+| Rare bird alert (NYC) | Every 15 min | `RARE_BIRD_ALERT_CHANNEL_ID` | `rare_bird_alert.py` |
 
-Both are started in `on_ready()` via `discord.ext.tasks.loop`.
+All are started in `on_ready()` via `discord.ext.tasks.loop`.
 
 ## Environment variables
 
@@ -154,6 +158,9 @@ TEST_DATABASE_URL=postgresql://piper:piper@localhost:5432/piper_state uv run pyt
 
 - `PIPER_BOT_UPDATES_CHANNEL_ID` in `main.py` — Discord channel where Piper posts "I'm up!" on startup (#piper-bot-updates)
 - `BIRDCAST_CHANNEL_ID` in `birdcast.py` — Discord channel for daily migration forecasts (#bird-cast-updates)
+- `RARE_BIRD_ALERT_CHANNEL_ID` in `main.py` — Discord channel for ABA Code 3+ rare bird alerts
+- `NYC_COUNTIES` in `rare_bird_alert.py` — List of NYC county eBird region codes to poll
+- `MIN_ABA_CODE` in `rare_bird_alert.py` — Minimum ABA code to trigger alerts (default: 3)
 - `WATCHED_HOTSPOTS` in `year_lifers.py` — List of `Hotspot` dataclasses (id, name, channel_id) for year lifer tracking
 - `CACHE_MAX_SIZE` in `main.py` — Max conversation cache entries (50)
 - `_DUCK_IDLE_SECONDS` in `bird_query.py` — DuckDB connection idle timeout (5 min)

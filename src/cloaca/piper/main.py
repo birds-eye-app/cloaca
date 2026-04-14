@@ -20,6 +20,11 @@ from cloaca.piper.birdcast import (
     mark_forecast_posted,
     migration_dashboard_link_view,
 )
+from cloaca.piper.rare_bird_alert import (
+    check_for_rare_birds,
+    format_rare_bird_message,
+    rare_bird_link_view,
+)
 from cloaca.piper.year_lifers import (
     WATCHED_HOTSPOTS,
     all_time_list_link_view,
@@ -101,6 +106,7 @@ async def build_prior_context(ref_msg: discord.Message) -> str:
 
 
 PIPER_BOT_UPDATES_CHANNEL_ID = 1492206410711433397
+RARE_BIRD_ALERT_CHANNEL_ID = 1492206410711433397  # TODO: set to dedicated channel
 
 
 _EASTERN = ZoneInfo("America/New_York")
@@ -328,6 +334,31 @@ async def post_migration_traffic():
     logger.info("posted migration traffic for %s", yesterday)
 
 
+@tasks.loop(minutes=15)
+async def check_rare_bird_alerts():
+    """Poll NYC counties for ABA Code 3+ rare bird sightings."""
+    try:
+        sightings = await check_for_rare_birds()
+    except Exception:
+        logger.exception("failed to check for rare birds")
+        return
+
+    if not sightings:
+        logger.info("no new rare bird alerts for NYC")
+        return
+
+    channel = bot.get_channel(RARE_BIRD_ALERT_CHANNEL_ID)
+    if channel is None:
+        logger.warning(
+            "could not find rare bird alert channel %d", RARE_BIRD_ALERT_CHANNEL_ID
+        )
+        return
+
+    message = format_rare_bird_message(sightings)
+    await channel.send(message, view=rare_bird_link_view(sightings))
+    logger.info("posted %d rare bird alert(s) for NYC", len(sightings))
+
+
 @bot.event
 async def on_ready():
     logger.info("online as %s", bot.user)
@@ -342,6 +373,8 @@ async def on_ready():
         post_birdcast_forecast.start()
     if not post_migration_traffic.is_running():
         post_migration_traffic.start()
+    if not check_rare_bird_alerts.is_running():
+        check_rare_bird_alerts.start()
     if not check_year_lifers.is_running():
         for hotspot in WATCHED_HOTSPOTS:
             try:

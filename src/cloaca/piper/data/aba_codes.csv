@@ -1,0 +1,139 @@
+species_code,common_name,aba_code
+gargan,Garganey,4
+eurwig,Eurasian Wigeon,3
+tufduc,Tufted Duck,3
+kineid,King Eider,3
+harduc,Harlequin Duck,3
+bargol,Barrow's Goldeneye,3
+smew,Smew,4
+comeid,Common Eider,3
+bargoo,Barnacle Goose,3
+corcra,Corn Crake,5
+pacloo,Pacific Loon,3
+yebloo,Yellow-billed Loon,4
+wesgre,Western Grebe,3
+eargre,Eared Grebe,3
+whwdov,White-winged Dove,3
+cogdov,Common Ground Dove,3
+smbani,Smooth-billed Ani,4
+grbani,Groove-billed Ani,4
+swtkit,Swallow-tailed Kite,3
+swahaw,Swainson's Hawk,3
+gyrfal,Gyrfalcon,3
+burowl,Burrowing Owl,3
+nswowl,Northern Saw-whet Owl,3
+lewwoo,Lewis's Woodpecker,3
+bkbwoo,Black-backed Woodpecker,3
+aplfal,Aplomado Falcon,4
+eurkes,Eurasian Kestrel,5
+comswi,Common Swift,5
+saypho,Say's Phoebe,3
+verfly,Vermilion Flycatcher,3
+astfly,Ash-throated Flycatcher,4
+caskin,Cassin's Kingbird,4
+trokin,Tropical Kingbird,4
+weskin,Western Kingbird,3
+sctfly,Scissor-tailed Flycatcher,3
+fotfly,Fork-tailed Flycatcher,4
+grykin,Gray Kingbird,3
+logshr,Loggerhead Shrike,3
+belvir,Bell's Vireo,3
+norwhe,Northern Wheatear,3
+towsol,Townsend's Solitaire,3
+varthr,Varied Thrush,3
+bohwax,Bohemian Waxwing,3
+evegro,Evening Grosbeak,3
+redcro,Red Crossbill,3
+whwcro,White-winged Crossbill,3
+brambl,Brambling,4
+comcha,Common Chaffinch,5
+grywag,Gray Wagtail,5
+whiwag,White Wagtail,4
+smilon,Smith's Longspur,3
+larbun,Lark Bunting,3
+clcspa,Clay-colored Sparrow,3
+larspa,Lark Sparrow,3
+harspa,Harris's Sparrow,3
+gnttow,Green-tailed Towhee,3
+spotow,Spotted Towhee,3
+bkhgro,Black-headed Grosbeak,3
+lazbun,Lazuli Bunting,3
+paibun,Painted Bunting,3
+dickci,Dickcissel,3
+sumtan,Summer Tanager,3
+westan,Western Tanager,3
+bulori,Bullock's Oriole,3
+whfibi,White-faced Ibis,3
+ycnher,Yellow-crowned Night Heron,3
+kirwar,Kirtland's Warbler,3
+prowar,Prothonotary Warbler,3
+swawar,Swainson's Warbler,3
+cerwar,Cerulean Warbler,3
+conwar,Connecticut Warbler,3
+mouwar,Mourning Warbler,3
+towwar,Townsend's Warbler,4
+macwar,MacGillivray's Warbler,4
+btywar,Black-throated Gray Warbler,4
+virwar,Virginia's Warbler,4
+yebcha,Yellow-breasted Chat,3
+gowwar,Golden-winged Warbler,3
+cavswa,Cave Swallow,3
+ameavo,American Avocet,3
+wilplo,Wilson's Plover,3
+amgplo,American Golden-Plover,3
+baisan,Baird's Sandpiper,3
+stisan,Stilt Sandpiper,3
+lobdow,Long-billed Dowitcher,3
+hudgod,Hudsonian Godwit,3
+margod,Marbled Godwit,3
+ruff,Ruff,4
+cursan,Curlew Sandpiper,4
+batgod,Bar-tailed Godwit,4
+bktgod,Black-tailed Godwit,4
+woosan,Wood Sandpiper,4
+comgre,Common Greenshank,4
+whwter,White-winged Tern,4
+litgul,Little Gull,3
+rosgul,Ross's Gull,4
+ivogul,Ivory Gull,4
+sabgul,Sabine's Gull,3
+fragul,Franklin's Gull,3
+lbbgul,Lesser Black-backed Gull,3
+glagul,Glaucous Gull,3
+blkski,Black Skimmer,3
+sooter1,Sooty Tern,4
+briter1,Bridled Tern,4
+arcter,Arctic Tern,3
+roster,Roseate Tern,3
+brnnod,Brown Noddy,4
+blknod,Black Noddy,5
+whiter,White Tern,5
+bkcpet,Black-capped Petrel,3
+corshe1,Cory's Shearwater,3
+greshe,Great Shearwater,3
+sooshe,Sooty Shearwater,3
+manshe,Manx Shearwater,3
+wispet,Wilson's Storm-Petrel,3
+sopsku1,South Polar Skua,4
+gresku1,Great Skua,4
+norgan,Northern Gannet,3
+brnpel,Brown Pelican,3
+magfri,Magnificent Frigatebird,3
+refboo,Red-footed Booby,4
+brnboo,Brown Booby,4
+masboo,Masked Booby,4
+renpha,Red-necked Phalarope,3
+redpha1,Red Phalarope,3
+sancra,Sandhill Crane,3
+whocra,Whooping Crane,4
+rufhum,Rufous Hummingbird,3
+calhum,Calliope Hummingbird,4
+bkchum,Black-chinned Hummingbird,3
+lecspa,LeConte's Sparrow,3
+labduc,Labrador Duck,6
+carpar,Carolina Parakeet,6
+paspig,Passenger Pigeon,6
+bacwar,Bachman's Warbler,6
+ivbwoo,Ivory-billed Woodpecker,6
+eskcur,Eskimo Curlew,6
+greauk,Great Auk,6

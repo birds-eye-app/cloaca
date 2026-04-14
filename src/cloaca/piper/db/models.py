@@ -47,3 +47,15 @@ class PendingProvisionalLifer(pydantic.BaseModel):
     lifer_type: str
     year: Optional[int]
     created_at: datetime.datetime
+
+
+class RareBirdAlert(pydantic.BaseModel):
+    species_code: str
+    region_code: str
+    common_name: str
+    aba_code: int
+    obs_date: datetime.date
+    observer_name: str
+    sub_id: str
+    location_name: str
+    alerted_at: datetime.datetime

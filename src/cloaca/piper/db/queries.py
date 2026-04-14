@@ -51,11 +51,38 @@ ON CONFLICT DO NOTHING
 """
 
 
+GET_RECENT_RARE_BIRD_ALERT = """-- name: get_recent_rare_bird_alert \\:one
+SELECT 1 FROM rare_bird_alerts
+WHERE species_code = :p1 AND region_code = :p2
+  AND alerted_at > CURRENT_TIMESTAMP - INTERVAL '7 days'
+"""
+
+
 INSERT_BIRDCAST_POST = """-- name: insert_birdcast_post \\:exec
 INSERT INTO birdcast_post_log (location, forecast_date)
 VALUES (:p1, :p2)
 ON CONFLICT DO NOTHING
 """
+
+
+INSERT_RARE_BIRD_ALERT = """-- name: insert_rare_bird_alert \\:exec
+INSERT INTO rare_bird_alerts
+    (species_code, region_code, common_name, aba_code, obs_date,
+     observer_name, sub_id, location_name)
+VALUES (:p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8)
+ON CONFLICT DO NOTHING
+"""
+
+
+class InsertRareBirdAlertParams(pydantic.BaseModel):
+    species_code: str
+    region_code: str
+    common_name: str
+    aba_code: int
+    obs_date: datetime.date
+    observer_name: str
+    sub_id: str
+    location_name: str
 
 
 INSERT_PENDING_PROVISIONAL = """-- name: insert_pending_provisional \\:exec
@@ -301,4 +328,34 @@ class AsyncQuerier:
         await self._conn.execute(
             sqlalchemy.text(REMOVE_YEAR_SPECIES),
             {"p1": hotspot_id, "p2": year, "p3": species_code},
+        )
+
+    async def get_recent_rare_bird_alert(
+        self, *, species_code: str, region_code: str
+    ) -> Optional[int]:
+        row = (
+            await self._conn.execute(
+                sqlalchemy.text(GET_RECENT_RARE_BIRD_ALERT),
+                {"p1": species_code, "p2": region_code},
+            )
+        ).first()
+        if row is None:
+            return None
+        return row[0]
+
+    async def insert_rare_bird_alert(
+        self, arg: InsertRareBirdAlertParams
+    ) -> None:
+        await self._conn.execute(
+            sqlalchemy.text(INSERT_RARE_BIRD_ALERT),
+            {
+                "p1": arg.species_code,
+                "p2": arg.region_code,
+                "p3": arg.common_name,
+                "p4": arg.aba_code,
+                "p5": arg.obs_date,
+                "p6": arg.observer_name,
+                "p7": arg.sub_id,
+                "p8": arg.location_name,
+            },
         )

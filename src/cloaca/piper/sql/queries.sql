@@ -68,3 +68,15 @@ WHERE location = $1 AND forecast_date = $2;
 INSERT INTO birdcast_post_log (location, forecast_date)
 VALUES ($1, $2)
 ON CONFLICT DO NOTHING;
+
+-- name: GetRecentRareBirdAlert :one
+SELECT 1 FROM rare_bird_alerts
+WHERE species_code = $1 AND region_code = $2
+  AND alerted_at > CURRENT_TIMESTAMP - INTERVAL '7 days';
+
+-- name: InsertRareBirdAlert :exec
+INSERT INTO rare_bird_alerts
+    (species_code, region_code, common_name, aba_code, obs_date,
+     observer_name, sub_id, location_name)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+ON CONFLICT DO NOTHING;

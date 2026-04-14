@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 _CHANNEL_NAMES: dict[int, str] = {
     h.channel_id: h.name.lower().replace(" ", "-") for h in WATCHED_HOTSPOTS
 }
+# Add the rare bird alert channel
+from cloaca.piper.main import RARE_BIRD_ALERT_CHANNEL_ID
+
+_CHANNEL_NAMES[RARE_BIRD_ALERT_CHANNEL_ID] = "rare-bird-alerts"
 
 
 def _make_mock_channel(channel_id: int) -> AsyncMock:
@@ -57,6 +61,11 @@ async def main():
         action="store_true",
         help="Run backfill (makes ~100+ eBird API calls per hotspot)",
     )
+    parser.add_argument(
+        "--rare-birds",
+        action="store_true",
+        help="Run rare bird alert check for NYC (ABA Code 3+)",
+    )
     args = parser.parse_args()
 
     from cloaca.piper import main as piper_main
@@ -78,8 +87,12 @@ async def main():
                     await backfill_year_species(hotspot.id)
                     await backfill_all_time_species(hotspot.id)
 
-            # Run the real check_year_lifers loop once
-            await piper_main.check_year_lifers.coro()
+            if args.rare_birds:
+                # Run the rare bird alert check once
+                await piper_main.check_rare_bird_alerts.coro()
+            else:
+                # Run the real check_year_lifers loop once
+                await piper_main.check_year_lifers.coro()
     finally:
         await close_engine()
 
