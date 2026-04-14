@@ -20,6 +20,7 @@ from cloaca.piper.birdcast import (
     mark_forecast_posted,
     migration_dashboard_link_view,
 )
+from cloaca.piper.year_list_sync import format_sync_message, run_sync_checks
 from cloaca.piper.year_lifers import (
     WATCHED_HOTSPOTS,
     all_time_list_link_view,
@@ -328,6 +329,18 @@ async def post_migration_traffic():
     logger.info("posted migration traffic for %s", yesterday)
 
 
+@tasks.loop(time=datetime.time(hour=18, minute=0, tzinfo=_EASTERN))
+async def check_year_list_sync():
+    now = datetime.datetime.now(_EASTERN)
+    results = await run_sync_checks(now.year)
+    message = format_sync_message(results)
+    channel = bot.get_channel(PIPER_BOT_UPDATES_CHANNEL_ID)
+    if channel is None:
+        logger.warning("could not find bot updates channel %d", PIPER_BOT_UPDATES_CHANNEL_ID)
+        return
+    await channel.send(message)
+
+
 @bot.event
 async def on_ready():
     logger.info("online as %s", bot.user)
@@ -342,6 +355,8 @@ async def on_ready():
         post_birdcast_forecast.start()
     if not post_migration_traffic.is_running():
         post_migration_traffic.start()
+    if not check_year_list_sync.is_running():
+        check_year_list_sync.start()
     if not check_year_lifers.is_running():
         for hotspot in WATCHED_HOTSPOTS:
             try:
