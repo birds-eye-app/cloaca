@@ -63,7 +63,7 @@ def parse_csv_data_frame(data_frame: pd.DataFrame) -> list[Observation]:
         raise ValueError("The CSV headers do not match the expected headers.")
 
     # Sort the dataframe by Date and Time columns
-    data_frame.sort_values(by=["Date", "Time"], inplace=True)
+    data_frame = data_frame.sort_values(by=["Date", "Time"])
 
     # Convert each row into an Observation data class
     observations = [
