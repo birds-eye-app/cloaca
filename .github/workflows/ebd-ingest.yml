@@ -26,8 +26,12 @@ on:
 
 jobs:
   ingest:
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
+    # Self-hosted Mac runner labelled 'ebd'. No GHA 6h cap, faster CPU, and
+    # ~3× faster network to eBird than ubuntu-latest. Matched only by runners
+    # carrying both 'self-hosted' and 'ebd' labels so the existing Tests
+    # workflow stays on GHA-hosted runners.
+    runs-on: [self-hosted, ebd]
+    timeout-minutes: 720
 
     env:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
