@@ -1,0 +1,65 @@
+name: EBD bandwidth probe
+
+# Manually dispatched. 3 GHA runners pull non-overlapping byte ranges of the
+# eBird tar in parallel. If per-shard throughput stays close to the single-
+# runner baseline (~8.5 MB/s observed from a standard ubuntu-latest runner),
+# eBird's rate cap is per-connection and parallel downloaders give linear
+# scaling. If per-shard throughput drops by ~1/N, the cap is on the Azure
+# egress range and splitting buys nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: EBD .tar URL
+        required: true
+        default: REDACTED_EBD_URL
+      bytes_per_shard:
+        description: Bytes to fetch per shard (decimal; default 1 GiB)
+        required: true
+        default: "1073741824"
+      shard_offset_gb:
+        description: Gap (GB) between shard start offsets, to ensure distinct content windows
+        required: true
+        default: "75"
+
+jobs:
+  probe:
+    name: shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+
+    steps:
+      - name: Runner IP
+        run: |
+          IP=$(curl -s --max-time 10 ipinfo.io/ip || echo "unknown")
+          echo "Shard ${{ matrix.shard }} runner egress IP: $IP"
+          echo "- shard ${{ matrix.shard }} IP: \`$IP\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Range download timing
+        env:
+          URL: ${{ inputs.url }}
+          BYTES: ${{ inputs.bytes_per_shard }}
+          SHARD_OFFSET_GB: ${{ inputs.shard_offset_gb }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          OFFSET=$(( SHARD * SHARD_OFFSET_GB * 1000000000 ))
+          END=$(( OFFSET + BYTES - 1 ))
+          echo "Shard $SHARD downloading bytes $OFFSET-$END from $URL"
+          curl -s --range "$OFFSET-$END" "$URL" -o /dev/null \
+            -w "shard=$SHARD bytes=%{size_download} time_s=%{time_total} speed_Bps=%{speed_download}\n" \
+            | tee /tmp/shard.txt
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Shard $SHARD result**" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/shard.txt >> "$GITHUB_STEP_SUMMARY"
+          # Also report Mbps for human reading
+          BPS=$(awk -F= '{for(i=1;i<=NF;i++) if($i~"speed_Bps") print $(i+1)}' /tmp/shard.txt | awk '{print $1}')
+          MBPS=$(awk -v b="$BPS" 'BEGIN{printf "%.2f", b/1000000}')
+          echo "(${MBPS} MB/s)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
