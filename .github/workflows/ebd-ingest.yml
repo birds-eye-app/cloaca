@@ -1,0 +1,122 @@
+name: EBD streaming ingest
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: EBD .tar URL
+        required: true
+        default: https://download.ebird.org/ebd/prepackaged/ebd_relMar-2026.tar
+      max_bytes:
+        description: Stop after N decompressed bytes (0 = full run; suffixes K/M/G allowed)
+        required: true
+        default: "1G"
+      chunk_bytes:
+        description: Parquet chunk rotation size
+        required: true
+        default: "500M"
+      block_bytes:
+        description: CSV reader block size
+        required: false
+        default: "64M"
+      prefix_suffix:
+        description: Suffix for R2 release prefix (run id is also appended)
+        required: true
+        default: "-gha-test"
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Disk space before
+        run: df -h /
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+        with:
+          version: latest
+
+      - name: Run streaming ingest
+        timeout-minutes: 340
+        env:
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
+          INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
+          INPUT_BLOCK_BYTES: ${{ inputs.block_bytes }}
+          INPUT_PREFIX_SUFFIX: ${{ inputs.prefix_suffix }}
+          GH_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -o pipefail
+          uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
+            --url "$INPUT_URL" \
+            --max-bytes "$INPUT_MAX_BYTES" \
+            --chunk-bytes "$INPUT_CHUNK_BYTES" \
+            --block-bytes "$INPUT_BLOCK_BYTES" \
+            --prefix-suffix="${INPUT_PREFIX_SUFFIX}-${GH_RUN_ID}" \
+            --nyc-db /tmp/ebd_nyc_gha.db \
+            2>&1 | tee /tmp/ingest.log
+
+      - name: Disk space after
+        if: always()
+        run: df -h /
+
+      - name: NYC DB stats
+        if: always()
+        run: |
+          if [ -f /tmp/ebd_nyc_gha.db ]; then
+            ls -lh /tmp/ebd_nyc_gha.db
+          else
+            echo "NYC DB not produced"
+          fi
+
+      - name: Run summary
+        if: always()
+        env:
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
+          INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
+          INPUT_PREFIX_SUFFIX: ${{ inputs.prefix_suffix }}
+          GH_RUN_ID: ${{ github.run_id }}
+        run: |
+          release=$(basename "$INPUT_URL" .tar)
+          {
+            echo "## EBD ingest run"
+            echo ""
+            echo "- URL: \`$INPUT_URL\`"
+            echo "- max_bytes: \`$INPUT_MAX_BYTES\`"
+            echo "- chunk_bytes: \`$INPUT_CHUNK_BYTES\`"
+            echo "- R2 prefix: \`release=${release}${INPUT_PREFIX_SUFFIX}-${GH_RUN_ID}\`"
+            echo ""
+            echo "### Final pipeline stats"
+            echo '```'
+            tail -n 20 /tmp/ingest.log 2>/dev/null || echo "(no log captured)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload NYC DB
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ebd-nyc-db-${{ github.run_id }}
+          path: /tmp/ebd_nyc_gha.db
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingest-log-${{ github.run_id }}
+          path: /tmp/ingest.log
+          if-no-files-found: ignore
+          retention-days: 7
