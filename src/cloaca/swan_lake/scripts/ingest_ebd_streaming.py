@@ -455,8 +455,11 @@ def main() -> int:
     stop_event = threading.Event()
 
     def _sig(_signum, _frame):
-        with stats.lock:
-            stats.status = "stopping (signal)"
+        # Signal handlers run on the main thread between bytecodes; if the
+        # main thread is inside `with stats.lock:` when this fires, taking the
+        # non-reentrant lock here would deadlock. Status writes don't need
+        # consistency with anything else for telemetry, so just assign.
+        stats.status = "stopping (signal)"
         stop_event.set()
 
     signal.signal(signal.SIGINT, _sig)

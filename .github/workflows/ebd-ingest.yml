@@ -48,14 +48,21 @@ jobs:
 
       - name: Run streaming ingest
         timeout-minutes: 340
+        env:
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
+          INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
+          INPUT_BLOCK_BYTES: ${{ inputs.block_bytes }}
+          INPUT_PREFIX_SUFFIX: ${{ inputs.prefix_suffix }}
+          GH_RUN_ID: ${{ github.run_id }}
         run: |
           set -o pipefail
           uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
-            --url "${{ inputs.url }}" \
-            --max-bytes "${{ inputs.max_bytes }}" \
-            --chunk-bytes "${{ inputs.chunk_bytes }}" \
-            --block-bytes "${{ inputs.block_bytes }}" \
-            --prefix-suffix="${{ inputs.prefix_suffix }}-${{ github.run_id }}" \
+            --url "$INPUT_URL" \
+            --max-bytes "$INPUT_MAX_BYTES" \
+            --chunk-bytes "$INPUT_CHUNK_BYTES" \
+            --block-bytes "$INPUT_BLOCK_BYTES" \
+            --prefix-suffix="${INPUT_PREFIX_SUFFIX}-${GH_RUN_ID}" \
             --nyc-db /tmp/ebd_nyc_gha.db \
             2>&1 | tee /tmp/ingest.log
 
@@ -74,14 +81,21 @@ jobs:
 
       - name: Run summary
         if: always()
+        env:
+          INPUT_URL: ${{ inputs.url }}
+          INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
+          INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
+          INPUT_PREFIX_SUFFIX: ${{ inputs.prefix_suffix }}
+          GH_RUN_ID: ${{ github.run_id }}
         run: |
+          release=$(basename "$INPUT_URL" .tar)
           {
             echo "## EBD ingest run"
             echo ""
-            echo "- URL: \`${{ inputs.url }}\`"
-            echo "- max_bytes: \`${{ inputs.max_bytes }}\`"
-            echo "- chunk_bytes: \`${{ inputs.chunk_bytes }}\`"
-            echo "- R2 prefix: \`release=$(basename ${{ inputs.url }} .tar)${{ inputs.prefix_suffix }}-${{ github.run_id }}\`"
+            echo "- URL: \`$INPUT_URL\`"
+            echo "- max_bytes: \`$INPUT_MAX_BYTES\`"
+            echo "- chunk_bytes: \`$INPUT_CHUNK_BYTES\`"
+            echo "- R2 prefix: \`release=${release}${INPUT_PREFIX_SUFFIX}-${GH_RUN_ID}\`"
             echo ""
             echo "### Final pipeline stats"
             echo '```'
