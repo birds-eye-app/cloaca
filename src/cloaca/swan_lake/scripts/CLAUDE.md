@@ -171,20 +171,26 @@ A 300 MB smoke test against `ebd_relMar-2026` confirmed:
 
 ## Running it
 
+The EBD download URL is sensitive and is **never** committed to the repo. It
+lives in `EBD_TAR_URL` in your local `.env` and as the `EBD_TAR_URL` GitHub
+Actions secret. The examples below show `"$EBD_TAR_URL"` instead of the
+literal URL — make sure your shell has it loaded (`set -a; source .env;
+set +a`) before running.
+
 ```bash
 # Smoke test (~300 MB decompressed, ~15 seconds, 2 chunks to R2)
 uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
-  --url "REDACTED_EBD_URL" \
+  --url "$EBD_TAR_URL" \
   --max-bytes 300M --chunk-bytes 80M --block-bytes 16M \
   --prefix-suffix=-smoketest
 
 # Skip R2 entirely and write Parquet to a local workdir
 uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
-  --url "..." --dry-run-r2 --workdir /tmp/ebd-out --max-bytes 50M
+  --url "$EBD_TAR_URL" --dry-run-r2 --workdir /tmp/ebd-out --max-bytes 50M
 
 # Full run (no caps) — expect ~2.8 hours wall time end-to-end
 uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
-  --url "REDACTED_EBD_URL"
+  --url "$EBD_TAR_URL"
 ```
 
 `uv run` reads the PEP 723 inline metadata block at the top of the script

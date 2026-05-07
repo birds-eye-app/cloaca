@@ -3,10 +3,10 @@ name: EBD streaming ingest
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: EBD .tar URL
-        required: true
-        default: REDACTED_EBD_URL
+      url_override:
+        description: "Override the URL (default: secrets.EBD_TAR_URL)"
+        required: false
+        default: ""
       max_bytes:
         description: Stop after N decompressed bytes (0 = full run; suffixes K/M/G allowed)
         required: true
@@ -49,7 +49,7 @@ jobs:
       - name: Run streaming ingest
         timeout-minutes: 340
         env:
-          INPUT_URL: ${{ inputs.url }}
+          INPUT_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
           INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
           INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
           INPUT_BLOCK_BYTES: ${{ inputs.block_bytes }}
@@ -82,7 +82,7 @@ jobs:
       - name: Run summary
         if: always()
         env:
-          INPUT_URL: ${{ inputs.url }}
+          INPUT_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
           INPUT_MAX_BYTES: ${{ inputs.max_bytes }}
           INPUT_CHUNK_BYTES: ${{ inputs.chunk_bytes }}
           INPUT_PREFIX_SUFFIX: ${{ inputs.prefix_suffix }}

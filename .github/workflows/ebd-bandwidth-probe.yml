@@ -10,10 +10,10 @@ name: EBD bandwidth probe
 on:
   workflow_dispatch:
     inputs:
-      url:
-        description: EBD .tar URL
-        required: true
-        default: REDACTED_EBD_URL
+      url_override:
+        description: "Override the URL (default: secrets.EBD_TAR_URL)"
+        required: false
+        default: ""
       bytes_per_shard:
         description: Bytes to fetch per shard (decimal; default 1 GiB)
         required: true
@@ -43,14 +43,14 @@ jobs:
 
       - name: Range download timing
         env:
-          URL: ${{ inputs.url }}
+          URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
           BYTES: ${{ inputs.bytes_per_shard }}
           SHARD_OFFSET_GB: ${{ inputs.shard_offset_gb }}
           SHARD: ${{ matrix.shard }}
         run: |
           OFFSET=$(( SHARD * SHARD_OFFSET_GB * 1000000000 ))
           END=$(( OFFSET + BYTES - 1 ))
-          echo "Shard $SHARD downloading bytes $OFFSET-$END from $URL"
+          echo "Shard $SHARD downloading bytes $OFFSET-$END (URL not echoed)"
           curl -s --range "$OFFSET-$END" "$URL" -o /dev/null \
             -w "shard=$SHARD bytes=%{size_download} time_s=%{time_total} speed_Bps=%{speed_download}\n" \
             | tee /tmp/shard.txt
