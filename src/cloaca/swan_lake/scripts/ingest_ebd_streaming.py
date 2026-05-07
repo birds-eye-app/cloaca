@@ -10,9 +10,18 @@
 # ///
 """Stream-ingest the eBird EBD tar from a URL.
 
-One pass: HTTP stream -> tar -> gunzip -> TSV parse -> fan out to two sinks:
-  1. Rolling Parquet chunks uploaded to Cloudflare R2 (full dataset).
-  2. NYC-county-filtered rows appended into a local DuckDB (Render-bound subset).
+Two run shapes:
+
+* **Streaming (default)** — HTTP -> tar -> gunzip -> TSV parse -> fan out to
+  (a) rolling Parquet chunks uploaded to R2, (b) a NYC-county-filtered local
+  DuckDB. Single pass, no on-disk staging. Network drop = restart from byte 0.
+
+* **Cached (--cache-dir <path> or env EBD_CACHE_DIR)** — adds a Stage 1 that
+  pulls the raw .tar to <cache-dir>/<basename>.tar (resumable via HTTP Range)
+  and mirrors it to r2://<bucket>/raw/<basename>.tar. Stage 2 then opens the
+  local .tar and runs the same fan-out pipeline. Re-running is idempotent: a
+  complete .tar on disk skips Stage 1 download; a complete R2 raw object
+  skips Stage 1 upload. Survives network drops at byte granularity.
 
 Run with:  uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py --url ...
 """
@@ -35,6 +44,7 @@ from typing import Optional
 from urllib.request import Request, urlopen
 
 import boto3
+import boto3.s3.transfer as s3_transfer
 import duckdb
 import pyarrow as pa
 import pyarrow.compute as pc
@@ -104,6 +114,8 @@ class Stats:
     last_uploaded_key: str = ""
     invalid_rows: int = 0
     status: str = "starting"
+    # Stage 1 (--cache-dir mode) — raw .tar mirror to R2 progress.
+    stage1_r2_uploaded: int = 0
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     def snapshot(self) -> dict:
@@ -123,6 +135,7 @@ class Stats:
                 "last_uploaded_key": self.last_uploaded_key,
                 "invalid_rows": self.invalid_rows,
                 "status": self.status,
+                "stage1_r2_uploaded": self.stage1_r2_uploaded,
             }
         e = d["elapsed"] or 1e-9
         d["dl_avg_mbps"] = d["bytes_downloaded"] / 1e6 / e
@@ -292,6 +305,16 @@ def render_panel(stats: Stats, args) -> Panel:
     )
     if s["last_uploaded_key"]:
         t.add_row("Last upload", s["last_uploaded_key"])
+    if s.get("stage1_r2_uploaded"):
+        if s["total_bytes"] > 0:
+            pct = 100 * s["stage1_r2_uploaded"] / s["total_bytes"]
+            t.add_row(
+                "R2 raw mirror",
+                f"{fmt_bytes(s['stage1_r2_uploaded'])} / "
+                f"{fmt_bytes(s['total_bytes'])} ({pct:.2f}%)",
+            )
+        else:
+            t.add_row("R2 raw mirror", fmt_bytes(s["stage1_r2_uploaded"]))
 
     return Panel(t, title="[bold]EBD streaming ingest[/]", border_style="blue")
 
@@ -378,6 +401,114 @@ CREATE TABLE ebd_nyc (
 """
 
 
+# === Stage 1: cache-dir resumable download =====================================
+
+
+def stage1_download_to_cache(
+    url: str,
+    cache_path: Path,
+    s3,
+    bucket: str,
+    raw_key: str,
+    stats: Stats,
+    stop_event: threading.Event,
+) -> Path:
+    """Download `url` to `cache_path` (HTTP Range-resumable) and mirror it to
+    `r2://<bucket>/<raw_key>`. Returns `cache_path` once both are complete.
+
+    Idempotent: a `.tar` file already at full size is reused; an existing R2
+    object with matching ContentLength is left alone. A partial `.tar.partial`
+    is resumed via HTTP Range.
+    """
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    partial_path = cache_path.with_suffix(cache_path.suffix + ".partial")
+
+    # Determine total size up front; populate stats.total_bytes for the panel.
+    with urlopen(Request(url, method="HEAD"), timeout=30) as r:
+        total = int(r.headers["Content-Length"])
+    with stats.lock:
+        stats.total_bytes = total
+
+    # === A. Disk download with Range resume ===
+    if cache_path.exists() and cache_path.stat().st_size == total:
+        with stats.lock:
+            stats.bytes_downloaded = total
+            stats.status = "stage1: disk cached"
+    else:
+        local_size = partial_path.stat().st_size if partial_path.exists() else 0
+        if local_size > total:
+            partial_path.unlink()
+            local_size = 0
+        with stats.lock:
+            stats.bytes_downloaded = local_size
+            stats.status = "stage1: downloading"
+
+        if local_size < total:
+            headers = {}
+            if local_size > 0:
+                headers["Range"] = f"bytes={local_size}-"
+            req = Request(url, headers=headers)
+            with urlopen(req, timeout=300) as resp:
+                with open(partial_path, "ab") as f:
+                    while not stop_event.is_set():
+                        chunk = resp.read(1 << 20)  # 1 MiB
+                        if not chunk:
+                            break
+                        f.write(chunk)
+                        with stats.lock:
+                            stats.bytes_downloaded += len(chunk)
+
+        if stop_event.is_set():
+            return partial_path  # caller can detect this via stop_event
+
+        actual = partial_path.stat().st_size
+        if actual != total:
+            raise RuntimeError(
+                f"Disk size {actual} != expected {total} for {partial_path}"
+            )
+        partial_path.rename(cache_path)
+        with stats.lock:
+            stats.status = "stage1: disk complete"
+
+    # === B. R2 raw mirror via boto3 multipart (skip if already there) ===
+    with stats.lock:
+        stats.status = "stage1: r2 mirror"
+        stats.stage1_r2_uploaded = 0
+
+    try:
+        head = s3.head_object(Bucket=bucket, Key=raw_key)
+        if head["ContentLength"] == total:
+            with stats.lock:
+                stats.stage1_r2_uploaded = total
+                stats.status = "stage1: r2 cached"
+            return cache_path
+    except Exception:
+        pass
+
+    config = s3_transfer.TransferConfig(
+        multipart_threshold=64 * 1024 * 1024,
+        multipart_chunksize=64 * 1024 * 1024,
+        max_concurrency=4,
+        use_threads=True,
+    )
+
+    def _progress(n: int):
+        with stats.lock:
+            stats.stage1_r2_uploaded += n
+
+    s3.upload_file(
+        str(cache_path),
+        bucket,
+        raw_key,
+        Config=config,
+        Callback=_progress,
+    )
+
+    with stats.lock:
+        stats.status = "stage1: r2 mirror complete"
+    return cache_path
+
+
 # === Main =====================================================================
 
 
@@ -418,6 +549,16 @@ def main() -> int:
     )
     p.add_argument("--block-bytes", default="64M", help="CSV reader block size.")
     p.add_argument("--workdir", default=None)
+    p.add_argument(
+        "--cache-dir",
+        default=os.environ.get("EBD_CACHE_DIR", ""),
+        help=(
+            "If set, run a Stage 1 that downloads the raw .tar to "
+            "<cache-dir>/<basename>.tar (HTTP Range-resumable on retry) and "
+            "mirrors it to r2://<bucket>/raw/<basename>.tar, then runs Stage 2 "
+            "from disk. Falls back to env EBD_CACHE_DIR. Empty = streaming mode."
+        ),
+    )
     p.add_argument(
         "--dry-run-r2",
         action="store_true",
@@ -495,17 +636,45 @@ def main() -> int:
     con = duckdb.connect(str(nyc_db_path))
     con.execute(CREATE_NYC_TABLE)
 
-    try:
-        with urlopen(Request(args.url, method="HEAD"), timeout=30) as r:
-            cl = r.headers.get("Content-Length")
-            if cl:
-                with stats.lock:
-                    stats.total_bytes = int(cl)
-    except Exception as e:
-        print(f"HEAD failed (non-fatal): {e}", file=sys.stderr)
+    cached_tar_path: Optional[Path] = None
+    if args.cache_dir:
+        if args.dry_run_r2:
+            raise SystemExit(
+                "--cache-dir requires R2 (it mirrors the raw .tar there). "
+                "Drop --dry-run-r2 or unset --cache-dir."
+            )
+        cache_dir = Path(args.cache_dir).expanduser()
+        basename = Path(args.url.rsplit("/", 1)[-1]).name
+        cached_tar_path = cache_dir / basename
+        raw_key = f"raw/{basename}"
+        cached_tar_path = stage1_download_to_cache(
+            args.url,
+            cached_tar_path,
+            s3,
+            bucket,
+            raw_key,
+            stats,
+            stop_event,
+        )
+        if stop_event.is_set():
+            console.print("[yellow]Stage 1 interrupted; rerun to resume.[/]")
+            return 1
+    else:
+        try:
+            with urlopen(Request(args.url, method="HEAD"), timeout=30) as r:
+                cl = r.headers.get("Content-Length")
+                if cl:
+                    with stats.lock:
+                        stats.total_bytes = int(cl)
+        except Exception as e:
+            print(f"HEAD failed (non-fatal): {e}", file=sys.stderr)
 
     with stats.lock:
-        stats.status = "downloading"
+        # bytes_downloaded carries Stage-1 disk-download progress while in
+        # cache mode; reset it for Stage 2 so the panel's "Downloaded" line
+        # tracks how far through the local .tar we've read.
+        stats.bytes_downloaded = 0
+        stats.status = "stage2: streaming" if cached_tar_path else "downloading"
 
     chunk_writer: Optional[pq.ParquetWriter] = None
     chunk_path: Optional[Path] = None
@@ -544,7 +713,10 @@ def main() -> int:
 
     open_new_chunk()
 
-    raw = urlopen(args.url, timeout=300)
+    if cached_tar_path is not None:
+        raw = open(cached_tar_path, "rb")
+    else:
+        raw = urlopen(args.url, timeout=300)
     tracked_raw = TrackingStream(raw, stats)
     tar = tarfile.open(fileobj=tracked_raw, mode="r|")
 
