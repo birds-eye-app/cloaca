@@ -62,7 +62,33 @@ def make_s3():
 
 def head_total_bytes(url: str) -> int:
     with urlopen(Request(url, method="HEAD"), timeout=30) as r:
-        return int(r.headers["Content-Length"])
+        cl = r.headers.get("Content-Length")
+        if cl is None:
+            raise RuntimeError("HEAD response missing Content-Length header")
+        return int(cl)
+
+
+def with_retry(fn, *, attempts: int = 4, base_delay: float = 2.0, what: str = "op"):
+    """Call fn() with exponential backoff. Re-raises the final exception if all
+    attempts fail. Used for both the Range GET against the source and the
+    upload_part call against R2; both can flake on transient network errors.
+    """
+    for attempt in range(1, attempts + 1):
+        try:
+            return fn()
+        except Exception as e:
+            if attempt == attempts:
+                raise
+            delay = base_delay * (2 ** (attempt - 1))
+            # Strip URL from error string defensively — the source URL is a
+            # secret and tracebacks from urllib include it. The message is
+            # for human eyeballing in the run log; the original exception
+            # still propagates if all attempts fail.
+            print(
+                f"  {what} attempt {attempt}/{attempts} failed: "
+                f"{type(e).__name__}; retrying in {delay:.1f}s"
+            )
+            time.sleep(delay)
 
 
 def write_gha_output(pairs: dict[str, str | int | bool]):
@@ -88,11 +114,18 @@ def compute_assignments(total_bytes: int, part_size: int, total_shards: int):
     are globally sequential 1..total_parts so the multipart upload sees them
     in order regardless of which shard wrote them.
     """
+    if total_bytes <= 0:
+        raise ValueError(f"total_bytes must be positive; got {total_bytes}")
+    s3_min_part = 5 * 1024 * 1024  # 5 MiB
     full, rem = divmod(total_bytes, part_size)
     total_parts = full + (1 if rem else 0)
     if total_parts > 10000:
         raise ValueError(
             f"{total_parts} parts exceeds S3 multipart limit of 10000 — increase part-size"
+        )
+    if total_parts > 1 and part_size < s3_min_part:
+        raise ValueError(
+            f"part_size {part_size:,} is below S3's 5 MiB minimum for non-final parts"
         )
     if total_shards > total_parts:
         raise ValueError(
@@ -144,7 +177,10 @@ def init_cmd(args):
     release = basename[: -len(".tar")]
     raw_key = f"raw/{basename}"
 
-    # Skip if final object already exists at expected size
+    # Skip if final object already exists at expected size. Only swallow the
+    # 404 "object absent" path; other errors (auth / throttling / 5xx) should
+    # surface so we don't silently start a multipart upload that's destined
+    # to fail.
     try:
         head = s3.head_object(Bucket=bucket, Key=raw_key)
         if head["ContentLength"] == total_bytes:
@@ -161,8 +197,10 @@ def init_cmd(args):
                 }
             )
             return
-    except s3.exceptions.ClientError:
-        pass
+    except s3.exceptions.ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "")
+        if code not in ("404", "NoSuchKey", "NotFound"):
+            raise
 
     assignments, total_parts = compute_assignments(
         total_bytes, args.part_size, args.shards
@@ -260,7 +298,8 @@ def shard_cmd(args):
         expected_size = part_info["size"]
         state_key = _state_key(upload_id, part_num)
 
-        # Skip if already uploaded
+        # Skip if already uploaded. Narrow the swallow to NoSuchKey/404; any
+        # other ClientError (auth, throttling, 5xx) should propagate.
         try:
             existing = s3.get_object(Bucket=bucket, Key=state_key)
             data = json.loads(existing["Body"].read())
@@ -271,24 +310,31 @@ def shard_cmd(args):
                 print(f"  [{part_num:>5}] already uploaded; skipping")
                 bytes_done += expected_size
                 continue
-        except s3.exceptions.ClientError:
-            pass
+        except s3.exceptions.ClientError as e:
+            code = e.response.get("Error", {}).get("Code", "")
+            if code not in ("404", "NoSuchKey", "NotFound"):
+                raise
 
-        # Stream-download to a temp file
+        # Stream-download to a temp file (with retry on transient network errors)
         with tempfile.NamedTemporaryFile(
             prefix=f"ebd-part-{part_num:05d}-", delete=False
         ) as tmp:
             tmp_path = tmp.name
         try:
+
+            def _download_part():
+                req = Request(url, headers={"Range": f"bytes={start}-{end}"})
+                with urlopen(req, timeout=300) as resp, open(tmp_path, "wb") as out:
+                    shutil.copyfileobj(resp, out, length=8 << 20)
+                actual = os.path.getsize(tmp_path)
+                if actual != expected_size:
+                    raise RuntimeError(
+                        f"Part {part_num}: got {actual} bytes, expected {expected_size}"
+                    )
+                return actual
+
             t0 = time.monotonic()
-            req = Request(url, headers={"Range": f"bytes={start}-{end}"})
-            with urlopen(req, timeout=300) as resp, open(tmp_path, "wb") as out:
-                shutil.copyfileobj(resp, out, length=8 << 20)
-            actual_size = os.path.getsize(tmp_path)
-            if actual_size != expected_size:
-                raise RuntimeError(
-                    f"Part {part_num}: got {actual_size} bytes, expected {expected_size}"
-                )
+            actual_size = with_retry(_download_part, what=f"part {part_num} download")
             dl_secs = time.monotonic() - t0
             dl_mbps = actual_size / 1e6 / max(dl_secs, 1e-9)
             print(
@@ -296,17 +342,20 @@ def shard_cmd(args):
                 f"in {dl_secs:.1f}s ({dl_mbps:.2f} MB/s)"
             )
 
-            # Upload as a part
+            # Upload as a part (with retry on transient R2 errors)
+            def _upload_part():
+                with open(tmp_path, "rb") as f:
+                    return s3.upload_part(
+                        Bucket=bucket,
+                        Key=raw_key,
+                        UploadId=upload_id,
+                        PartNumber=part_num,
+                        Body=f,
+                        ContentLength=actual_size,
+                    )
+
             t1 = time.monotonic()
-            with open(tmp_path, "rb") as f:
-                upload_resp = s3.upload_part(
-                    Bucket=bucket,
-                    Key=raw_key,
-                    UploadId=upload_id,
-                    PartNumber=part_num,
-                    Body=f,
-                    ContentLength=actual_size,
-                )
+            upload_resp = with_retry(_upload_part, what=f"part {part_num} upload")
             up_secs = time.monotonic() - t1
             up_mbps = actual_size / 1e6 / max(up_secs, 1e-9)
             etag = upload_resp["ETag"]
