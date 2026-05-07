@@ -1,0 +1,144 @@
+name: Mirror eBird raw .tar to R2 (parallel multipart)
+
+# Manually dispatched. Three job stages:
+#   1. init   — single runner; HEAD URL, decide shard / part assignments,
+#               create R2 multipart upload, write manifest.
+#   2. shard  — N parallel runners (default 3); each downloads its byte range
+#               from eBird via HTTP Range and uploads it as parts to R2.
+#   3. complete — single runner; gathers part ETags, calls
+#                 complete_multipart_upload to assemble the final object.
+#
+# The bandwidth probe established that GHA runners get distinct Azure egress
+# IPs and that eBird's per-IP cap means parallel downloaders scale linearly
+# (~3× single-runner throughput at N=3). This workflow uses that property to
+# bring full-tar mirror time from ~7.5h to ~2.5h on a default ubuntu-latest
+# runner pool.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url_override:
+        description: "Override the URL (default: secrets.EBD_TAR_URL)"
+        required: false
+        default: ""
+      shards:
+        description: "Number of parallel download shards"
+        required: false
+        default: "3"
+      part_size:
+        description: "Multipart part size in bytes (default 5 GB; max 5 GB per S3 spec)"
+        required: false
+        default: "5000000000"
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      already_complete: ${{ steps.init.outputs.already_complete }}
+      upload_id: ${{ steps.init.outputs.upload_id }}
+      total_bytes: ${{ steps.init.outputs.total_bytes }}
+      raw_key: ${{ steps.init.outputs.raw_key }}
+      release: ${{ steps.init.outputs.release }}
+      manifest_key: ${{ steps.init.outputs.manifest_key }}
+      shards_json: ${{ steps.init.outputs.shards_json }}
+    env:
+      EBD_TAR_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+        with:
+          version: latest
+      - name: Init multipart upload
+        id: init
+        env:
+          INPUT_SHARDS: ${{ inputs.shards }}
+          INPUT_PART_SIZE: ${{ inputs.part_size }}
+        run: |
+          uv run src/cloaca/swan_lake/scripts/ebd_multipart.py init \
+            --shards "$INPUT_SHARDS" \
+            --part-size "$INPUT_PART_SIZE"
+
+  shard:
+    needs: init
+    if: needs.init.outputs.already_complete != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.init.outputs.shards_json) }}
+
+    env:
+      EBD_TAR_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+        with:
+          version: latest
+      - name: Runner egress IP
+        run: |
+          IP=$(curl -s --max-time 10 ipinfo.io/ip || echo unknown)
+          echo "shard ${{ matrix.shard }} egress IP: $IP"
+          echo "- shard ${{ matrix.shard }} egress IP: \`$IP\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: Disk space before
+        run: df -h /
+      - name: Download shard
+        env:
+          INPUT_MANIFEST: ${{ needs.init.outputs.manifest_key }}
+          INPUT_SHARD: ${{ matrix.shard }}
+        run: |
+          uv run src/cloaca/swan_lake/scripts/ebd_multipart.py shard \
+            --manifest-key "$INPUT_MANIFEST" \
+            --shard-index "$INPUT_SHARD"
+      - name: Disk space after
+        if: always()
+        run: df -h /
+
+  complete:
+    needs: [init, shard]
+    if: needs.init.outputs.already_complete != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+        with:
+          version: latest
+      - name: Complete multipart upload
+        env:
+          INPUT_MANIFEST: ${{ needs.init.outputs.manifest_key }}
+        run: |
+          uv run src/cloaca/swan_lake/scripts/ebd_multipart.py complete \
+            --manifest-key "$INPUT_MANIFEST"
+      - name: Run summary
+        if: always()
+        env:
+          UPLOAD_ID: ${{ needs.init.outputs.upload_id }}
+          RAW_KEY: ${{ needs.init.outputs.raw_key }}
+          TOTAL_BYTES: ${{ needs.init.outputs.total_bytes }}
+          RELEASE: ${{ needs.init.outputs.release }}
+        run: |
+          {
+            echo "## Raw .tar mirror complete"
+            echo ""
+            echo "- release: \`$RELEASE\`"
+            echo "- upload_id: \`$UPLOAD_ID\`"
+            echo "- raw_key: \`$RAW_KEY\`"
+            echo "- total_bytes: \`$TOTAL_BYTES\`"
+          } >> "$GITHUB_STEP_SUMMARY"
