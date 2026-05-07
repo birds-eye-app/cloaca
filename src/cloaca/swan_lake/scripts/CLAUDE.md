@@ -161,10 +161,6 @@ A 300 MB smoke test against `ebd_relMar-2026` confirmed:
   chunks into `year=YYYY/` (or finer) Parquet partitions for query
   pruning. Easy to express as a GHA matrix where each worker handles a
   range of chunks.
-- **Resume on disconnect.** The single `urlopen` has no retry / range
-  resume. For a 2.8h job that is a real risk on flaky networks. Add
-  a `Range`-based resume around a chunk-boundary checkpoint when this
-  goes to production.
 - **Cleanup of smoke-test artifacts.** Local
   `src/cloaca/swan_lake/dbs/ebd_nyc_smoketest.db` and the
   `release=<rel>-smoketest/` R2 prefix are still around for inspection.
@@ -182,10 +178,63 @@ uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
 uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
   --url "..." --dry-run-r2 --workdir /tmp/ebd-out --max-bytes 50M
 
-# Full run (no caps) — expect ~2.8 hours wall time end-to-end
+# Full run (no caps) — streaming mode, ~2.8h, no resume on network drop
 uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
   --url "https://download.ebird.org/ebd/prepackaged/ebd_relMar-2026.tar"
+
+# Full run with disk + R2 raw mirror (resumable)
+uv run src/cloaca/swan_lake/scripts/ingest_ebd_streaming.py \
+  --url "https://download.ebird.org/ebd/prepackaged/ebd_relMar-2026.tar" \
+  --cache-dir /Volumes/lacie_disk/ebd-cache
+# or set EBD_CACHE_DIR=/Volumes/lacie_disk/ebd-cache in .env and drop --cache-dir
 ```
+
+## --cache-dir mode (resumable)
+
+Adds a Stage 1 that materializes the raw release somewhere durable before
+processing. Stage 1 does two things:
+
+1. **Disk download with HTTP Range resume.** Writes
+   `<cache-dir>/<basename>.tar.partial` chunk by chunk. On disconnect /
+   re-run, sends a `Range: bytes=<local_size>-` and appends. Atomic-renames
+   to `<basename>.tar` once the on-disk size matches the URL's
+   `Content-Length`.
+
+2. **R2 raw mirror via boto3 multipart.** After the disk file is complete,
+   uploads to `r2://<bucket>/raw/<basename>.tar`. boto3 handles multipart
+   internally with 4-way concurrency and 64 MiB parts. If
+   `s3.head_object(...)` already returns the object at the expected
+   ContentLength, the upload is skipped.
+
+Stage 2 then opens the local `.tar` and runs the existing fan-out pipeline
+(NYC DuckDB + rolling Parquet chunks to `r2://<bucket>/release=…/`).
+
+Re-running with the same `--cache-dir` is fully idempotent:
+
+| State on retry | Stage 1 behavior |
+|---|---|
+| `.tar` exists, full size | skip disk download |
+| `.tar.partial` exists, partial size | resume HTTP from that offset |
+| `.tar.partial` somehow > total | truncate, restart |
+| R2 raw object exists, full size | skip R2 upload |
+| R2 raw object missing or wrong size | re-upload from disk |
+| Stage 2 crashed mid-run | re-run reuses the disk file; chunks overwrite by name |
+
+### What's not (yet) resumable
+
+- **Stage 2 crashes during decompression / parsing don't checkpoint
+  parser state.** A re-run starts the .tar from byte 0 again. Cheap
+  relative to network download (disk reads are 100s of MB/s, not 23 MB/s),
+  but not free.
+- **Mid-multipart R2 upload crashes restart the whole boto3
+  upload_file.** boto3 doesn't currently persist multipart state across
+  process exits; aborted multiparts may linger on R2 with no default
+  lifecycle. Configure an R2 lifecycle rule to abort incomplete
+  multiparts after N days if you re-run a lot.
+- **Disk-download response stream stalls without closing.** The 300s
+  timeout on `urlopen(..., timeout=300)` covers connect; for stalled
+  bodies you may need to Ctrl+C and let the resume logic restart from
+  the on-disk size.
 
 `uv run` reads the PEP 723 inline metadata block at the top of the script
 and provisions `pyarrow`, `boto3`, `duckdb`, `rich`, `python-dotenv` into an
