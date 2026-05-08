@@ -202,37 +202,95 @@ def init_cmd(args):
         if code not in ("404", "NoSuchKey", "NotFound"):
             raise
 
-    assignments, total_parts = compute_assignments(
-        total_bytes, args.part_size, args.shards
-    )
+    # Resume an in-progress multipart upload on the same key, if one exists
+    # and its manifest is intact. The manifest lives at
+    # parts-state/<UploadId>/manifest.json and was written when the prior init
+    # ran; reusing it preserves the byte-range / part-number assignments so
+    # already-uploaded parts (also in parts-state/<UploadId>/<NNNNN>.json) can
+    # be skipped on the resumed shard runs.
+    upload_id = None
+    assignments = None
+    total_parts = None
+    try:
+        resp = s3.list_multipart_uploads(Bucket=bucket, Prefix=raw_key)
+        candidates = sorted(
+            (u for u in resp.get("Uploads", []) if u["Key"] == raw_key),
+            key=lambda u: u["Initiated"],
+            reverse=True,
+        )
+    except s3.exceptions.ClientError:
+        candidates = []
+    for c in candidates:
+        candidate_id = c["UploadId"]
+        manifest_key_try = f"parts-state/{candidate_id}/manifest.json"
+        try:
+            existing = s3.get_object(Bucket=bucket, Key=manifest_key_try)
+            existing_manifest = json.loads(existing["Body"].read())
+        except s3.exceptions.ClientError as e:
+            code = e.response.get("Error", {}).get("Code", "")
+            if code not in ("404", "NoSuchKey", "NotFound"):
+                raise
+            print(
+                f"  in-progress upload {candidate_id} has no manifest; "
+                f"aborting it so we can start fresh"
+            )
+            try:
+                s3.abort_multipart_upload(
+                    Bucket=bucket, Key=raw_key, UploadId=candidate_id
+                )
+            except Exception:
+                pass
+            continue
+        if existing_manifest.get("total_bytes") != total_bytes:
+            print(
+                f"  in-progress upload {candidate_id} manifest disagrees on "
+                f"total_bytes ({existing_manifest.get('total_bytes')} vs "
+                f"current {total_bytes}); aborting it"
+            )
+            try:
+                s3.abort_multipart_upload(
+                    Bucket=bucket, Key=raw_key, UploadId=candidate_id
+                )
+            except Exception:
+                pass
+            continue
+        upload_id = candidate_id
+        assignments = existing_manifest["shards"]
+        total_parts = existing_manifest["total_parts"]
+        print(
+            f"Resuming in-progress multipart upload {upload_id} "
+            f"({existing_manifest['total_shards']} shards, {total_parts} parts)"
+        )
+        break
 
-    resp = s3.create_multipart_upload(Bucket=bucket, Key=raw_key)
-    upload_id = resp["UploadId"]
+    if upload_id is None:
+        assignments, total_parts = compute_assignments(
+            total_bytes, args.part_size, args.shards
+        )
+        resp = s3.create_multipart_upload(Bucket=bucket, Key=raw_key)
+        upload_id = resp["UploadId"]
+        manifest = {
+            "upload_id": upload_id,
+            "raw_key": raw_key,
+            "release": release,
+            "total_bytes": total_bytes,
+            "part_size": args.part_size,
+            "total_parts": total_parts,
+            "total_shards": args.shards,
+            "shards": assignments,
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"parts-state/{upload_id}/manifest.json",
+            Body=json.dumps(manifest, indent=2).encode(),
+            ContentType="application/json",
+        )
+        print(f"Created multipart upload {upload_id}")
 
-    manifest = {
-        "upload_id": upload_id,
-        "raw_key": raw_key,
-        "release": release,
-        "total_bytes": total_bytes,
-        "part_size": args.part_size,
-        "total_parts": total_parts,
-        "total_shards": args.shards,
-        "shards": assignments,
-        "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-    }
     manifest_key = f"parts-state/{upload_id}/manifest.json"
-    s3.put_object(
-        Bucket=bucket,
-        Key=manifest_key,
-        Body=json.dumps(manifest, indent=2).encode(),
-        ContentType="application/json",
-    )
-
-    print(f"Created multipart upload {upload_id}")
     print(f"  total_bytes : {total_bytes:,}")
     print(f"  total_parts : {total_parts}")
-    print(f"  part_size   : {args.part_size:,}")
-    print(f"  shards      : {args.shards}")
     print(f"  manifest    : r2://{bucket}/{manifest_key}")
     for a in assignments:
         n = len(a["parts"])
@@ -251,7 +309,9 @@ def init_cmd(args):
             "raw_key": raw_key,
             "release": release,
             "manifest_key": manifest_key,
-            "shards_json": json.dumps(list(range(args.shards))),
+            # On resume the shard count comes from the existing manifest, not
+            # args.shards, so use the actual assignment length.
+            "shards_json": json.dumps(list(range(len(assignments)))),
         }
     )
 
