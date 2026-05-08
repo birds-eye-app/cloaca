@@ -43,6 +43,7 @@ jobs:
       manifest_key: ${{ steps.init.outputs.manifest_key }}
       shards_json: ${{ steps.init.outputs.shards_json }}
     env:
+      PYTHONUNBUFFERED: "1"
       EBD_TAR_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -67,7 +68,7 @@ jobs:
     needs: init
     if: needs.init.outputs.already_complete != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 350
 
     strategy:
       fail-fast: false
@@ -75,6 +76,7 @@ jobs:
         shard: ${{ fromJSON(needs.init.outputs.shards_json) }}
 
     env:
+      PYTHONUNBUFFERED: "1"
       EBD_TAR_URL: ${{ inputs.url_override || secrets.EBD_TAR_URL }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -111,6 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
+      PYTHONUNBUFFERED: "1"
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
