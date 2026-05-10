@@ -113,14 +113,23 @@ def cmd_partitioned_parquet(args):
     print("Compression: ZSTD")
     print()
 
+    # Spill the global sort to the lacie disk — the default temp directory
+    # caps out around 25 GB on this Mac and the 71 GB sort + write needs
+    # more headroom. Lacie has ~1 TB free.
+    temp_dir = os.environ.get("DUCKDB_TEMP_DIR", "/Volumes/lacie_disk/duckdb-temp")
+    Path(temp_dir).mkdir(parents=True, exist_ok=True)
+
     con = duckdb.connect()
     configure_duckdb(con)
-    # Surface progress and bound memory so DuckDB doesn't OOM on the partition
-    # buffers (one open writer per (country_code, state_code) pair, plus the
-    # internal row-buffer per writer).
-    con.execute("PRAGMA memory_limit='12GB'")
-    con.execute("PRAGMA threads=8")
+    con.execute(f"PRAGMA temp_directory='{temp_dir}'")
+    con.execute("PRAGMA max_temp_directory_size='500GiB'")
+    # Bigger memory_limit cuts spill volume; threads=4 trades parallelism
+    # for tighter per-thread sort buffers (avoids per-thread spill explosion).
+    con.execute("PRAGMA memory_limit='16GB'")
+    con.execute("PRAGMA threads=4")
+    con.execute("PRAGMA preserve_insertion_order=false")
     con.execute("PRAGMA enable_progress_bar=true")
+    print(f"Spill directory: {temp_dir}")
 
     t0 = time.monotonic()
     con.execute(f"""
@@ -143,23 +152,32 @@ def cmd_native_duckdb(args):
     bucket = os.environ["R2_BUCKET"]
     release = args.release or derive_release()
     src = f"r2://{bucket}/release={release}/*.parquet"
-    work_dir = Path(os.environ.get("EBD_LOCAL_WORK", "/tmp/ebd-repartition"))
+    work_dir = Path(
+        os.environ.get("EBD_LOCAL_WORK", "/Volumes/lacie_disk/ebd-repartition")
+    )
     work_dir.mkdir(parents=True, exist_ok=True)
     local_db = work_dir / f"{release}.duckdb"
     if local_db.exists():
         print(f"Removing existing {local_db}")
         local_db.unlink()
     raw_key = f"duckdb/{release}.duckdb"
+    # Spill to lacie too; default temp dir is too small for the global sort
+    temp_dir = os.environ.get("DUCKDB_TEMP_DIR", "/Volumes/lacie_disk/duckdb-temp")
+    Path(temp_dir).mkdir(parents=True, exist_ok=True)
 
     print(f"Source:        {src}")
     print(f"Local build:   {local_db}")
     print(f"R2 destination: r2://{bucket}/{raw_key}")
+    print(f"Spill dir:     {temp_dir}")
     print()
 
     con = duckdb.connect(str(local_db))
     configure_duckdb(con)
-    con.execute("PRAGMA memory_limit='12GB'")
-    con.execute("PRAGMA threads=8")
+    con.execute(f"PRAGMA temp_directory='{temp_dir}'")
+    con.execute("PRAGMA max_temp_directory_size='500GiB'")
+    con.execute("PRAGMA memory_limit='16GB'")
+    con.execute("PRAGMA threads=4")
+    con.execute("PRAGMA preserve_insertion_order=false")
     con.execute("PRAGMA enable_progress_bar=true")
 
     print("Phase 1: CREATE TABLE ebd AS SELECT ... ORDER BY (clustering)")
