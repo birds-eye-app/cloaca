@@ -90,7 +90,7 @@ QUERIES: dict[str, str] = {
             COUNT(DISTINCT scientific_name) AS species,
             COUNT(DISTINCT sampling_event_identifier) AS checklists
         FROM {SOURCE}
-        WHERE locality_id = 'L99381'
+        WHERE locality_id = 'L191106'
     """,
     "q3_state_recent": """
         SELECT common_name, COUNT(*) AS sightings
