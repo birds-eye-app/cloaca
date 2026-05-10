@@ -258,3 +258,42 @@ CREATE OR REPLACE SECRET ebd_r2 (
 );
 SELECT count(*) FROM read_parquet('r2://ebd/release=ebd_relMar-2026/*.parquet');
 ```
+
+## Partition experiments (`repartition_ebd.py`, `bench_partitions.py`)
+
+The default `release=…/chunk_NNNNN.parquet` layout is input-order; only
+date-range filters get implicit zone-map pruning. For region-bound queries
+we're testing two alternative shapes via `repartition_ebd.py`:
+
+| Shape | Path | Built by |
+|---|---|---|
+| **partitioned-parquet** | `r2://ebd/partitioned-by-state/release=<rel>/country_code=…/state_code=…/data_*.parquet` | `repartition_ebd.py partitioned-parquet` |
+| **native-duckdb** | `r2://ebd/duckdb/<rel>.duckdb` | `repartition_ebd.py native-duckdb` |
+
+Both apply the same global sort: `country_code, state_code, locality_id,
+observation_date`. That clusters rows so DuckDB's per-row-group zone maps
+prune scans on those columns; **explicit indexes are deliberately avoided**
+per [DuckDB's own guidance](https://duckdb.org/docs/guides/performance/indexing).
+
+`bench_partitions.py` runs an apples-to-apples query suite against any
+combination of `--datasets unpartitioned,partitioned,native` and reports
+cold + warm wallclock for each.
+
+### HTTP timeout / retry tuning
+
+Long R2 reads from a contended residential connection trip DuckDB's
+default 30 s `http_timeout` regularly. Both scripts now `SET
+http_timeout = 300000`, `http_retries = 5`, `http_retry_wait_ms = 2000` —
+recommended whenever you're running R2-against-DuckDB pipelines from any
+non-cloud network.
+
+### Operational notes
+
+- Partition build runs `COPY ... PARTITION_BY (country_code, state_code)`
+  directly against R2; no local staging needed.
+- Native build writes locally first (`/tmp/ebd-repartition/<rel>.duckdb`,
+  override with `EBD_LOCAL_WORK`), then uploads via boto3 multipart. The
+  `--cleanup-local` flag deletes the staged file after upload.
+- Don't run two R2-heavy jobs in parallel from the same residential
+  uplink. We tried it; the second job timed out at chunk 10. Sequential
+  is reliable.
