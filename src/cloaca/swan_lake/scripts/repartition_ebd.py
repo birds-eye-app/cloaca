@@ -110,33 +110,43 @@ def cmd_partitioned_parquet(args):
     print(f"Source: {src}")
     print(f"Destination: {dst}")
     print("Partition keys: country_code, state_code")
+    print(
+        f"Within-partition sort: {'yes' if args.sort else 'no (disk-spill workaround)'}"
+    )
     print("Compression: ZSTD")
     print()
 
-    # Spill the global sort to the lacie disk — the default temp directory
-    # caps out around 25 GB on this Mac and the 71 GB sort + write needs
-    # more headroom. Lacie has ~1 TB free.
-    temp_dir = os.environ.get("DUCKDB_TEMP_DIR", "/Volumes/lacie_disk/duckdb-temp")
-    Path(temp_dir).mkdir(parents=True, exist_ok=True)
+    # Optional spill location for the global sort. Without --sort the global
+    # ORDER BY is skipped and only modest in-memory partition routing is
+    # needed; with --sort the spill grows to 70 GB+ and we route it to a
+    # large external disk via env DUCKDB_TEMP_DIR.
+    if args.sort:
+        temp_dir = os.environ.get("DUCKDB_TEMP_DIR", "/Volumes/lacie_disk/duckdb-temp")
+        Path(temp_dir).mkdir(parents=True, exist_ok=True)
+        print(f"Spill directory: {temp_dir}")
 
     con = duckdb.connect()
     configure_duckdb(con)
-    con.execute(f"PRAGMA temp_directory='{temp_dir}'")
-    con.execute("PRAGMA max_temp_directory_size='500GiB'")
-    # Bigger memory_limit cuts spill volume; threads=4 trades parallelism
-    # for tighter per-thread sort buffers (avoids per-thread spill explosion).
+    if args.sort:
+        con.execute(f"PRAGMA temp_directory='{temp_dir}'")
+        con.execute("PRAGMA max_temp_directory_size='500GiB'")
     con.execute("PRAGMA memory_limit='16GB'")
     con.execute("PRAGMA threads=4")
     con.execute("PRAGMA preserve_insertion_order=false")
     con.execute("PRAGMA enable_progress_bar=true")
-    print(f"Spill directory: {temp_dir}")
+
+    order_by_clause = (
+        "ORDER BY country_code, state_code, locality_id, observation_date"
+        if args.sort
+        else ""
+    )
 
     t0 = time.monotonic()
     con.execute(f"""
         COPY (
             SELECT *
             FROM read_parquet('{src}')
-            ORDER BY country_code, state_code, locality_id, observation_date
+            {order_by_clause}
         )
         TO '{dst}'
         (FORMAT PARQUET,
@@ -238,6 +248,16 @@ def main():
     sub = p.add_subparsers(dest="cmd", required=True)
 
     pp = sub.add_parser("partitioned-parquet")
+    pp.add_argument(
+        "--sort",
+        action="store_true",
+        help=(
+            "Globally ORDER BY (country, state, locality, date) before "
+            "partitioning. Yields tighter zone-map pruning on locality/date "
+            "within each partition file. Adds ~70 GB of sort spill — "
+            "requires a large temp_directory (set DUCKDB_TEMP_DIR)."
+        ),
+    )
     pp.set_defaults(func=cmd_partitioned_parquet)
 
     nd = sub.add_parser("native-duckdb")
