@@ -113,6 +113,18 @@ QUERIES: dict[str, str] = {
         WHERE common_name ILIKE '%Owl%'
           AND approved = TRUE
     """,
+    "q6_state_species": """
+        -- Combines region-partition pruning with a species filter; tests
+        -- whether sort-within-partition on locality helps zone-map prune.
+        SELECT locality_id, locality, COUNT(*) AS sightings
+        FROM {SOURCE}
+        WHERE country_code = 'US' AND state_code = 'US-NY'
+          AND common_name = 'Eastern Phoebe'
+          AND approved = TRUE
+        GROUP BY 1, 2
+        ORDER BY sightings DESC
+        LIMIT 10
+    """,
 }
 
 
