@@ -46,6 +46,11 @@ def derive_release() -> str:
 def configure(con):
     con.execute("INSTALL httpfs")
     con.execute("LOAD httpfs")
+    # Long timeouts + retries — slow / contended residential R2 connections
+    # otherwise trip 30s defaults frequently in long benchmark runs.
+    con.execute("SET http_timeout = 300000")
+    con.execute("SET http_retries = 5")
+    con.execute("SET http_retry_wait_ms = 2000")
     con.execute(
         """
         CREATE OR REPLACE SECRET ebd_r2 (

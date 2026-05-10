@@ -62,9 +62,18 @@ def derive_release() -> str:
 
 
 def configure_duckdb(con: duckdb.DuckDBPyConnection):
-    """Install/load httpfs + create R2 secret on the given connection."""
+    """Install/load httpfs + create R2 secret on the given connection.
+
+    Bump default HTTP timeouts and retry counts. The default 30s timeout
+    trips frequently during long, contention-heavy R2 reads (e.g. when
+    multiple jobs share the same residential downlink). 5 min per request
+    plus 5 retries with 2s backoff handles those without giving up.
+    """
     con.execute("INSTALL httpfs")
     con.execute("LOAD httpfs")
+    con.execute("SET http_timeout = 300000")  # 5 min per request
+    con.execute("SET http_retries = 5")
+    con.execute("SET http_retry_wait_ms = 2000")
     con.execute(
         """
         CREATE OR REPLACE SECRET ebd_r2 (
