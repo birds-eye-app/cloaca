@@ -70,6 +70,156 @@ def health_check() -> Dict[str, str]:
     return {"status": "SQUAWK"}
 
 
+# === EBD R2 DuckDB query endpoints (experimental) ============================
+# Holds a single DuckDB connection ATTACHed to a sample EBD database on R2.
+# Per-request handlers create child cursors so concurrent requests don't
+# corrupt each other. Designed to validate cold/warm latency from Render's
+# host before committing to building the full-scale .duckdb on R2.
+
+_ebd_r2_con: duckdb.DuckDBPyConnection | None = None
+_ebd_r2_attach_ms: int | None = None
+
+
+@Cloaca_App.on_event("startup")
+async def _attach_ebd_r2() -> None:
+    """Open a long-lived DuckDB connection and ATTACH the R2 .duckdb file."""
+    global _ebd_r2_con, _ebd_r2_attach_ms
+    required = (
+        "R2_ACCOUNT_ID",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY",
+        "R2_BUCKET",
+    )
+    if not all(os.environ.get(k) for k in required):
+        print("[duck-query] R2 env vars missing; /v1/duck-query/* will 503")
+        return
+    release = os.environ.get("EBD_R2_NATIVE_RELEASE", "sample-30")
+    bucket = os.environ["R2_BUCKET"]
+    attach_path = f"r2://{bucket}/duckdb/{release}.duckdb"
+    print(f"[duck-query] ATTACH {attach_path}")
+    t0 = time.monotonic()
+    try:
+        con = duckdb.connect()
+        con.execute("INSTALL httpfs")
+        con.execute("LOAD httpfs")
+        con.execute("SET http_timeout = 300000")
+        con.execute("SET http_retries = 5")
+        # Render Starter is 512 MB; bound DuckDB to leave room for Python/FastAPI.
+        con.execute("PRAGMA memory_limit='256MB'")
+        con.execute(
+            """
+            CREATE OR REPLACE SECRET ebd_r2 (
+                TYPE r2,
+                KEY_ID $key,
+                SECRET $secret,
+                ACCOUNT_ID $account
+            )
+            """,
+            {
+                "key": os.environ["R2_ACCESS_KEY_ID"],
+                "secret": os.environ["R2_SECRET_ACCESS_KEY"],
+                "account": os.environ["R2_ACCOUNT_ID"],
+            },
+        )
+        con.execute(f"ATTACH '{attach_path}' AS ebd (READ_ONLY)")
+        # Pre-warm catalog/metadata so the first user request doesn't pay it.
+        con.execute("SELECT 1 FROM ebd.ebd LIMIT 1").fetchall()
+        _ebd_r2_con = con
+        _ebd_r2_attach_ms = int((time.monotonic() - t0) * 1000)
+        print(f"[duck-query] ATTACH + prewarm done in {_ebd_r2_attach_ms} ms")
+    except Exception as e:
+        print(f"[duck-query] ATTACH failed: {e}")
+
+
+def _ebd_run(query: str, params: Dict[str, Any] | None = None) -> tuple[list, int]:
+    """Execute a query against the held DuckDB connection via a fresh cursor.
+    Returns (rows, query_ms). Raises RuntimeError if not connected."""
+    if _ebd_r2_con is None:
+        raise RuntimeError("duck-query not connected")
+    cur = _ebd_r2_con.cursor()
+    t0 = time.monotonic()
+    rows = cur.execute(query, params or {}).fetchall()
+    return rows, int((time.monotonic() - t0) * 1000)
+
+
+@Cloaca_App.get("/v1/duck-query/healthz")
+async def duck_query_healthz() -> Dict[str, Any]:
+    if _ebd_r2_con is None:
+        return {"status": "disconnected"}
+    try:
+        rows, ms = await asyncio.to_thread(
+            _ebd_run, "SELECT COUNT(*) AS n FROM ebd.ebd"
+        )
+        return {
+            "status": "ok",
+            "row_count": rows[0][0],
+            "query_ms": ms,
+            "attach_ms": _ebd_r2_attach_ms,
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
+@Cloaca_App.get("/v1/duck-query/state-aggregate")
+async def duck_query_state_aggregate(state_code: str) -> Dict[str, Any]:
+    """Top 10 localities by distinct species for a given state. E.g. state_code=US-NY."""
+    if _ebd_r2_con is None:
+        return {"error": "duck-query disconnected"}
+    country = state_code.split("-")[0] if "-" in state_code else state_code
+    rows, ms = await asyncio.to_thread(
+        _ebd_run,
+        """
+        SELECT locality, COUNT(DISTINCT scientific_name) AS species_count
+        FROM ebd.ebd
+        WHERE country_code = $country AND state_code = $state
+          AND all_species_reported = TRUE
+          AND approved = TRUE
+          AND category NOT IN ('slash', 'spuh')
+          AND (exotic_code IS NULL OR exotic_code = 'N')
+        GROUP BY locality
+        ORDER BY species_count DESC
+        LIMIT 10
+        """,
+        {"country": country, "state": state_code},
+    )
+    return {
+        "query_ms": ms,
+        "rows": [{"locality": r[0], "species_count": r[1]} for r in rows],
+    }
+
+
+@Cloaca_App.get("/v1/duck-query/hotspot")
+async def duck_query_hotspot(locality_id: str) -> Dict[str, Any]:
+    """Aggregate stats for a single locality_id (eBird hotspot or personal location)."""
+    if _ebd_r2_con is None:
+        return {"error": "duck-query disconnected"}
+    rows, ms = await asyncio.to_thread(
+        _ebd_run,
+        """
+        SELECT
+            COUNT(*) AS rows,
+            COUNT(DISTINCT scientific_name) AS species,
+            COUNT(DISTINCT sampling_event_identifier) AS checklists,
+            MIN(observation_date) AS earliest,
+            MAX(observation_date) AS latest
+        FROM ebd.ebd
+        WHERE locality_id = $locality
+        """,
+        {"locality": locality_id},
+    )
+    if not rows:
+        return {"query_ms": ms, "rows": 0}
+    r = rows[0]
+    return {
+        "query_ms": ms,
+        "rows": r[0],
+        "species": r[1],
+        "checklists": r[2],
+        "earliest": str(r[3]) if r[3] else None,
+        "latest": str(r[4]) if r[4] else None,
+    }
+
+
 @Cloaca_App.get("/v1/nearby_observations")
 async def get_nearby_observations_api(
     latitude: float, longitude: float, file_id: str
