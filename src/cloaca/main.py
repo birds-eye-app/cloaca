@@ -104,8 +104,11 @@ async def _attach_ebd_r2() -> None:
         con.execute("LOAD httpfs")
         con.execute("SET http_timeout = 300000")
         con.execute("SET http_retries = 5")
-        # Render Starter is 512 MB; bound DuckDB to leave room for Python/FastAPI.
-        con.execute("PRAGMA memory_limit='256MB'")
+        # Render Starter is 512 MB. Leave headroom for Python/FastAPI/piper;
+        # spill to the persistent disk instead of OOMing on large scans.
+        con.execute("PRAGMA memory_limit='128MB'")
+        con.execute("SET temp_directory='/var/data/duckdb-tmp'")
+        con.execute("SET max_temp_directory_size='2GB'")
         con.execute(
             """
             CREATE OR REPLACE SECRET ebd_r2 (
