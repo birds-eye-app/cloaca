@@ -107,8 +107,9 @@ async def _attach_ebd_r2() -> None:
         # Render Starter is 512 MB. Leave headroom for Python/FastAPI/piper;
         # spill to the persistent disk instead of OOMing on large scans.
         con.execute("PRAGMA memory_limit='128MB'")
+        # /var/data is 1GB and already holds ebd_nyc.db (~440MB); leave room.
         con.execute("SET temp_directory='/var/data/duckdb-tmp'")
-        con.execute("SET max_temp_directory_size='2GB'")
+        con.execute("SET max_temp_directory_size='400MB'")
         con.execute(
             """
             CREATE OR REPLACE SECRET ebd_r2 (
