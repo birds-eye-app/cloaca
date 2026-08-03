@@ -12,4 +12,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-editable
-CMD ["uv", "run", "fastapi", "run", "src/cloaca/main.py"]
+RUN chmod +x docker-entrypoint.sh
+# Runs migrations first iff MIGRATE_ON_START=1 (plain-Docker hosts like the patch-town box), then
+# serves. Render keeps using preDeployCommand for migrations and leaves MIGRATE_ON_START unset.
+CMD ["./docker-entrypoint.sh"]

@@ -60,9 +60,12 @@ async def _get_duck_conn(duck_db_path: str) -> _CachedDuckConn:
         stack = AsyncExitStack()
         await stack.__aenter__()
         try:
+            # mcp-server-motherduck is a locked project dependency (pinned in pyproject/uv.lock),
+            # so spawn its console script from the venv rather than `uvx`-fetching it from PyPI at
+            # runtime — no network dependency or floating version at container start.
             params = StdioServerParameters(
-                command="uvx",
-                args=["mcp-server-motherduck", "--db-path", duck_db_path],
+                command="mcp-server-motherduck",
+                args=["--db-path", duck_db_path],
             )
             read, write = await stack.enter_async_context(stdio_client(params))
             session = await stack.enter_async_context(ClientSession(read, write))
