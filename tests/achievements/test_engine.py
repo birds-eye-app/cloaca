@@ -92,6 +92,21 @@ class TestLifers:
         assert lifers[24].tier == Tier.GOLD
         assert lifers[23].tier == Tier.SILVER
 
+    def test_forms_and_subspecies_collapse_to_species(self):
+        obs = [
+            mk_obs("Rock Pigeon (Feral Pigeon)", "Columba livia (Feral Pigeon)", "2024-01-01", "S1"),
+            mk_obs("Rock Pigeon", "Columba livia", "2024-01-02", "S2"),
+            mk_obs("Yellow-rumped Warbler (Myrtle)", "Setophaga coronata coronata", "2024-01-03", "S3"),
+            mk_obs("Yellow-rumped Warbler (Audubon's)", "Setophaga coronata auduboni", "2024-01-04", "S4"),
+            mk_obs("Dark-eyed Junco (Oregon)", "Junco hyemalis [oreganus Group]", "2024-01-05", "S5"),
+        ]
+        lifers = events_of(compute(obs), AchievementType.LIFER)
+        assert [(a.species, a.date) for a in lifers] == [
+            ("Rock Pigeon", "2024-01-01"),
+            ("Yellow-rumped Warbler", "2024-01-03"),
+            ("Dark-eyed Junco", "2024-01-05"),
+        ]
+
     def test_spuhs_and_hybrids_are_ignored(self):
         obs = [
             mk_obs("gull sp.", "Larus sp.", "2024-01-01"),

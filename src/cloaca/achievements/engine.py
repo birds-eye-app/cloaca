@@ -115,6 +115,24 @@ PATCH_VISIT_TITLES = {
 }
 
 
+def _species_key(scientific_name: str) -> str:
+    """Collapse subspecies/forms to the species-level binomial.
+
+    "Setophaga coronata coronata" (Myrtle), "Columba livia (Feral Pigeon)",
+    and "Junco hyemalis [oreganus Group]" all key as their first two words,
+    so forms don't show up as separate lifers/patch birds.
+    """
+    words = str(scientific_name).replace("[", " ").replace("(", " ").split()
+    return " ".join(words[:2])
+
+
+def _display_name(common_name: str) -> str:
+    """Strip form qualifiers: "Dark-eyed Junco (Oregon)" -> "Dark-eyed Junco"."""
+    name = str(common_name)
+    idx = name.find(" (")
+    return name[:idx] if idx > 0 else name
+
+
 def _parse_date(raw: str) -> datetime.date | None:
     try:
         return datetime.date.fromisoformat(str(raw))
@@ -252,7 +270,7 @@ def _summarize_checklists(
     species_per_checklist: dict[str, set[str]] = defaultdict(set)
     for obs in species_obs:
         sub_id = str(obs.submission_id)
-        species_per_checklist[sub_id].add(obs.scientific_name)
+        species_per_checklist[sub_id].add(_species_key(obs.scientific_name))
         if sub_id not in checklists:
             date = _parse_date(obs.date)
             assert date is not None
@@ -464,8 +482,8 @@ def _process_species_sighting(
     patch_year_lists: dict[tuple[str, int], set[str]],
     region_lists: dict[str, set[str]],
 ) -> None:
-    sci = obs.scientific_name
-    common = obs.common_name
+    sci = _species_key(obs.scientific_name)
+    common = _display_name(obs.common_name)
     date_iso = date.isoformat()
     year = date.year
 
@@ -671,7 +689,7 @@ def _process_big_days(out: _Emitter, species_obs: list[Observation]) -> None:
     for obs in species_obs:
         date = _parse_date(obs.date)
         assert date is not None
-        species_by_day[date].add(obs.scientific_name)
+        species_by_day[date].add(_species_key(obs.scientific_name))
 
     record = 0
     for date in sorted(species_by_day):
@@ -752,22 +770,22 @@ def summarize(
 ) -> AchievementSummary:
     species_obs = [o for o in observations if is_singular_bird_species(o)]
 
-    life_list = {o.scientific_name for o in species_obs}
+    life_list = {_species_key(o.scientific_name) for o in species_obs}
     checklists = {str(o.submission_id) for o in species_obs}
 
     patch_totals = {
-        p.name: len({o.scientific_name for o in species_obs if p.matches(o)})
+        p.name: len({_species_key(o.scientific_name) for o in species_obs if p.matches(o)})
         for p in patches
     }
     region_totals = {
-        r.name: len({o.scientific_name for o in species_obs if r.matches(o)})
+        r.name: len({_species_key(o.scientific_name) for o in species_obs if r.matches(o)})
         for r in regions
     }
 
     species_by_day: dict[str, set[str]] = defaultdict(set)
     for o in species_obs:
         if _parse_date(o.date) is not None:
-            species_by_day[str(o.date)].add(o.scientific_name)
+            species_by_day[str(o.date)].add(_species_key(o.scientific_name))
     biggest_day = (
         max(species_by_day.items(), key=lambda kv: len(kv[1])) if species_by_day else None
     )
