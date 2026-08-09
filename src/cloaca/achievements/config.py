@@ -53,9 +53,12 @@ DEFAULT_PATCHES: tuple[Patch, ...] = (
     ),
     Patch(
         # "My House" spans past + present home locations; add/remove IDs as
-        # you move or create new personal locations at home.
+        # you move or create new personal locations at home. The "emily"
+        # substring catches renames like "Emily's Backyard" ->
+        # "Emily and David's Backyard" (eBird re-IDs renamed locations).
         name="My House",
-        location_ids=frozenset({"L23333013", "L30645449"}),  # 26 King, Emily's Backyard
+        location_ids=frozenset({"L23333013", "L30645449", "L41095929"}),
+        name_substrings=("emily",),
     ),
 )
 
