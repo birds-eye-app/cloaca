@@ -174,9 +174,10 @@
   <div class="cards" id="flyCards"></div>
   <div class="helptext">
     Birds appear as <b>dark shapes</b> and sing their <b>real songs</b> (recordings from
-    xeno&#8209;canto.org). Type a bird's name to reveal it &mdash; the <b>first letter locks on</b>.
-    A wrong key <b>scares it away</b>. A bird that escapes unnamed costs a <b>&#9829;</b>.
-    Clear a level to unlock the next &mdash; new, trickier birds join as you go.
+    xeno&#8209;canto.org). <b>Name the bird by ear</b> for <b>double points</b> &mdash; wait,
+    and its letters slowly appear. The word bank at the bottom lists the level's birds;
+    <b>space</b> replays the song. A wrong key <b>scares the bird away</b>; one that escapes
+    unnamed costs a <b>&#9829;</b>. Clear a level to unlock the next &mdash; trickier birds join as you go.
   </div>
   <div class="credits" id="menuCredits">Recordings &copy; their recordists, CC-licensed via <a href="https://xeno-canto.org" target="_blank" rel="noopener">xeno-canto.org</a>. Full credits after each level.</div>
 </div>
@@ -515,11 +516,16 @@ const ECOS={
 const ECO_ORDER=["backyard","forest","wetland","grassland","coast"];
 const LEVELS=[
   null,
-  {tiers:[1],total:10,concurrent:2,speed:40,gap:2.8},
-  {tiers:[1,2],total:14,concurrent:3,speed:54,gap:2.0},
-  {tiers:[1,2,3],total:18,concurrent:4,speed:68,gap:1.4},
+  {tiers:[1],total:10,concurrent:2,speed:40,gap:2.8,hint:{delay:2.5,ramp:4.5}},
+  {tiers:[1,2],total:14,concurrent:3,speed:54,gap:2.0,hint:{delay:4,ramp:6}},
+  {tiers:[1,2,3],total:18,concurrent:4,speed:68,gap:1.4,hint:{delay:6,ramp:9}},
 ];
-const MIGRATION={total:30,concurrent:4,speed:62,gap:1.6,perEco:6};
+const MIGRATION={total:30,concurrent:4,speed:62,gap:1.6,perEco:6,hint:{delay:5,ramp:7}};
+// hint ladder: 0 = name fully hidden (ID by ear, double points) → 1 = fully shown
+function hintFrac(b,t){
+  const h=(game.migration?MIGRATION:game.levelCfg).hint||{delay:0,ramp:.01};
+  return clamp((t-b.spawnT-h.delay)/h.ramp,0,1);
+}
 
 /* ============================ progress ============================ */
 const store={
@@ -993,6 +999,7 @@ function resolveBird(b,how){
   if(game.target===b)game.target=null;
   if(b.clip){b.clip.stop();b.clip=null;}
   if(game.singer===b)game.singer=null;
+  if(game.lastSinger===b)game.lastSinger=null;
 }
 function revealBird(b){
   b.state="revealed";b.stateT=game.time;
@@ -1000,9 +1007,12 @@ function revealBird(b){
   resolveBird(b,"got");
   game.combo++;game.bestCombo=Math.max(game.bestCombo,game.combo);
   const dwell=game.time-b.spawnT;
-  const pts=Math.round(10*b.word.length*clamp(1.6-dwell*.08,1,1.6)*(1+Math.min(1.5,game.combo*.1)));
+  const frac=hintFrac(b,game.time);
+  const earMult=2-frac; // no letters shown = double points
+  const pts=Math.round(10*b.word.length*earMult*clamp(1.6-dwell*.08,1,1.6)*(1+Math.min(1.5,game.combo*.1)));
   game.score+=pts;
-  game.popups.push({x:b.x,y:b.y-40,text:"+"+pts,t:game.time,col:"#28C840"});
+  const byEar=frac<.2;
+  game.popups.push({x:b.x,y:b.y-40,text:"+"+pts+(byEar?" BY EAR!":""),t:game.time,col:byEar?"#FFD24A":"#28C840"});
   sfxGood();
   setTimeout(()=>{if(game.mode==="playing")songFor(b,{quick:true});},240);
   burst(b.x,b.y,["#FFD24A","#3ED8D0","#E0559E"]);
@@ -1059,7 +1069,7 @@ function startLevel(){
   game.score=0;game.combo=0;game.bestCombo=0;game.lives=3;
   game.spawned=0;game.resolved=0;game.lastSpawn=-99;
   game.target=null;game.keysGood=0;game.keysBad=0;
-  game.lifelist=new Map();game.singer=null;
+  game.lifelist=new Map();game.singer=null;game.lastSinger=null;
   game.shake=0;game.ended="";game.won=false;
   game.introText=game.migration?"MIGRATION!":game.eco.name+" — LEVEL "+game.level;
   game.introT=0;
@@ -1123,6 +1133,12 @@ function handleLetter(ch){
     game.keysBad++;game.target=null;scareBird(b);
   }
 }
+function replaySong(b){
+  // replay a bird's song on demand (space / tap) without waiting its timer
+  if(!b||b.state!=="active")return;
+  if(game.singer&&game.singer!==b)return;
+  b.nextSing=game.time; // the update loop sings it this frame
+}
 addEventListener("keydown",e=>{
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   const k=e.key.toLowerCase();
@@ -1130,7 +1146,11 @@ addEventListener("keydown",e=>{
     if(k==="escape"){pauseGame();return;}
     if(k==="m"){setMuted(!muted);return;}
     if(/^[a-z]$/.test(k)){e.preventDefault();handleLetter(k);}
-    if(k===" ")e.preventDefault();
+    if(k===" "){
+      e.preventDefault();
+      const last=game.singer||game.lastSinger;
+      replaySong(last||game.birds.find(b=>b.state==="active"));
+    }
   }else if(game.mode==="paused"&&k==="escape")resumeGame();
 });
 const mobileInput=$("mobileInput");
@@ -1141,7 +1161,18 @@ mobileInput.addEventListener("input",()=>{
   for(const ch of v)if(/[a-z]/.test(ch))handleLetter(ch);
   mobileInput.value="";
 });
-canvas.addEventListener("pointerdown",()=>{if(game.mode==="playing")focusMobile();});
+canvas.addEventListener("pointerdown",e=>{
+  if(game.mode!=="playing")return;
+  focusMobile();
+  // tapping a bird replays its song
+  let best=null,bd=1e9;
+  for(const b of game.birds){
+    if(b.state!=="active")continue;
+    const d=Math.hypot(b.x-e.clientX,b.y+(b.bob||0)-e.clientY);
+    if(d<70&&d<bd){best=b;bd=d;}
+  }
+  if(best)replaySong(best);
+});
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&game.mode==="playing")pauseGame();});
 
 /* ============================ update ============================ */
@@ -1167,7 +1198,7 @@ function update(dt){
       if(b.x<-60){missBird(b);continue;}
       // one bird sings at a time — clearer for learning
       if(t>=b.nextSing&&(!game.singer||game.singer===b)){
-        game.singer=b;
+        game.singer=b;game.lastSinger=b;
         const buf=AUDIO.buffers[b.slug];
         let d=0;
         if(buf||SPECIES[b.slug].syn){b.clip=buf?playClip(b.slug):null;d=buf?b.clip?.dur||0:playSynth(SPECIES[b.slug].syn);}
@@ -1227,6 +1258,7 @@ function render(){
   for(const b of game.birds){
     if(b.state==="active")drawLabel(b,t);
   }
+  drawWordBank();
   if(game.target&&game.target.state==="active"){
     const b=game.target;
     ctx.save();
@@ -1273,24 +1305,32 @@ function render(){
 }
 function drawLabel(b,t){
   const name=b.spec.name;
+  const frac=hintFrac(b,t);
+  const locked=game.target===b;
+  if(frac<=0&&!locked)return; // pure ear-ID phase: silhouette + song only
   const fs=Math.max(9,Math.min(12,Math.round(W/90)));
   ctx.font=fs+'px PS2P,"Courier New",monospace';
   const cw=fs+1;
   const totalW=name.length*cw;
   const bx=b.x-totalW/2,by=b.y+(b.bob||0)+26*PXS/3+14;
-  const locked=game.target===b;
   // plate
   ctx.fillStyle=locked?"rgba(27,32,68,.92)":"rgba(27,32,68,.72)";
   ctx.fillRect(bx-5,by-fs-3,totalW+10,fs+10);
   if(locked){ctx.strokeStyle="#FFD24A";ctx.lineWidth=2;ctx.strokeRect(bx-5,by-fs-3,totalW+10,fs+10);}
+  const letterCount=b.word.length;
+  const shown=Math.floor(frac*letterCount+1e-6);
   let li=0,x=bx;
   for(let i=0;i<name.length;i++){
     const ch=name[i],isL=/[a-z]/.test(ch);
-    let col="#FFFFFF";
-    if(isL){col=li<b.typed?"#39FF6E":(locked?"#FFFFFF":"#C8CCE8");li++;}
-    else col="#8A8CB8";
+    let col="#FFFFFF",draw=ch;
+    if(isL){
+      if(li<b.typed)col="#39FF6E";
+      else if(li<shown)col=locked?"#FFFFFF":"#C8CCE8";
+      else{draw="_";col="rgba(200,204,232,.45)";}
+      li++;
+    }else col="#8A8CB8";
     ctx.fillStyle=col;
-    ctx.fillText(ch,x,by);
+    ctx.fillText(draw,x,by);
     x+=cw;
   }
   if(locked){
@@ -1300,6 +1340,37 @@ function drawLabel(b,t){
       cx2+=cw;
     }
     if(Math.floor(t*3)%2===0){ctx.fillStyle="#FFD24A";ctx.fillRect(cx2,by+3,cw-2,3);}
+  }
+}
+
+function drawWordBank(){
+  // this level's bird names — the reference sheet that makes ear-ID learnable
+  let pool=game.pool;
+  if(game.migration)pool=ECOS[game.eco.key].birds.filter(s=>game.pool.includes(s));
+  if(!pool.length)return;
+  const fs=Math.max(8,Math.min(10,Math.round(W/110)));
+  ctx.font=fs+'px PS2P,"Courier New",monospace';
+  const pad=8,gapX=10,gapY=8,chH=fs+10;
+  const items=pool.map(s=>({s,n:SPECIES[s].name,w:SPECIES[s].name.length*(fs+1)+pad*2}));
+  const rows=[];let row=[],rw=0;
+  for(const it of items){
+    if(rw+it.w+gapX>W-20&&row.length){rows.push(row);row=[];rw=0;}
+    row.push(it);rw+=it.w+gapX;
+  }
+  if(row.length)rows.push(row);
+  let y=H-8-rows.length*(chH+gapY)+gapY;
+  for(const r of rows){
+    const total=r.reduce((a,it)=>a+it.w,0)+gapX*(r.length-1);
+    let x=(W-total)/2;
+    for(const it of r){
+      const got=game.lifelist.get(it.s)==="got";
+      ctx.fillStyle=got?"rgba(16,72,36,.85)":"rgba(27,32,68,.8)";
+      ctx.fillRect(x,y,it.w,chH);
+      ctx.fillStyle=got?"#39FF6E":"rgba(220,224,240,.85)";
+      ctx.fillText(it.n,x+pad,y+chH-8);
+      x+=it.w+gapX;
+    }
+    y+=chH+gapY;
   }
 }
 

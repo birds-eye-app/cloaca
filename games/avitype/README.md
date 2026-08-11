@@ -11,9 +11,15 @@ learning birds by ear fun.
   silhouettes** in the right ecosystem at roughly the right height (ovenbirds
   on the ground, tanagers in the canopy, kestrels hovering, ospreys way up)
   and sing **real recordings** from xeno-canto.org.
-- Type a bird's name to reveal its colored pixel art (its song replays as a
-  reward). The first letter locks on. A wrong key **scares the bird away**;
-  a bird that escapes unnamed costs a life.
+- **Name the bird by ear for double points.** Birds arrive with no label —
+  just the silhouette and the song. Wait, and the name's letters appear one
+  at a time (hangman-style hints, slower at higher levels), scaling the
+  bonus back down. A word bank of the level's birds sits at the bottom of
+  the screen, and space replays the current song — so the round is really
+  "which of these is singing?"
+- Typing the name reveals the bird's colored pixel art (its song replays as
+  a reward). The first letter locks on. A wrong key **scares the bird
+  away**; a bird that escapes unnamed costs a life.
 - **Levels teach progressively**: level 1 of each flyway has only that
   habitat's common, iconic birds; levels 2 and 3 mix in trickier species.
   Before each level, a field-guide briefing shows the new birds — tap a card
