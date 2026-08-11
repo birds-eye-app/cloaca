@@ -77,6 +77,14 @@ SPECIES: list[tuple[str, str, str, str]] = [
     ("oystercatcher", "oystercatcher", "Haematopus palliatus", "call"),
     ("sanderling", "sanderling", "Calidris alba", "call"),
     ("plover", "plover", "Pluvialis squatarola", "call"),
+    ("mourning-dove", "mourning dove", "Zenaida macroura", "song"),
+    ("house-sparrow", "house sparrow", "Passer domesticus", "song"),
+    ("house-finch", "house finch", "Haemorhous mexicanus", "song"),
+    ("downy-woodpecker", "downy woodpecker", "Dryobates pubescens", "call"),
+    ("tufted-titmouse", "titmouse", "Baeolophus bicolor", "song"),
+    ("white-breasted-nuthatch", "nuthatch", "Sitta carolinensis", "call"),
+    ("dark-eyed-junco", "junco", "Junco hyemalis", "song"),
+    ("song-sparrow", "song sparrow", "Melospiza melodia", "song"),
 ]
 
 SOUND_EXT = "http://rs.tdwg.org/ac/terms/Multimedia"
@@ -206,10 +214,10 @@ def best_window(src: str) -> float:
     return max(0.0, best_i * 0.25 - 0.2)
 
 
-def encode_clip(src: str, start: float, dest: str) -> None:
-    fade_out = CLIP_SECONDS - 0.45
+def encode_clip(src: str, start: float, dest: str, dur: float = CLIP_SECONDS) -> None:
+    fade_out = dur - 0.45
     subprocess.run(
-        [FFMPEG, "-y", "-v", "error", "-ss", f"{start:.2f}", "-t", str(CLIP_SECONDS),
+        [FFMPEG, "-y", "-v", "error", "-ss", f"{start:.2f}", "-t", str(dur),
          "-i", src, "-ac", "1", "-ar", "22050",
          "-af", f"afade=t=in:d=0.15,afade=t=out:st={fade_out}:d=0.45,loudnorm=I=-18:TP=-1.5",
          "-b:a", "48k", dest],

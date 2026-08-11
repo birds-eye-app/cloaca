@@ -1,0 +1,152 @@
+[
+  {
+    "slug": "bittern",
+    "sci": "Botaurus lentiginosus",
+    "xcId": "1013532",
+    "action": "recut",
+    "span": {
+      "start": 12.0,
+      "dur": 6.0,
+      "coverage": 0.833,
+      "peak": 0.981,
+      "mean": 0.795,
+      "worst_rival": 0.287,
+      "rival_name": "Swamp Sparrow",
+      "worst_gap": 1,
+      "score": 7.630000000000003
+    },
+    "final": {
+      "coverage": 0.833,
+      "peak": 0.967,
+      "mean": 0.692,
+      "worst_rival": 0.149,
+      "rival_name": "Sedge Wren",
+      "worst_gap": 1
+    }
+  },
+  {
+    "slug": "blue-jay",
+    "sci": "Cyanocitta cristata",
+    "xcId": "1012556",
+    "action": "recut",
+    "span": {
+      "start": 2.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.813,
+      "mean": 0.703,
+      "worst_rival": 0.351,
+      "rival_name": "Indian Gray Hornbill",
+      "worst_gap": 0,
+      "score": 7.27
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.73,
+      "mean": 0.606,
+      "worst_rival": 0.26,
+      "rival_name": "Indian Gray Hornbill",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "bobolink",
+    "sci": "Dolichonyx oryzivorus",
+    "xcId": "1021265",
+    "action": "recut",
+    "span": {
+      "start": 2.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.996,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.448
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 1.0,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "cardinal",
+    "sci": "Cardinalis cardinalis",
+    "xcId": "1093538",
+    "action": "recut",
+    "span": {
+      "start": 11.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.996,
+      "mean": 0.994,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.123999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.996,
+      "worst_rival": 0.12,
+      "rival_name": "Northern Mockingbird",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "carolina-wren",
+    "sci": "Thryothorus ludovicianus",
+    "xcId": "1093537",
+    "action": "recut",
+    "span": {
+      "start": 18.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.995,
+      "mean": 0.992,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.700000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.99,
+      "mean": 0.981,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "chickadee",
+    "sci": "Poecile atricapillus",
+    "xcId": "994313",
+    "action": "recut",
+    "span": {
+      "start": 2.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.928,
+      "mean": 0.779,
+      "worst_rival": 0.201,
+      "rival_name": "White-throated Gerygone",
+      "worst_gap": 0,
+      "score": 10.290000000000003
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.933,
+      "mean": 0.933,
+      "worst_rival": 0.26,
+      "rival_name": "Mountain Chickadee",
+      "worst_gap": 0
+    }
+  }
+]

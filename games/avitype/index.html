@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AVITYPE — Bird Song Academy</title>
+<link rel="icon" href="data:,">
 <style>
   @font-face{
     font-family:"PS2P";
@@ -160,7 +161,7 @@
 <div id="hud" class="hidden">
   <div class="box bevel"><span class="cap">SCORE</span><span class="lcd" id="hudScore">0</span></div>
   <div class="box bevel"><span class="cap">LIVES</span><span id="hearts" style="margin-top:4px"><span>&#9829;</span><span>&#9829;</span><span>&#9829;</span></span></div>
-  <div class="box bevel" id="levelBox"><span id="levelName">FOREST — LEVEL 1</span><span id="progressBar" class="inset"></span></div>
+  <div class="box bevel" id="levelBox"><span id="levelName">BACKYARD — LEVEL 1</span><span id="progressBar" class="inset"></span></div>
   <button class="iconbtn bevel" id="muteBtn" title="mute (m)">&#9835;</button>
   <button class="iconbtn bevel" id="pauseBtn" title="pause (esc)">II</button>
 </div>
@@ -361,18 +362,51 @@ function songFor(b,{quick}={}){
    pose: stand | ground | wader | float | soar | fly | hover
    px: sprite paint spec (see painter). syn: fallback synth song. */
 const SPECIES={
+  /* ---------------- backyard (field-guide pack) ---------------- */
+  // plump buffy-tan, SMALL round head, black wing spots, LONG TAPERED TAIL
+  "mourning-dove":{name:"mourning dove",tier:1,band:[.62,.84],pose:"ground",
+    px:{L:15,body:"#C4A98A",belly:"#D9C0A0",head:"#C4A98A",beak:"#5A4A44",spots:"#4A4038",smallHead:1,longTail:1,tail:"#8A8078",leg:"#C87070"},
+    syn:[w(0,.25,480,430,.5,0,"sine"),w(.38,.55,600,460,.55,6,"sine"),w(1.1,.4,470,410,.5,0,"sine"),w(1.6,.4,450,395,.45,0,"sine")]},
+  // male: GRAY CROWN over CHESTNUT NAPE, black bib, dingy gray breast
+  "house-sparrow":{name:"house sparrow",tier:2,band:[.52,.76],pose:"stand",
+    px:{L:11,body:"#8A6A4A",belly:"#B8B0A0",head:"#98959C",cap:"#98959C",nape:"#6B3A28",bib:"#22242E",wing:"#7A5638",wingbar:"#E8E4D8",beak:"#22242E"},
+    syn:[0,.3,.6].flatMap(t=>[w(t,.06,2100,2750,.45),w(t+.07,.1,2750,2150,.48)])},
+  // male: RASPBERRY-RED head+breast fading into brown-STREAKED belly
+  "house-finch":{name:"house finch",tier:2,band:[.44,.68],pose:"stand",
+    px:{L:11,body:"#9A7A5E",belly:"#E0D6C4",head:"#D64A48",breast:"#D64A48",streaks:"#8A6A50",wing:"#8A6A50",beak:"#8A7A64"},
+    syn:[w(0,.09,3000,3400,.4),w(.11,.09,3500,2900,.4),w(.22,.09,2800,3300,.42),w(.33,.09,3400,2700,.42),w(.44,.09,3000,3500,.42),w(.55,.09,3400,2800,.42),w(.68,.22,3300,1900,.45)]},
+  // plain gray, jaunty CREST, pale front, rusty flank wash
+  "tufted-titmouse":{name:"titmouse",tier:3,band:[.38,.62],pose:"stand",
+    px:{L:11,body:"#98A0AC",belly:"#E8E4DC",crest:"#98A0AC",cheek:"#E8E4DC",breast:"#D9A878",beak:"#22242E"},
+    syn:[0,.42,.84].flatMap(t=>[w(t,.16,3400,3300,.48),w(t+.18,.2,2500,2380,.5)])},
+  // pied LADDER-BACK checks, white belly, RED NAPE SPOT — climbs HEAD-UP
+  "downy-woodpecker":{name:"downy woodpecker",tier:2,band:[.36,.58],pose:"stand",
+    px:{L:11,body:"#22242E",belly:"#F2F2EE",wing:"#22242E",checks:"#F2F2EE",eyeline:"#F2F2EE",napeSpot:"#E03028",beak:"#3A3E48",climb:1},
+    syn:[w(0,.05,4200,3900,.5,0,"square"),...[...Array(11)].map((_,i)=>w(.3+i*.055,.05,3300-i*140,3150-i*150,.42))]},
+  // slate-gray HOOD over snow belly, PINK BILL, white outer tail feathers
+  "dark-eyed-junco":{name:"junco",tier:3,band:[.68,.88],pose:"ground",
+    px:{L:10,body:"#4A4E58",belly:"#F5F5F2",head:"#3A3E48",breast:"#4A4E58",beak:"#E8A8B8",tailEdge:"#F2F2EE",leg:"#C89078"},
+    syn:ticks(0,13,.06,3600,.35,.045,"triangle")},
+  // blue-gray back, black cap, white face — the UPSIDE-DOWN bird
+  "white-breasted-nuthatch":{name:"nuthatch",tier:3,band:[.38,.62],pose:"stand",
+    px:{L:11,body:"#7A93B8",belly:"#F2F2EE",cap:"#22242E",cheek:"#FFFFFF",beak:"#3A3E48",tail:"#4A5A78",climb:-1},
+    syn:[0,.32,.64].map(t=>w(t,.2,1380,1260,.5,22,"sawtooth"))},
+  // brown crown + pale eyebrow, coarse STREAKS meeting in a STICKPIN spot
+  "song-sparrow":{name:"song sparrow",tier:3,band:[.56,.8],pose:"stand",
+    px:{L:11,body:"#8A6242",belly:"#E8E0D0",head:"#7A5A3E",eyeline:"#C8B896",streaks:"#6B4A32",stickpin:"#5A4028",wing:"#7A5238",beak:"#6B5A48"},
+    syn:[w(0,.13,3300,3200,.45),w(.2,.13,3300,3200,.45),w(.4,.13,3300,3200,.45),nz(.62,.35,3800,3800,.42,9),...ticks(1.05,7,.07,2500,.38,.05,"triangle")]},
   /* ---------------- forest ---------------- */
-  "robin":{name:"robin",tier:1,band:[.6,.82],pose:"stand",
-    px:{L:13,body:"#7A6450",belly:"#E8702E",head:"#4A3C30",beak:"#F2C230"},
+  "robin":{name:"robin",tier:1,band:[.66,.86],pose:"ground",
+    px:{L:13,body:"#6A5A50",belly:"#E8702E",head:"#3E3A38",beak:"#F2C230",leg:"#5A4A38"},
     syn:phrase3(2100,2800,6)},
   "blue-jay":{name:"blue jay",tier:1,band:[.42,.66],pose:"stand",
-    px:{L:14,body:"#3E7BE8",belly:"#EAEEF4",wing:"#2A5FC8",crest:"#3E7BE8",bib:"#22242E",beak:"#22242E"},
+    px:{L:14,body:"#3E7BE8",belly:"#EAEEF4",wing:"#2A5FC8",crest:"#3E7BE8",bib:"#22242E",beak:"#22242E",wingbar:"#FFFFFF",tail:"#2A5FC8"},
     syn:[w(0,.26,3400,2300,.5,14,"sawtooth"),nz(0,.26,3000,2200,.25,3),w(.4,.26,3300,2200,.5,14,"sawtooth"),nz(.4,.26,2900,2100,.25,3)]},
   "cardinal":{name:"cardinal",tier:1,band:[.5,.72],pose:"stand",
-    px:{L:13,body:"#E03028",belly:"#E03028",crest:"#E03028",mask:"#22242E",beak:"#E8862A"},
+    px:{L:13,body:"#D62C20",belly:"#E03028",crest:"#D62C20",mask:"#22242E",beak:"#E8862A",tail:"#A82018",wing:"#C02418"},
     syn:[w(0,.3,1500,3300,.5),w(.42,.3,1500,3300,.5),...ticks(.9,4,.15,2800,.4,.09,"triangle")]},
   "chickadee":{name:"chickadee",tier:1,band:[.42,.66],pose:"stand",
-    px:{L:10,body:"#AEB8BE",belly:"#E8E0CE",cap:"#22242E",bib:"#22242E",beak:"#22242E"},
+    px:{L:11,body:"#A8B2B8",belly:"#E8DCC0",cap:"#22242E",bib:"#22242E",cheek:"#FFFFFF",beak:"#22242E"},
     syn:[w(0,.4,3900,3750,.4),w(.55,.45,3100,2950,.42)]},
   "carolina-wren":{name:"carolina wren",tier:2,band:[.66,.84],pose:"stand",
     px:{L:10,body:"#B06A3C",belly:"#E8C89A",eyeline:"#F2EEE0",beak:"#5A4A38",tailUp:1},
@@ -415,8 +449,8 @@ const SPECIES={
   "meadowlark":{name:"meadowlark",tier:1,band:[.66,.84],pose:"stand",
     px:{L:13,body:"#8E6A42",belly:"#F2D030",bib:"#22242E",beak:"#8A7A5A"},
     syn:[w(0,.24,2650,2200,.45),w(.3,.24,2100,1650,.45),w(.62,.34,1900,1150,.5)]},
-  "goldfinch":{name:"goldfinch",tier:1,band:[.38,.58],pose:"fly",
-    px:{L:9,body:"#F2D830",belly:"#F2D830",wing:"#22242E",cap:"#22242E",beak:"#E8A05A"},
+  "goldfinch":{name:"goldfinch",tier:2,band:[.38,.58],pose:"fly",
+    px:{L:9,body:"#F2D830",belly:"#F2D830",wing:"#22242E",cap:"#22242E",beak:"#E8A05A",wingbar:"#F2EEE0",tail:"#22242E"},
     syn:[w(0,.11,2400,3000,.42),w(.14,.11,3100,2650,.42),w(.28,.11,2500,3050,.42),w(.42,.14,3100,2500,.45)]},
   "red-tailed-hawk":{name:"red-tailed hawk",tier:1,band:[.12,.32],pose:"soar",
     px:{L:16,body:"#8E6242",belly:"#E8DCC2",wing:"#6A4A34",tail:"#C86A3A",beak:"#E8C24A"},
@@ -465,6 +499,10 @@ const SPECIES={
 for(const k in SPECIES){SPECIES[k].slug=k;SPECIES[k].word=SPECIES[k].name.toLowerCase().replace(/[^a-z]/g,"");}
 
 const ECOS={
+  backyard:{key:"backyard",name:"BACKYARD",
+    birds:["cardinal","blue-jay","chickadee","robin","mourning-dove","goldfinch",
+           "house-sparrow","house-finch","tufted-titmouse","downy-woodpecker",
+           "dark-eyed-junco","white-breasted-nuthatch","song-sparrow"]},
   forest:{key:"forest",name:"FOREST",
     birds:["robin","blue-jay","cardinal","chickadee","carolina-wren","wood-thrush","ovenbird","scarlet-tanager"]},
   wetland:{key:"wetland",name:"WETLAND",
@@ -474,14 +512,14 @@ const ECOS={
   coast:{key:"coast",name:"COAST",
     birds:["gull","loon","osprey","willet","tern","oystercatcher","sanderling","plover"]},
 };
-const ECO_ORDER=["forest","wetland","grassland","coast"];
+const ECO_ORDER=["backyard","forest","wetland","grassland","coast"];
 const LEVELS=[
   null,
   {tiers:[1],total:10,concurrent:2,speed:40,gap:2.8},
   {tiers:[1,2],total:14,concurrent:3,speed:54,gap:2.0},
   {tiers:[1,2,3],total:18,concurrent:4,speed:68,gap:1.4},
 ];
-const MIGRATION={total:24,concurrent:4,speed:62,gap:1.6,perEco:6};
+const MIGRATION={total:30,concurrent:4,speed:62,gap:1.6,perEco:6};
 
 /* ============================ progress ============================ */
 const store={
@@ -533,6 +571,9 @@ const spriteCache=new Map();
 function paintBird(sg,p,pose,frame,S){
   // paints colored pixels into sprite ctx sg, canvas size S.w×S.h, bird faces left
   const L=p.L,cx=(S.w>>1),cy=(S.h>>1);
+  if(p.climb){ // trunk-clinging: +1 head-up (woodpecker), -1 head-down (nuthatch)
+    sg.translate(cx,cy);sg.rotate(p.climb*Math.PI/2);sg.translate(-cx,-cy);
+  }
   const dark="#22242E";
   const body=p.body,belly=p.belly||p.body;
   const R=(x,y,w2,h2,c)=>{sg.fillStyle=c;sg.fillRect(Math.round(x),Math.round(y),Math.round(w2),Math.round(h2));};
@@ -598,11 +639,15 @@ function paintBird(sg,p,pose,frame,S){
   // stand / ground / float
   const bw=Math.round(L*.55),bh=Math.round(L*.38);
   const by=cy+2;
-  const tailLen=Math.round(L*.5);
+  const tailLen=Math.round(L*(p.longTail?.9:.5));
   // tail
   const tc=p.tail||p.wing||body;
   if(p.tailUp){for(let i=0;i<tailLen;i++)R(cx+bw-2+i,by-2-i,2,2,tc);}
-  else for(let i=0;i<tailLen;i++)R(cx+bw-2+i,by-2+Math.round(i*.3),2,2,tc);
+  else for(let i=0;i<tailLen;i++){
+    const th=p.longTail&&i>tailLen*.55?1:2; // dove: long tapered tail
+    R(cx+bw-2+i,by-2+Math.round(i*.3),2,th,tc);
+    if(p.tailEdge)R(cx+bw-2+i,by-2+Math.round(i*.3)+th,1,1,p.tailEdge); // junco outer tail
+  }
   // legs
   if(pose!=="float"){
     const legLen=pose==="ground"?3:4;
@@ -614,21 +659,27 @@ function paintBird(sg,p,pose,frame,S){
   E(cx-1,by+1,Math.round(bw*.75),Math.max(1,Math.round(bh*.7)),belly);
   if(p.breast)E(cx-Math.round(bw*.45),by,Math.round(bw*.4),Math.max(1,Math.round(bh*.7)),p.breast);
   if(p.wing)E(cx+1,by-1,Math.round(bw*.5),Math.max(1,Math.round(bh*.5)),p.wing);
+  if(p.wingbar){R(cx,by-1,Math.round(bw*.5)+1,1,p.wingbar);
+                R(cx+1,by+1,Math.round(bw*.4)+1,1,p.wingbar);}
+  if(p.streaks)for(let i=0;i<4;i++)R(cx-Math.round(bw*.55)+i*3,by-1+(i%2),1,3,p.streaks);
+  if(p.stickpin)R(cx-Math.round(bw*.6),by,2,2,p.stickpin);
   if(p.shoulder)R(cx+1,by-bh+1,3,2,p.shoulder);
   if(p.band)R(cx-Math.round(bw*.3),by,Math.round(bw*.9),2,p.band);
   if(p.spots)for(let i=0;i<7;i++)R(cx-Math.round(bw*.6)+i*2,by+(i%3),1,1,p.spots);
   if(p.bands){R(cx-bw+1,by-1,bw,1,p.bands);R(cx-bw+1,by+2,bw,1,p.bands);}
   if(p.checks)for(let i=0;i<8;i++)R(cx-bw+2+i*2,by-bh+2+(i%2)*2,1,1,p.checks);
   // head
-  const hr=Math.max(2,Math.round(L*.24));
+  const hr=Math.max(2,Math.round(L*(p.smallHead?.17:.24)));
   const hx=cx-bw-Math.round(hr*.3),hy=by-bh-Math.round(hr*.5);
   E(hx,hy,hr,hr,p.head||body);
   if(p.cap)R(hx-hr,hy-hr,hr*2+1,Math.max(1,Math.round(hr*.8)),p.cap);
+  if(p.cheek)R(hx-hr,hy,hr*2,Math.max(1,hr-1),p.cheek);
   if(p.mask)R(hx-hr,hy-1,hr+1,2,p.mask);
   if(p.bib)R(hx-Math.round(hr*.8),hy+hr-1,hr*2,2,p.bib);
   if(p.eyeline)R(hx-hr,hy-1,hr*2,1,p.eyeline);
   if(p.nape)R(hx,hy-hr,hr*2,2,p.nape);
   if(p.crest){R(hx-1,hy-hr-2,3,2,p.crest);R(hx+1,hy-hr-1,2,1,p.crest);}
+  if(p.napeSpot)R(hx+hr-1,hy-hr,2,1,p.napeSpot); // downy's red nape
   // beak
   const bkLen=Math.max(2,Math.round(L*(p.bigBeak?.5:.22)));
   R(hx-hr-bkLen,hy,bkLen,1,p.beak);
@@ -685,6 +736,7 @@ function drawSun(){
 }
 function sceneColors(eco){
   return {
+    backyard:{sky:"#8CCCF2",far:"#C9BFD4",farLine:"#9C8FAE",mid:"#4A9642",ground:"#5FB04E",ground2:"#4E9C44"},
     forest:{sky:"#7EC8F8",far:"#9CCB7C",farLine:"#7FB65E",mid:"#3E8E4E",ground:"#58A85A",ground2:"#47945B"},
     wetland:{sky:"#8FD8F0",far:"#7FC49A",farLine:"#66B084",mid:"#5FA344",ground:"#3E8FC8",ground2:"#3079AE"},
     grassland:{sky:"#90CDF4",far:"#B8C464",farLine:"#9CAC4E",mid:"#C8A43C",ground:"#E3B341",ground2:"#D19E2F"},
@@ -704,7 +756,95 @@ function drawScene(eco,scroll,t){
     rect(x,y,1,ground-y,C.far);
     rect(x,y,1,1,C.farLine);
   }
-  if(eco.key==="forest"){
+  if(eco.key==="backyard"){
+    // neighbor rooflines beyond the yard (parallax .15)
+    for(let k=Math.floor(scroll*.15/56)-1;k<=Math.floor((scroll*.15+LW)/56)+1;k++){
+      const x=Math.round(k*56+hash(k*11)*14-scroll*.15);
+      const h3=hash(k*13);
+      ell(x+27,horizon-2,7,3,"#A89ABB"); // hedge between lots
+      rect(x,horizon-8,18,8,h3>.72?"#C86A5A":(h3>.38?"#E8DCC2":"#C9BFD4"));
+      for(let i=0;i<5;i++)rect(x-1+i,horizon-13+i,20-i*2,1,"#B85A48"); // chunky roof
+      rect(x+3,horizon-16,2,4,"#8A5A4A"); // chimney
+      rect(x+5,horizon-6,3,3,"#7A93B8");rect(x+11,horizon-6,3,3,"#7A93B8"); // windows
+    }
+    rect(0,horizon-1,LW,1,C.farLine);
+    // lawn
+    rect(0,horizon,LW,LH-horizon,C.ground);
+    dither(0,horizon,LW,LH-horizon,C.ground2,3);
+    // white picket fence (parallax .55)
+    const fenceY=horizon+2;
+    rect(0,fenceY+3,LW,1,"#E4E4DC");rect(0,fenceY+7,LW,1,"#E4E4DC");
+    for(let k=Math.floor(scroll*.55/7)-1;k<=Math.floor((scroll*.55+LW)/7)+1;k++){
+      const x=Math.round(k*7-scroll*.55);
+      rect(x,fenceY,2,10,"#F2F2EE");
+      rect(x,fenceY,2,1,"#FFFFFF");
+      rect(x+1,fenceY+1,1,9,"#D8D8D0");
+    }
+    // one BIG maple per 200px tile — its trunk is the climb-bird perch line
+    const ty=Math.round(LH*.30);
+    for(let k=Math.floor(scroll/200)-1;k<=Math.floor((scroll+LW)/200)+1;k++){
+      const x=Math.round(k*200+hash(k*17)*40-scroll);
+      // trunk + bark texture + root flare
+      rect(x-4,ty,8,ground-ty,"#6B4A2E");
+      rect(x+2,ty,2,ground-ty,"#8A6A44");
+      rect(x-4,ty,1,ground-ty,"#5A3E26");
+      dither(x-3,ty+8,6,ground-ty-10,"#5A3E26",4);
+      rect(x-6,ground-3,3,3,"#6B4A2E");rect(x+3,ground-3,4,3,"#6B4A2E");
+      // limbs reaching into the canopy
+      for(let i=0;i<8;i++){
+        rect(x-4-i,ty+2-i,3,2,"#6B4A2E");
+        rect(x+2+i,ty+5-i,3,2,"#6B4A2E");
+      }
+      // canopy sits ON the trunk
+      ell(x,ty-8,30,11,"#3A7D36");
+      ell(x-16,ty-3,16,9,"#3A7D36");
+      ell(x+16,ty-2,17,9,"#3A7D36");
+      ell(x+2,ty-14,20,9,"#4A9642");
+      ell(x-10,ty-16,13,7,"#5FAE4E");
+      ell(x+14,ty-11,10,6,"#4A9642");
+      dither(x-26,ty-12,52,18,"#2E6B2C",3);
+      // platform feeder — tray sits in the feeder-bird band
+      const fx=Math.round(k*200+110+hash(k*7)*18-scroll),trayY=Math.round(LH*.62);
+      rect(fx,trayY+3,2,ground-trayY-3,"#8B6B4A");
+      rect(fx-2,trayY+6,1,3,"#8B6B4A");rect(fx+3,trayY+6,1,3,"#8B6B4A"); // braces
+      rect(fx-7,trayY,16,3,"#A57A4E");
+      rect(fx-7,trayY,16,1,"#C89A6A");
+      rect(fx-7,trayY,1,3,"#8B6B4A");rect(fx+8,trayY,1,3,"#8B6B4A"); // tray lips
+      dither(fx-6,trayY,14,1,"#D9C29A",2); // seed heap
+      // little shingled roof so it reads as a feeder, not a bare post
+      rect(fx-6,trayY-4,1,4,"#8B6B4A");rect(fx+7,trayY-4,1,4,"#8B6B4A");
+      rect(fx-7,trayY-6,16,2,"#B85A48");
+      rect(fx-5,trayY-8,12,2,"#B85A48");
+      rect(fx-2,trayY-9,6,1,"#C86A58");
+      // birdbath (stolen from the Saturday-Cartoon pitch)
+      const bxx=Math.round(k*200+55+hash(k*29)*20-scroll);
+      rect(bxx-1,ground-7,3,7,"#B8B8B0");rect(bxx-3,ground-1,7,1,"#A8A8A0");
+      ell(bxx,ground-8,6,2,"#B8B8B0");
+      ell(bxx,ground-9,4,1,"#7EC8F8");
+      if((t*2+k)%3<1.2)rect(bxx+2,ground-11,1,1,"#FFFFFF"); // sparkle blink
+    }
+    // yard dressing: stepping stones, flower tufts, coiled garden hose
+    for(let k=Math.floor(scroll/34)-1;k<=Math.floor((scroll+LW)/34)+1;k++){
+      const x=Math.round(k*34+hash(k*3)*10-scroll);
+      ell(x,ground+4+Math.round(hash(k*7)*Math.max(1,LH-ground-6)),3,1,"#B8B8B0");
+    }
+    for(let k=Math.floor(scroll/22)-1;k<=Math.floor((scroll+LW)/22)+1;k++){
+      const x=Math.round(k*22+hash(k*5)*12-scroll);
+      const gy=horizon+14+Math.round(hash(k*9)*(LH-horizon-18));
+      rect(x,gy-3,1,3,C.mid);
+      rect(x,gy-4,1,1,["#E03028","#FFD24A","#E0559E"][Math.floor(hash(k*13)*3)]);
+    }
+    for(let k=Math.floor(scroll/300)-1;k<=Math.floor((scroll+LW)/300)+1;k++){
+      const x=Math.round(k*300+hash(k*19)*60-scroll),gy=ground+5;
+      ell(x,gy,6,2,"#2E7D32");ell(x,gy,4,1,C.ground);ell(x+7,gy+1,2,1,"#2E7D32");
+    }
+    // drifting maple leaves
+    for(let k=0;k<3;k++){
+      const lx2=((Math.round(hash(k*23)*LW+Math.sin(t*.7+k*2)*8-scroll*1.05)%LW)+LW)%LW;
+      const ly2=Math.round(LH*.08)+Math.round((t*9+k*53)%(LH*.55));
+      rect(lx2,ly2,1,1,"#C86A3A");
+    }
+  }else if(eco.key==="forest"){
     // mid treeline blobs
     for(let k=Math.floor(scroll*.4/26)-1;k<=Math.floor((scroll*.4+LW)/26)+1;k++){
       const x=Math.round(k*26+hash(k)*16-scroll*.4);
@@ -783,8 +923,8 @@ function drawScene(eco,scroll,t){
 /* ============================ game state ============================ */
 const game={
   mode:"menu",
-  ecoKey:"forest",level:1,migration:false,
-  eco:ECOS.forest,levelCfg:LEVELS[1],
+  ecoKey:"backyard",level:1,migration:false,
+  eco:ECOS.backyard,levelCfg:LEVELS[1],
   pool:[],newBirds:[],
   birds:[],particles:[],popups:[],
   scroll:0,time:0,
@@ -832,6 +972,13 @@ function spawnBird(){
     nextSing:game.time+.3+Math.random()*.5,singUntil:0,
     clip:null,spawnT:game.time,
   };
+  if(spec.px.climb&&game.eco.key==="backyard"){
+    // glue climb birds to a maple trunk just off-screen: parallax-1.0 trunks
+    // scroll at exactly bird speed, so the bird rides its trunk across.
+    let k=Math.floor((game.scroll+(W+40)/PXS)/200)-1;
+    while((k*200+hash(k*17)*40-game.scroll)*PXS<W+40)k++;
+    b.x=(k*200+hash(k*17)*40-game.scroll)*PXS+6*PXS*spec.px.climb;
+  }
   game.birds.push(b);
   game.spawned++;
   game.lastSpawn=game.time;
@@ -1051,6 +1198,12 @@ function render(){
     const state=b.state==="active"?"silhouette":"color";
     const spr=getSprite(b.slug,state,frame);
     const lx=Math.round(b.x/PXS)-28,ly=Math.round((b.y+b.bob)/PXS)-22;
+    if(b.spec.px.climb&&b.state==="active"&&game.eco.key!=="backyard"){
+      // outside the backyard (migration) there's no maple — give the bird a snag
+      const sxc=Math.round(b.x/PXS)+(b.spec.px.climb>0?-10:6),syc=Math.round((b.y+b.bob)/PXS);
+      g.fillStyle="#6B4A2E";g.fillRect(sxc,syc-17,5,34);
+      g.fillStyle="#8A6A44";g.fillRect(sxc+3,syc-17,1,34);
+    }
     if(b.state==="fleeing"&&Math.floor(t*10)%2){
       g.globalAlpha=.6;g.drawImage(spr,lx,ly);g.globalAlpha=1;
     }else g.drawImage(spr,lx,ly);
@@ -1349,7 +1502,7 @@ $("muteBtn").onclick=()=>setMuted(!muted);
   buildMenu();
 })();
 
-window.__avitype={game,handleLetter,SPECIES,ECOS,store,AUDIO,configureLevel,startLevel,endLevel};
+window.__avitype={game,handleLetter,SPECIES,ECOS,store,AUDIO,configureLevel,startLevel,endLevel,getSprite};
 
 })();
 </script>

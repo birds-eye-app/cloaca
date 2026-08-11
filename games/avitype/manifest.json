@@ -54,12 +54,30 @@
     "license": "CC BY-NC-SA 4.0"
   },
   {
+    "slug": "dark-eyed-junco",
+    "name": "junco",
+    "sci": "Junco hyemalis",
+    "file": "audio/dark-eyed-junco.mp3",
+    "xcId": "1013748",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
     "slug": "dickcissel",
     "name": "dickcissel",
     "sci": "Spiza americana",
     "file": "audio/dickcissel.mp3",
     "xcId": "1007619",
     "recordist": "David A. Brinkman",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "downy-woodpecker",
+    "name": "downy woodpecker",
+    "sci": "Dryobates pubescens",
+    "file": "audio/downy-woodpecker.mp3",
+    "xcId": "1014005",
+    "recordist": "Stanislas Wroza",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -103,8 +121,26 @@
     "name": "heron",
     "sci": "Ardea herodias",
     "file": "audio/heron.mp3",
-    "xcId": "1020818",
-    "recordist": "Stanislas Wroza",
+    "xcId": "1040454",
+    "recordist": "Greg Irving",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "house-finch",
+    "name": "house finch",
+    "sci": "Haemorhous mexicanus",
+    "file": "audio/house-finch.mp3",
+    "xcId": "900144",
+    "recordist": "Thomas G. Graves",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "house-sparrow",
+    "name": "house sparrow",
+    "sci": "Passer domesticus",
+    "file": "audio/house-sparrow.mp3",
+    "xcId": "1103781",
+    "recordist": "David Darrell-Lambert",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -168,6 +204,15 @@
     "file": "audio/meadowlark.mp3",
     "xcId": "906697",
     "recordist": "Jeff Stewart",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "mourning-dove",
+    "name": "mourning dove",
+    "sci": "Zenaida macroura",
+    "file": "audio/mourning-dove.mp3",
+    "xcId": "580701",
+    "recordist": "Steve Hampton",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -252,12 +297,39 @@
     "license": "CC BY-NC-SA 4.0"
   },
   {
+    "slug": "song-sparrow",
+    "name": "song sparrow",
+    "sci": "Melospiza melodia",
+    "file": "audio/song-sparrow.mp3",
+    "xcId": "1013341",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
     "slug": "tern",
     "name": "tern",
     "sci": "Sterna hirundo",
     "file": "audio/tern.mp3",
     "xcId": "1027923",
     "recordist": "Richard E. Webster",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "tufted-titmouse",
+    "name": "titmouse",
+    "sci": "Baeolophus bicolor",
+    "file": "audio/tufted-titmouse.mp3",
+    "xcId": "895984",
+    "recordist": "Scott Gravette",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "white-breasted-nuthatch",
+    "name": "nuthatch",
+    "sci": "Sitta carolinensis",
+    "file": "audio/white-breasted-nuthatch.mp3",
+    "xcId": "871628",
+    "recordist": "Thomas Magarian",
     "license": "CC BY-NC-SA 4.0"
   },
   {
