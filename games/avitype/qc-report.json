@@ -148,5 +148,855 @@
       "rival_name": "Mountain Chickadee",
       "worst_gap": 0
     }
+  },
+  {
+    "slug": "dark-eyed-junco",
+    "sci": "Junco hyemalis",
+    "xcId": "1013748",
+    "action": "replaced XC1013748 -> XC804601",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.975,
+      "mean": 0.955,
+      "worst_rival": 0.263,
+      "rival_name": "Orange-crowned Warbler",
+      "worst_gap": 0,
+      "score": 12.094
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.985,
+      "mean": 0.958,
+      "worst_rival": 0.315,
+      "rival_name": "Eastern Bonelli's Warbler",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "dickcissel",
+    "sci": "Spiza americana",
+    "xcId": "1007619",
+    "action": "recut",
+    "span": {
+      "start": 3.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.992,
+      "mean": 0.976,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.528
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.92,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "downy-woodpecker",
+    "sci": "Dryobates pubescens",
+    "xcId": "1014005",
+    "action": "recut",
+    "span": {
+      "start": 14.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.973,
+      "mean": 0.954,
+      "worst_rival": 0.117,
+      "rival_name": "Lesser Spotted Woodpecker",
+      "worst_gap": 0,
+      "score": 13.527999999999999
+    },
+    "final": {
+      "coverage": 0.667,
+      "peak": 0.979,
+      "mean": 0.64,
+      "worst_rival": 0.104,
+      "rival_name": "Ladder-backed Woodpecker",
+      "worst_gap": 2
+    }
+  },
+  {
+    "slug": "egret",
+    "sci": "Ardea alba",
+    "xcId": "1043529",
+    "action": "recut",
+    "span": {
+      "start": 8.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.933,
+      "mean": 0.895,
+      "worst_rival": 0.127,
+      "rival_name": "Snowy Egret",
+      "worst_gap": 0,
+      "score": 12.357999999999997
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.984,
+      "mean": 0.982,
+      "worst_rival": 0.107,
+      "rival_name": "Snowy Egret",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "goldfinch",
+    "sci": "Spinus tristis",
+    "xcId": "1021822",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.965,
+      "worst_rival": 0.181,
+      "rival_name": "Chestnut-throated Seedeater",
+      "worst_gap": 0,
+      "score": 12.966000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.996,
+      "mean": 0.876,
+      "worst_rival": 0.105,
+      "rival_name": "Yellow-winged Blackbird",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "grasshopper-sparrow",
+    "sci": "Ammodramus savannarum",
+    "xcId": "1007620",
+    "action": "recut",
+    "span": {
+      "start": 12.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.795,
+      "mean": 0.7,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 11.379999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.827,
+      "mean": 0.669,
+      "worst_rival": 0.168,
+      "rival_name": "Dickcissel",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "gull",
+    "sci": "Leucophaeus atricilla",
+    "xcId": "1135805",
+    "action": "recut",
+    "span": {
+      "start": 4.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.986,
+      "mean": 0.969,
+      "worst_rival": 0.129,
+      "rival_name": "Franklin's Gull",
+      "worst_gap": 0,
+      "score": 13.286
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.954,
+      "mean": 0.941,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "heron",
+    "sci": "Ardea herodias",
+    "xcId": "1040454",
+    "action": "recut",
+    "span": {
+      "start": 1.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.978,
+      "mean": 0.952,
+      "worst_rival": 0.238,
+      "rival_name": "Military Macaw",
+      "worst_gap": 0,
+      "score": 12.075999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.907,
+      "mean": 0.888,
+      "worst_rival": 0.121,
+      "rival_name": "Military Macaw",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "house-finch",
+    "sci": "Haemorhous mexicanus",
+    "xcId": "900144",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.986,
+      "mean": 0.961,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 14.753999999999998
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.943,
+      "mean": 0.876,
+      "worst_rival": 0.151,
+      "rival_name": "White-crowned Sparrow",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "house-sparrow",
+    "sci": "Passer domesticus",
+    "xcId": "1103781",
+    "action": "recut",
+    "span": {
+      "start": 19.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.736,
+      "mean": 0.689,
+      "worst_rival": 0.15,
+      "rival_name": "Hypocolius",
+      "worst_gap": 0,
+      "score": 9.533999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.75,
+      "mean": 0.718,
+      "worst_rival": 0.243,
+      "rival_name": "Italian Sparrow",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "kestrel",
+    "sci": "Falco sparverius",
+    "xcId": "1013541",
+    "action": "replaced XC1013541 -> XC779660",
+    "span": {
+      "start": 1.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.995,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.746
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "killdeer",
+    "sci": "Charadrius vociferus",
+    "xcId": "1000428",
+    "action": "replaced XC1000428 -> XC1012888",
+    "span": {
+      "start": 4.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.997,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.766000000000002
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "kingfisher",
+    "sci": "Megaceryle alcyon",
+    "xcId": "1019917",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 1.0,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.190000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 1.0,
+      "mean": 1.0,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "loon",
+    "sci": "Gavia immer",
+    "xcId": "1009388",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.992,
+      "worst_rival": 0.131,
+      "rival_name": "Eurasian Curlew",
+      "worst_gap": 0,
+      "score": 13.844000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.996,
+      "worst_rival": 0.224,
+      "rival_name": "Ring-billed Gull",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "mallard",
+    "sci": "Anas platyrhynchos",
+    "xcId": "1094846",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.921,
+      "mean": 0.895,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 14.434000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.923,
+      "mean": 0.895,
+      "worst_rival": 0.185,
+      "rival_name": "American Black Duck",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "marsh-wren",
+    "sci": "Cistothorus palustris",
+    "xcId": "1013498",
+    "action": "recut",
+    "span": {
+      "start": 8.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.996,
+      "mean": 0.995,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.734
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.998,
+      "mean": 0.994,
+      "worst_rival": 0.106,
+      "rival_name": "Red-winged Blackbird",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "meadowlark",
+    "sci": "Sturnella magna",
+    "xcId": "906697",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.993,
+      "mean": 0.95,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 14.672
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.987,
+      "mean": 0.941,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "mourning-dove",
+    "sci": "Zenaida macroura",
+    "xcId": "580701",
+    "action": "recut",
+    "span": {
+      "start": 1.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.995,
+      "worst_rival": 0.131,
+      "rival_name": "Eurasian Collared-Dove",
+      "worst_gap": 0,
+      "score": 13.873999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.998,
+      "mean": 0.995,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "osprey",
+    "sci": "Pandion haliaetus",
+    "xcId": "225658",
+    "action": "recut",
+    "span": {
+      "start": 3.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 1.0,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.790000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.999,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "ovenbird",
+    "sci": "Seiurus aurocapilla",
+    "xcId": "1002741",
+    "action": "recut",
+    "span": {
+      "start": 7.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.988,
+      "mean": 0.979,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.542
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.992,
+      "mean": 0.987,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "oystercatcher",
+    "sci": "Haematopus palliatus",
+    "xcId": "573224",
+    "action": "replaced XC573224 -> XC269291",
+    "span": {
+      "start": 19.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.937,
+      "mean": 0.827,
+      "worst_rival": 0.785,
+      "rival_name": "Least Tern",
+      "worst_gap": 0,
+      "score": 3.798
+    },
+    "final": {
+      "coverage": 0.8,
+      "peak": 0.937,
+      "mean": 0.698,
+      "worst_rival": 0.165,
+      "rival_name": "American Avocet",
+      "worst_gap": 1
+    }
+  },
+  {
+    "slug": "plover",
+    "sci": "Pluvialis squatarola",
+    "xcId": "1088399",
+    "action": "recut",
+    "span": {
+      "start": 9.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.967,
+      "mean": 0.95,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 14.568000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.973,
+      "mean": 0.934,
+      "worst_rival": 0.27,
+      "rival_name": "European Golden-Plover",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "red-tailed-hawk",
+    "sci": "Buteo jamaicensis",
+    "xcId": "1033919",
+    "action": "replaced XC1033919 -> XC973857",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.98,
+      "mean": 0.938,
+      "worst_rival": 0.185,
+      "rival_name": "Crissal Thrasher",
+      "worst_gap": 0,
+      "score": 12.879999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.985,
+      "mean": 0.937,
+      "worst_rival": 0.21,
+      "rival_name": "Crissal Thrasher",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "red-winged-blackbird",
+    "sci": "Agelaius phoeniceus",
+    "xcId": "1133698",
+    "action": "replaced XC1133698 -> XC989810",
+    "span": {
+      "start": 3.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.734,
+      "mean": 0.66,
+      "worst_rival": 0.362,
+      "rival_name": "Tricolored Blackbird",
+      "worst_gap": 0,
+      "score": 6.392000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.661,
+      "mean": 0.646,
+      "worst_rival": 0.2,
+      "rival_name": "Sora",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "robin",
+    "sci": "Turdus migratorius",
+    "xcId": "1138978",
+    "action": "recut",
+    "span": {
+      "start": 3.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.508,
+      "mean": 0.452,
+      "worst_rival": 0.13,
+      "rival_name": "Eastern Bluebird",
+      "worst_gap": 0,
+      "score": 6.491999999999999
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.651,
+      "mean": 0.555,
+      "worst_rival": 0.158,
+      "rival_name": "Creamy-bellied Thrush",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "sanderling",
+    "sci": "Calidris alba",
+    "xcId": "1030106",
+    "action": "recut",
+    "span": {
+      "start": 6.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.945,
+      "mean": 0.817,
+      "worst_rival": 0.219,
+      "rival_name": "Mauritius White-eye",
+      "worst_gap": 0,
+      "score": 10.521999999999998
+    },
+    "final": {
+      "coverage": 0.833,
+      "peak": 0.613,
+      "mean": 0.495,
+      "worst_rival": 0.138,
+      "rival_name": "Western Kingbird",
+      "worst_gap": 1
+    }
+  },
+  {
+    "slug": "scarlet-tanager",
+    "sci": "Piranga olivacea",
+    "xcId": "1036514",
+    "action": "recut",
+    "span": {
+      "start": 25.0,
+      "dur": 6.0,
+      "coverage": 1.0,
+      "peak": 0.993,
+      "mean": 0.988,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.052
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.982,
+      "mean": 0.976,
+      "worst_rival": 0.11,
+      "rival_name": "Common Wood-Pigeon",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "song-sparrow",
+    "sci": "Melospiza melodia",
+    "xcId": "1013341",
+    "action": "replaced XC1013341 -> XC1013034",
+    "span": {
+      "start": 17.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.964,
+      "mean": 0.885,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 14.506
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.845,
+      "mean": 0.717,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "tern",
+    "sci": "Sterna hirundo",
+    "xcId": "1027923",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.992,
+      "worst_rival": 0.136,
+      "rival_name": "Arctic Tern",
+      "worst_gap": 0,
+      "score": 14.076
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.997,
+      "mean": 0.994,
+      "worst_rival": 0.186,
+      "rival_name": "Arctic Tern",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "tufted-titmouse",
+    "sci": "Baeolophus bicolor",
+    "xcId": "895984",
+    "action": "replaced XC895984 -> XC793408",
+    "span": {
+      "start": 15.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.985,
+      "mean": 0.97,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.44
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.992,
+      "mean": 0.985,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "white-breasted-nuthatch",
+    "sci": "Sitta carolinensis",
+    "xcId": "871628",
+    "action": "replaced XC871628 -> XC687224",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.998,
+      "mean": 0.996,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.752000000000002
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.998,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "willet",
+    "sci": "Tringa semipalmata",
+    "xcId": "901132",
+    "action": "recut",
+    "span": {
+      "start": 9.0,
+      "dur": 7.5,
+      "coverage": 1.0,
+      "peak": 0.985,
+      "mean": 0.97,
+      "worst_rival": 0.397,
+      "rival_name": "Common Yellowthroat",
+      "worst_gap": 0,
+      "score": 10.375999999999998
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.975,
+      "mean": 0.845,
+      "worst_rival": 0.293,
+      "rival_name": "Common Yellowthroat",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "wood-duck",
+    "sci": "Aix sponsa",
+    "xcId": "679723",
+    "action": "recut",
+    "span": {
+      "start": 0.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.998,
+      "mean": 0.979,
+      "worst_rival": 0.126,
+      "rival_name": "Pacific Screech-Owl",
+      "worst_gap": 0,
+      "score": 14.07
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.983,
+      "mean": 0.952,
+      "worst_rival": 0.156,
+      "rival_name": "Tropical Screech-Owl",
+      "worst_gap": 0
+    }
+  },
+  {
+    "slug": "wood-thrush",
+    "sci": "Hylocichla mustelina",
+    "xcId": "995787",
+    "action": "recut",
+    "span": {
+      "start": 16.0,
+      "dur": 9.0,
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.992,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0,
+      "score": 15.716000000000001
+    },
+    "final": {
+      "coverage": 1.0,
+      "peak": 0.999,
+      "mean": 0.997,
+      "worst_rival": 0.0,
+      "rival_name": "",
+      "worst_gap": 0
+    }
   }
 ]

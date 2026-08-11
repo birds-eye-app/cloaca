@@ -58,8 +58,8 @@
     "name": "junco",
     "sci": "Junco hyemalis",
     "file": "audio/dark-eyed-junco.mp3",
-    "xcId": "1013748",
-    "recordist": "Stanislas Wroza",
+    "xcId": "804601",
+    "recordist": "Paul Marvin",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -148,8 +148,8 @@
     "name": "kestrel",
     "sci": "Falco sparverius",
     "file": "audio/kestrel.mp3",
-    "xcId": "1013541",
-    "recordist": "Stanislas Wroza",
+    "xcId": "779660",
+    "recordist": "Patrice Mathieu",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -157,8 +157,8 @@
     "name": "killdeer",
     "sci": "Charadrius vociferus",
     "file": "audio/killdeer.mp3",
-    "xcId": "1000428",
-    "recordist": "David Tattersley",
+    "xcId": "1012888",
+    "recordist": "Stanislas Wroza",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -238,8 +238,8 @@
     "name": "oystercatcher",
     "sci": "Haematopus palliatus",
     "file": "audio/oystercatcher.mp3",
-    "xcId": "573224",
-    "recordist": "William Whitehead",
+    "xcId": "269291",
+    "recordist": "Paul Marvin",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -256,8 +256,8 @@
     "name": "red-tailed hawk",
     "sci": "Buteo jamaicensis",
     "file": "audio/red-tailed-hawk.mp3",
-    "xcId": "1033919",
-    "recordist": "Rory Nefdt",
+    "xcId": "973857",
+    "recordist": "Richard E. Webster",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -265,8 +265,8 @@
     "name": "red-winged blackbird",
     "sci": "Agelaius phoeniceus",
     "file": "audio/red-winged-blackbird.mp3",
-    "xcId": "1133698",
-    "recordist": "Rory Nefdt",
+    "xcId": "989810",
+    "recordist": "Ed Pandolfino",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -301,7 +301,7 @@
     "name": "song sparrow",
     "sci": "Melospiza melodia",
     "file": "audio/song-sparrow.mp3",
-    "xcId": "1013341",
+    "xcId": "1013034",
     "recordist": "Stanislas Wroza",
     "license": "CC BY-NC-SA 4.0"
   },
@@ -319,8 +319,8 @@
     "name": "titmouse",
     "sci": "Baeolophus bicolor",
     "file": "audio/tufted-titmouse.mp3",
-    "xcId": "895984",
-    "recordist": "Scott Gravette",
+    "xcId": "793408",
+    "recordist": "Jim Berry",
     "license": "CC BY-NC-SA 4.0"
   },
   {
@@ -328,8 +328,8 @@
     "name": "nuthatch",
     "sci": "Sitta carolinensis",
     "file": "audio/white-breasted-nuthatch.mp3",
-    "xcId": "871628",
-    "recordist": "Thomas Magarian",
+    "xcId": "687224",
+    "recordist": "David A. Brinkman",
     "license": "CC BY-NC-SA 4.0"
   },
   {
