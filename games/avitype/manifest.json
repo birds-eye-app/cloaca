@@ -1,0 +1,290 @@
+[
+  {
+    "slug": "bittern",
+    "name": "bittern",
+    "sci": "Botaurus lentiginosus",
+    "file": "audio/bittern.mp3",
+    "xcId": "1013532",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "blue-jay",
+    "name": "blue jay",
+    "sci": "Cyanocitta cristata",
+    "file": "audio/blue-jay.mp3",
+    "xcId": "1012556",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "bobolink",
+    "name": "bobolink",
+    "sci": "Dolichonyx oryzivorus",
+    "file": "audio/bobolink.mp3",
+    "xcId": "1021265",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "cardinal",
+    "name": "cardinal",
+    "sci": "Cardinalis cardinalis",
+    "file": "audio/cardinal.mp3",
+    "xcId": "1093538",
+    "recordist": "Mario Reyes Jr",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "carolina-wren",
+    "name": "carolina wren",
+    "sci": "Thryothorus ludovicianus",
+    "file": "audio/carolina-wren.mp3",
+    "xcId": "1093537",
+    "recordist": "Mario Reyes Jr",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "chickadee",
+    "name": "chickadee",
+    "sci": "Poecile atricapillus",
+    "file": "audio/chickadee.mp3",
+    "xcId": "994313",
+    "recordist": "Rory Nefdt",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "dickcissel",
+    "name": "dickcissel",
+    "sci": "Spiza americana",
+    "file": "audio/dickcissel.mp3",
+    "xcId": "1007619",
+    "recordist": "David A. Brinkman",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "egret",
+    "name": "egret",
+    "sci": "Ardea alba",
+    "file": "audio/egret.mp3",
+    "xcId": "1043529",
+    "recordist": "Sue Riffe",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "goldfinch",
+    "name": "goldfinch",
+    "sci": "Spinus tristis",
+    "file": "audio/goldfinch.mp3",
+    "xcId": "1021822",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "grasshopper-sparrow",
+    "name": "grasshopper sparrow",
+    "sci": "Ammodramus savannarum",
+    "file": "audio/grasshopper-sparrow.mp3",
+    "xcId": "1007620",
+    "recordist": "David A. Brinkman",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "gull",
+    "name": "gull",
+    "sci": "Leucophaeus atricilla",
+    "file": "audio/gull.mp3",
+    "xcId": "1135805",
+    "recordist": "Rory Nefdt",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "heron",
+    "name": "heron",
+    "sci": "Ardea herodias",
+    "file": "audio/heron.mp3",
+    "xcId": "1020818",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "kestrel",
+    "name": "kestrel",
+    "sci": "Falco sparverius",
+    "file": "audio/kestrel.mp3",
+    "xcId": "1013541",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "killdeer",
+    "name": "killdeer",
+    "sci": "Charadrius vociferus",
+    "file": "audio/killdeer.mp3",
+    "xcId": "1000428",
+    "recordist": "David Tattersley",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "kingfisher",
+    "name": "kingfisher",
+    "sci": "Megaceryle alcyon",
+    "file": "audio/kingfisher.mp3",
+    "xcId": "1019917",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "loon",
+    "name": "loon",
+    "sci": "Gavia immer",
+    "file": "audio/loon.mp3",
+    "xcId": "1009388",
+    "recordist": "Denis Provencher",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "mallard",
+    "name": "mallard",
+    "sci": "Anas platyrhynchos",
+    "file": "audio/mallard.mp3",
+    "xcId": "1094846",
+    "recordist": "Petter Westberg",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "marsh-wren",
+    "name": "marsh wren",
+    "sci": "Cistothorus palustris",
+    "file": "audio/marsh-wren.mp3",
+    "xcId": "1013498",
+    "recordist": "Stanislas Wroza",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "meadowlark",
+    "name": "meadowlark",
+    "sci": "Sturnella magna",
+    "file": "audio/meadowlark.mp3",
+    "xcId": "906697",
+    "recordist": "Jeff Stewart",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "osprey",
+    "name": "osprey",
+    "sci": "Pandion haliaetus",
+    "file": "audio/osprey.mp3",
+    "xcId": "225658",
+    "recordist": "Paul Marvin",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "ovenbird",
+    "name": "ovenbird",
+    "sci": "Seiurus aurocapilla",
+    "file": "audio/ovenbird.mp3",
+    "xcId": "1002741",
+    "recordist": "Sue Riffe",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "oystercatcher",
+    "name": "oystercatcher",
+    "sci": "Haematopus palliatus",
+    "file": "audio/oystercatcher.mp3",
+    "xcId": "573224",
+    "recordist": "William Whitehead",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "plover",
+    "name": "plover",
+    "sci": "Pluvialis squatarola",
+    "file": "audio/plover.mp3",
+    "xcId": "1088399",
+    "recordist": "Paul Kelly",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "red-tailed-hawk",
+    "name": "red-tailed hawk",
+    "sci": "Buteo jamaicensis",
+    "file": "audio/red-tailed-hawk.mp3",
+    "xcId": "1033919",
+    "recordist": "Rory Nefdt",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "red-winged-blackbird",
+    "name": "red-winged blackbird",
+    "sci": "Agelaius phoeniceus",
+    "file": "audio/red-winged-blackbird.mp3",
+    "xcId": "1133698",
+    "recordist": "Rory Nefdt",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "robin",
+    "name": "robin",
+    "sci": "Turdus migratorius",
+    "file": "audio/robin.mp3",
+    "xcId": "1138978",
+    "recordist": "Greg Irving",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "sanderling",
+    "name": "sanderling",
+    "sci": "Calidris alba",
+    "file": "audio/sanderling.mp3",
+    "xcId": "1030106",
+    "recordist": "Lionel FREDERIC",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "scarlet-tanager",
+    "name": "scarlet tanager",
+    "sci": "Piranga olivacea",
+    "file": "audio/scarlet-tanager.mp3",
+    "xcId": "1036514",
+    "recordist": "Bobby Wilcox",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "tern",
+    "name": "tern",
+    "sci": "Sterna hirundo",
+    "file": "audio/tern.mp3",
+    "xcId": "1027923",
+    "recordist": "Richard E. Webster",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "willet",
+    "name": "willet",
+    "sci": "Tringa semipalmata",
+    "file": "audio/willet.mp3",
+    "xcId": "901132",
+    "recordist": "David Tattersley",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "wood-duck",
+    "name": "wood duck",
+    "sci": "Aix sponsa",
+    "file": "audio/wood-duck.mp3",
+    "xcId": "679723",
+    "recordist": "Aziza Cooper",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "slug": "wood-thrush",
+    "name": "wood thrush",
+    "sci": "Hylocichla mustelina",
+    "file": "audio/wood-thrush.mp3",
+    "xcId": "995787",
+    "recordist": "Rory Nefdt",
+    "license": "CC BY-NC-SA 4.0"
+  }
+]
