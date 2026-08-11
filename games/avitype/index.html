@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>AVITYPE — a bird song typing game</title>
+<style>
+  :root{
+    --ink:#070B10;
+    --line:#DCE8EC;
+    --dim:#33414F;
+    --danger:#FF5964;
+    --accent:#8FE388;
+    --display:"Avenir Next","Futura","Century Gothic","Jost","Trebuchet MS",sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--ink);
+    color:var(--line);
+    font-family:var(--display);
+    overflow:hidden;
+    -webkit-user-select:none;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #game{position:fixed;inset:0;display:block}
+  #mobileInput{
+    position:fixed;top:-40px;left:0;width:10px;height:10px;
+    opacity:0;font-size:16px;border:0;background:transparent;color:transparent;
+  }
+  .screen{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:26px;
+    background:rgba(7,11,16,.78);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    text-align:center;padding:24px;z-index:10;
+  }
+  .hidden{display:none !important}
+  .title{
+    font-size:clamp(38px,8vw,74px);
+    font-weight:600;letter-spacing:.42em;text-indent:.42em;
+    color:var(--line);
+    text-shadow:0 0 18px rgba(220,232,236,.35);
+  }
+  .title b{color:var(--accent);font-weight:600;text-shadow:0 0 18px var(--accent)}
+  .tagline{
+    font-size:13px;letter-spacing:.34em;text-indent:.34em;text-transform:uppercase;
+    color:rgba(220,232,236,.55);
+  }
+  .grouplabel{
+    font-size:11px;letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;
+    color:rgba(220,232,236,.4);margin-bottom:10px;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .chip{
+    font-family:var(--display);font-size:13px;letter-spacing:.22em;text-indent:.22em;
+    text-transform:uppercase;color:rgba(220,232,236,.75);
+    background:transparent;border:1px solid rgba(220,232,236,.25);
+    padding:10px 18px;border-radius:2px;cursor:pointer;
+    transition:border-color .15s,color .15s,box-shadow .15s;
+  }
+  .chip:hover{border-color:rgba(220,232,236,.6)}
+  .chip:focus-visible{outline:1px solid var(--line);outline-offset:2px}
+  .chip.sel{
+    color:var(--chip,var(--accent));border-color:var(--chip,var(--accent));
+    box-shadow:0 0 12px color-mix(in srgb,var(--chip,var(--accent)) 40%,transparent),inset 0 0 8px color-mix(in srgb,var(--chip,var(--accent)) 12%,transparent);
+  }
+  .start{
+    font-size:16px;letter-spacing:.3em;text-indent:.3em;padding:14px 34px;
+    color:var(--ink);background:var(--line);border:0;border-radius:2px;cursor:pointer;
+    font-family:var(--display);font-weight:600;text-transform:uppercase;
+    box-shadow:0 0 22px rgba(220,232,236,.35);
+  }
+  .start:hover{box-shadow:0 0 30px rgba(220,232,236,.55)}
+  .footnote{font-size:11px;letter-spacing:.14em;color:rgba(220,232,236,.35);line-height:2}
+  .footnote b{color:rgba(220,232,236,.6);font-weight:600}
+  .bigstat{font-size:clamp(40px,9vw,84px);font-weight:600;letter-spacing:.08em;font-variant-numeric:tabular-nums;text-shadow:0 0 22px rgba(220,232,236,.3)}
+  .stats{display:flex;gap:34px;flex-wrap:wrap;justify-content:center}
+  .stat{display:flex;flex-direction:column;gap:6px}
+  .stat .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+  .stat .k{font-size:10px;letter-spacing:.28em;text-indent:.28em;text-transform:uppercase;color:rgba(220,232,236,.4)}
+  .lifelist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:640px}
+  .lifelist span{
+    font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+    border:1px solid rgba(220,232,236,.18);padding:5px 10px;border-radius:2px;
+    color:rgba(220,232,236,.4);
+  }
+  .lifelist span.got{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 55%,transparent);text-shadow:0 0 8px color-mix(in srgb,var(--accent) 60%,transparent)}
+  .lifelist span.fled{color:var(--danger);border-color:rgba(255,89,100,.4)}
+  .resulttitle{font-size:clamp(22px,5vw,36px);font-weight:600;letter-spacing:.34em;text-indent:.34em;text-transform:uppercase}
+  #pauseScreen .resulttitle{color:rgba(220,232,236,.85)}
+  @media (max-width:520px){
+    .screen{gap:18px}
+    .stats{gap:18px}
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<input id="mobileInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-hidden="true" tabindex="-1">
+
+<div id="menuScreen" class="screen">
+  <div>
+    <div class="title">AVI<b>TYPE</b></div>
+    <div class="tagline" style="margin-top:14px">type the birds &nbsp;·&nbsp; learn the songs</div>
+  </div>
+  <div>
+    <div class="grouplabel">Flyway</div>
+    <div class="row" id="ecoRow"></div>
+  </div>
+  <div>
+    <div class="grouplabel">Difficulty</div>
+    <div class="row" id="diffRow"></div>
+  </div>
+  <button class="start" id="startBtn">Take Flight</button>
+  <div class="footnote">
+    type a bird's name to reveal it — first letter locks on<br>
+    a wrong key <b>scares it off</b> · a bird that escapes unnamed costs a <b>life</b><br>
+    <b>esc</b> pause · <b>m</b> mute &nbsp;·&nbsp; best: <span id="bestLabel">—</span>
+  </div>
+</div>
+
+<div id="resultScreen" class="screen hidden">
+  <div class="resulttitle" id="resultTitle">MIGRATION COMPLETE</div>
+  <div class="bigstat" id="resultScore">0</div>
+  <div class="stats">
+    <div class="stat"><span class="v" id="stAcc">—</span><span class="k">accuracy</span></div>
+    <div class="stat"><span class="v" id="stCombo">—</span><span class="k">best combo</span></div>
+    <div class="stat"><span class="v" id="stBirds">—</span><span class="k">identified</span></div>
+  </div>
+  <div>
+    <div class="grouplabel">Field Notes</div>
+    <div class="lifelist" id="lifeList"></div>
+  </div>
+  <div class="row">
+    <button class="chip" id="againBtn">Fly Again</button>
+    <button class="chip" id="menuBtn">Menu</button>
+  </div>
+</div>
+
+<div id="pauseScreen" class="screen hidden">
+  <div class="resulttitle">PAUSED</div>
+  <div class="row">
+    <button class="chip" id="resumeBtn">Resume</button>
+    <button class="chip" id="quitBtn">Abandon Flight</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+/* ============================== utilities ============================== */
+
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const TAU=Math.PI*2;
+function hash(n){const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);}
+function noise1(x){const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return lerp(hash(i),hash(i+1),u);}
+const reducedMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ============================== audio ============================== */
+
+const AC=new (window.AudioContext||window.webkitAudioContext)();
+const master=AC.createGain();master.gain.value=.6;
+const comp=AC.createDynamicsCompressor();
+master.connect(comp);comp.connect(AC.destination);
+let muted=false;
+function setMuted(m){muted=m;master.gain.value=m?0:.6;}
+
+const noiseBuf=(()=>{
+  const b=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);
+  const d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  return b;
+})();
+
+// note helpers — a stylized "field guide chiptune" voice per species
+function w(t,d,f0,f1,v=.5,vib=0,type="triangle"){return{k:"tone",t,d,f0,f1,v,vib,type};}
+function nz(t,d,f0,f1,v=.5,q=6){return{k:"noise",t,d,f0,f1,v,q};}
+function ticks(t0,n,gap,f,v=.4,d=.03,type="square"){
+  const out=[];for(let i=0;i<n;i++)out.push(w(t0+i*gap,d,f,f*.92,v,0,type));return out;
+}
+
+function scheduleNote(note,t0,rate,vol){
+  const t=t0+note.t/rate,d=Math.max(.02,note.d/rate);
+  const g=AC.createGain();
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(note.v*vol,t+Math.min(.02,d*.3));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  g.connect(master);
+  if(note.k==="tone"){
+    const o=AC.createOscillator();
+    o.type=note.type||"triangle";
+    o.frequency.setValueAtTime(Math.max(30,note.f0),t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(30,note.f1),t+d);
+    if(note.vib){
+      const lfo=AC.createOscillator(),lg=AC.createGain();
+      lfo.frequency.value=note.vib;lg.gain.value=note.f0*.04;
+      lfo.connect(lg);lg.connect(o.frequency);
+      lfo.start(t);lfo.stop(t+d+.05);
+    }
+    o.connect(g);o.start(t);o.stop(t+d+.05);
+  }else{
+    const src=AC.createBufferSource();src.buffer=noiseBuf;src.loop=true;
+    const f=AC.createBiquadFilter();f.type="bandpass";f.Q.value=note.q;
+    f.frequency.setValueAtTime(Math.max(60,note.f0),t);
+    f.frequency.exponentialRampToValueAtTime(Math.max(60,note.f1),t+d);
+    src.connect(f);f.connect(g);src.start(t);src.stop(t+d+.05);
+  }
+}
+function playSong(notes,{rate=1,vol=.14}={}){
+  if(muted||AC.state!=="running")return 0;
+  const t0=AC.currentTime+.02;
+  let end=0;
+  for(const n of notes){scheduleNote(n,t0,rate,vol);end=Math.max(end,(n.t+n.d)/rate);}
+  return end;
+}
+function sfxKey(){playSong([w(0,.035,1500,1400,.14,0,"square")],{vol:.06});}
+function sfxDud(){playSong([w(0,.06,220,180,.3,0,"square")],{vol:.05});}
+function sfxScare(){
+  playSong([nz(0,.28,1800,700,.6,2),w(0,.22,700,220,.5,30,"sawtooth")],{vol:.12});
+}
+function sfxMiss(){playSong([w(0,.3,520,240,.5,0,"triangle"),w(.1,.35,380,170,.4,0,"triangle")],{vol:.1});}
+function sfxLock(){playSong([w(0,.05,900,1200,.3,0,"square"),w(.05,.06,1200,1500,.3,0,"square")],{vol:.06});}
+
+/* ============================== species ============================== */
+/* band: [top,bottom] as fraction of screen height where the bird lives.
+   pose: perch | ground | wader | float | soar | fly | hover
+   p: shape params — s size, beak, tail, crest, neck, legs, plump, span, kink, tailUp */
+
+function phrase3(f0,f1,vib){return[w(0,.2,f0,f1,.45,vib),w(.28,.2,f1,f0*.94,.42,vib),w(.6,.22,f0*.92,f1*1.04,.45,vib)];}
+
+const SPECIES={
+  /* -------- forest -------- */
+  wren:{n:"wren",band:[.74,.88],pose:"perch",p:{s:.62,beak:.7,tail:1.15,tailUp:.5,plump:1.05},
+    song:[...[0,.34,.68].flatMap(t=>[w(t,.08,3200,2600,.42),w(t+.1,.08,2200,2600,.4),w(t+.19,.12,2600,1950,.45)]),w(1.05,.14,2100,1700,.4)]},
+  robin:{n:"robin",band:[.66,.82],pose:"perch",p:{s:.9,beak:.55,tail:.9,plump:1.05},
+    song:phrase3(2100,2800,6).concat(phrase3(2500,1900,6).map(x=>({...x,t:x.t+1.05})))},
+  "blue jay":{n:"blue jay",band:[.5,.68],pose:"perch",p:{s:.95,beak:.6,tail:1.15,crest:.8},
+    song:[w(0,.26,3400,2300,.5,14,"sawtooth"),nz(0,.26,3000,2200,.25,3),w(.4,.26,3300,2200,.5,14,"sawtooth"),nz(.4,.26,2900,2100,.25,3)]},
+  chickadee:{n:"chickadee",band:[.5,.68],pose:"perch",p:{s:.55,beak:.35,tail:.95,plump:1.1},
+    song:[w(0,.4,3900,3750,.4),w(.55,.45,3100,2950,.42)]},
+  cardinal:{n:"cardinal",band:[.56,.74],pose:"perch",p:{s:.9,beak:.55,tail:1.05,crest:1},
+    song:[w(0,.3,1500,3300,.5),w(.42,.3,1500,3300,.5),...ticks(.9,4,.15,2800,.4,.09,"triangle").map((x,i)=>({...x,f0:2900-i*150,f1:2100-i*150}))]},
+  ovenbird:{n:"ovenbird",band:[.86,.94],pose:"ground",p:{s:.68,beak:.45,tail:.8},
+    song:[0,1,2,3,4].flatMap(i=>[w(i*.26,.09,3300,2900,.24+i*.06),w(i*.26+.11,.1,2500,2900,.24+i*.06)])},
+  "wood thrush":{n:"wood thrush",band:[.62,.8],pose:"perch",p:{s:.85,beak:.5,tail:.85,plump:1.15},
+    song:[w(0,.16,2300,2300,.35),w(.2,.34,1750,2500,.5,5),w(.6,.3,3200,3650,.32,16)]},
+  "scarlet tanager":{n:"scarlet tanager",band:[.34,.5],pose:"perch",p:{s:.82,beak:.5,tail:.9},
+    song:phrase3(2000,2600,26)},
+
+  /* -------- wetland -------- */
+  heron:{n:"heron",band:[.84,.92],pose:"wader",p:{s:1.5,beak:1.2,neck:1.1,legs:1.2},
+    song:[nz(0,.5,900,300,.7,2),w(0,.4,320,150,.35,0,"sawtooth")]},
+  egret:{n:"egret",band:[.84,.92],pose:"wader",p:{s:1.25,beak:1.05,neck:1,legs:1.1},
+    song:[nz(0,.22,1100,500,.6,2.5),nz(.3,.2,1000,450,.55,2.5)]},
+  mallard:{n:"mallard",band:[.84,.9],pose:"float",p:{s:.95,beak:.75,plump:1.2},
+    song:[0,1,2,3,4].map(i=>w(i*.2,.12,300-i*18,235-i*18,.5,0,"square"))},
+  "wood duck":{n:"wood duck",band:[.84,.9],pose:"float",p:{s:.9,beak:.6,plump:1.15,tailUp:.6,crest:.5},
+    song:[w(0,.5,850,2300,.45,9)]},
+  kingfisher:{n:"kingfisher",band:[.44,.6],pose:"perch",p:{s:.85,beak:1.3,crest:.9,tail:.7,plump:1.1},
+    song:ticks(0,12,.055,2300,.35,.028)},
+  bittern:{n:"bittern",band:[.82,.9],pose:"wader",p:{s:1.1,beak:.9,neck:.7,legs:.8,plump:1.2},
+    song:[w(0,.12,150,130,.7,0,"sine"),w(.24,.16,95,80,.85,0,"sine"),w(.5,.2,120,90,.8,0,"sine")]},
+  "marsh wren":{n:"marsh wren",band:[.68,.8],pose:"perch",p:{s:.55,beak:.6,tail:1.1,tailUp:.6},
+    song:[nz(0,.12,2500,2500,.3,3),...ticks(.14,9,.05,2700,.32,.03,"triangle")]},
+  "red-winged blackbird":{n:"red-winged blackbird",band:[.58,.74],pose:"perch",p:{s:.85,beak:.6,tail:1},
+    song:[w(0,.13,1150,1350,.42),w(.17,.13,1450,1700,.42),w(.36,.55,2300,2500,.5,42,"sawtooth")]},
+
+  /* -------- grassland -------- */
+  meadowlark:{n:"meadowlark",band:[.72,.86],pose:"perch",p:{s:.85,beak:.7,tail:.7,plump:1.2},
+    song:[w(0,.24,2650,2200,.45),w(.3,.24,2100,1650,.45),w(.62,.34,1900,1150,.5)]},
+  bobolink:{n:"bobolink",band:[.48,.64],pose:"fly",p:{s:.7,span:.85,tail:.6},
+    song:[0,1,2,3,4,5,6,7].map(i=>w(i*.11,.09,900+i*280+hash(i)*220,1100+i*300,.4,0,i%2?"triangle":"square"))},
+  kestrel:{n:"kestrel",band:[.22,.38],pose:"hover",p:{s:.8,span:1,tail:.9},
+    song:ticks(0,6,.12,3400,.4,.07,"triangle").map(x=>({...x,f1:2750}))},
+  dickcissel:{n:"dickcissel",band:[.68,.84],pose:"perch",p:{s:.68,beak:.5,tail:.8},
+    song:[w(0,.1,2050,1950,.42),w(.14,.1,2050,1950,.42),...ticks(.32,3,.15,2650,.4,.1,"sawtooth")]},
+  harrier:{n:"harrier",band:[.42,.58],pose:"soar",p:{s:1.05,span:1.25,kink:.5},
+    song:ticks(0,5,.09,1450,.36,.05)},
+  "horned lark":{n:"horned lark",band:[.86,.94],pose:"ground",p:{s:.6,beak:.4,tail:.7},
+    song:[0,1,2,3,4,5].map(i=>w(i*.13+hash(i*3)*.04,.07,3300+hash(i)*900,3800+hash(i+9)*600,.32))},
+  goldfinch:{n:"goldfinch",band:[.44,.6],pose:"fly",p:{s:.58,span:.7,tail:.55},
+    song:[w(0,.11,2400,3000,.42),w(.14,.11,3100,2650,.42),w(.28,.11,2500,3050,.42),w(.42,.14,3100,2500,.45)]},
+  "grasshopper sparrow":{n:"grasshopper sparrow",band:[.78,.9],pose:"perch",p:{s:.58,beak:.4,tail:.6},
+    song:[w(0,.06,4100,4000,.3),w(.1,.06,3900,4000,.3),nz(.2,.75,4300,4300,.4,8)]},
+
+  /* -------- coast -------- */
+  gull:{n:"gull",band:[.2,.42],pose:"soar",p:{s:1,span:1.3,kink:.35},
+    song:[w(0,.24,1350,1100,.5,7,"sawtooth"),...[0,1,2,3].map(i=>w(.34+i*.16,.11,1250-i*90,1000-i*90,.45,7,"sawtooth"))]},
+  tern:{n:"tern",band:[.24,.44],pose:"fly",p:{s:.75,span:1.15,kink:.6,tail:.9},
+    song:[w(0,.16,2900,1800,.5,0,"sawtooth"),w(.3,.16,2900,1800,.5,0,"sawtooth")]},
+  sanderling:{n:"sanderling",band:[.88,.95],pose:"ground",p:{s:.52,beak:.6,tail:.5},
+    song:ticks(0,3,.12,2600,.35,.06,"triangle")},
+  plover:{n:"plover",band:[.86,.94],pose:"ground",p:{s:.6,beak:.45,tail:.55,plump:1.1},
+    song:[w(0,.14,2900,2900,.42),w(.2,.26,2450,1750,.45)]},
+  osprey:{n:"osprey",band:[.1,.28],pose:"soar",p:{s:1.15,span:1.35,kink:.7},
+    song:[0,1,2,3,4].map(i=>w(i*.15,.11,2250-i*130,1700-i*130,.42))},
+  pelican:{n:"pelican",band:[.48,.64],pose:"soar",p:{s:1.35,span:1.3,kink:.25,beak:1.4},
+    song:[nz(0,.3,420,220,.6,2),w(0,.25,130,95,.6,0,"sine")]},
+  oystercatcher:{n:"oystercatcher",band:[.86,.93],pose:"ground",p:{s:.75,beak:1.25,legs:.7,plump:1.1},
+    song:(()=>{const a=[];let t=0,g=.24;for(let i=0;i<8;i++){a.push(w(t,.09,1900,1850,.45));t+=g;g=Math.max(.07,g*.82);}return a;})()},
+  gannet:{n:"gannet",band:[.14,.34],pose:"soar",p:{s:1.1,span:1.35,kink:.5},
+    song:[nz(0,.2,800,600,.5,3),w(0,.18,620,540,.4,18,"sawtooth"),nz(.3,.2,800,600,.5,3),w(.3,.18,620,540,.4,18,"sawtooth")]},
+};
+
+const ECOS={
+  forest:{key:"forest",name:"FOREST",accent:"#8FE388",
+    birds:["wren","robin","blue jay","chickadee","cardinal","ovenbird","wood thrush","scarlet tanager"]},
+  wetland:{key:"wetland",name:"WETLAND",accent:"#58C7E0",
+    birds:["heron","egret","mallard","wood duck","kingfisher","bittern","marsh wren","red-winged blackbird"]},
+  grassland:{key:"grassland",name:"GRASSLAND",accent:"#E8C662",
+    birds:["meadowlark","bobolink","kestrel","dickcissel","harrier","horned lark","goldfinch","grasshopper sparrow"]},
+  coast:{key:"coast",name:"COAST",accent:"#F2917E",
+    birds:["gull","tern","sanderling","plover","osprey","pelican","oystercatcher","gannet"]},
+};
+const ECO_ORDER=["forest","wetland","grassland","coast"];
+
+const DIFFS={
+  fledgling:{key:"fledgling",name:"FLEDGLING",concurrent:2,total:14,speed:44,gap:2.6,perEco:6},
+  adult:{key:"adult",name:"ADULT",concurrent:3,total:22,speed:62,gap:1.7,perEco:8},
+  raptor:{key:"raptor",name:"RAPTOR",concurrent:5,total:30,speed:82,gap:1,perEco:10},
+};
+
+/* ============================== canvas ============================== */
+
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=window.innerWidth;H=window.innerHeight;
+  canvas.width=W*DPR;canvas.height=H*DPR;
+  canvas.style.width=W+"px";canvas.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize);resize();
+
+function alphaColor(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+const LINE="#DCE8EC",DANGER="#FF5964",SILH="#1D2836";
+
+/* ============================== terrain ============================== */
+
+const stars=[...Array(70)].map((_,i)=>({x:hash(i*7),y:hash(i*13)*.55,r:.6+hash(i*29)*1.3,ph:hash(i*41)*TAU}));
+const motes=[...Array(reducedMotion?12:34)].map((_,i)=>({x:hash(i*3)*1.2,y:hash(i*5),v:.35+hash(i*11)*.8,r:.5+hash(i*17)*1}));
+
+function drawRidge(off,baseY,amp,freq,style,width){
+  ctx.strokeStyle=style;ctx.lineWidth=width;ctx.beginPath();
+  for(let sx=0;sx<=W+8;sx+=8){
+    const y=baseY-noise1((sx+off)*freq)*amp;
+    sx===0?ctx.moveTo(sx,y):ctx.lineTo(sx,y);
+  }
+  ctx.stroke();
+}
+function decorate(off,spacing,fn){
+  const k0=Math.floor(off/spacing)-1,k1=Math.floor((off+W)/spacing)+1;
+  for(let k=k0;k<=k1;k++){
+    const sx=k*spacing+hash(k)*spacing*.6-off;
+    if(sx>-80&&sx<W+80)fn(sx,k);
+  }
+}
+function conifer(x,gy,h,style){
+  ctx.strokeStyle=style;ctx.lineWidth=1;ctx.beginPath();
+  const w0=h*.42;
+  ctx.moveTo(x,gy-h);ctx.lineTo(x-w0,gy);ctx.lineTo(x+w0,gy);ctx.closePath();
+  ctx.moveTo(x,gy-h*.94);ctx.lineTo(x-w0*.6,gy-h*.38);ctx.moveTo(x,gy-h*.94);ctx.lineTo(x+w0*.6,gy-h*.38);
+  ctx.stroke();
+}
+function broadleaf(x,gy,h,style){
+  ctx.strokeStyle=style;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy-h*.4);ctx.stroke();
+  ctx.beginPath();ctx.arc(x,gy-h*.62,h*.32,0,TAU);ctx.stroke();
+}
+function reedClump(x,gy,h,style,t,k){
+  ctx.strokeStyle=style;ctx.lineWidth=1;
+  const sway=reducedMotion?0:Math.sin(t*1.2+k)*2.5;
+  for(let i=-2;i<=2;i++){
+    const rh=h*(.7+hash(k*5+i)*.5);
+    ctx.beginPath();ctx.moveTo(x+i*3.5,gy);
+    ctx.quadraticCurveTo(x+i*3.5+sway*.4,gy-rh*.6,x+i*4.5+sway,gy-rh);ctx.stroke();
+    if(hash(k*9+i)>.55){
+      ctx.beginPath();ctx.moveTo(x+i*4.5+sway,gy-rh);ctx.lineTo(x+i*4.5+sway,gy-rh-6);ctx.lineWidth=3;ctx.stroke();ctx.lineWidth=1;
+    }
+  }
+}
+function grassTuft(x,gy,h,style,k){
+  ctx.strokeStyle=style;ctx.lineWidth=1;ctx.beginPath();
+  for(let i=-2;i<=2;i++){
+    const gh=h*(.6+hash(k*3+i)*.6);
+    ctx.moveTo(x,gy);ctx.quadraticCurveTo(x+i*2,gy-gh*.6,x+i*4,gy-gh);
+  }
+  ctx.stroke();
+}
+function fencePost(x,gy,style){
+  ctx.strokeStyle=style;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x,gy-26);ctx.stroke();
+  ctx.lineWidth=.75;ctx.beginPath();
+  ctx.moveTo(x-30,gy-20);ctx.lineTo(x+30,gy-21);ctx.moveTo(x-30,gy-11);ctx.lineTo(x+30,gy-12);ctx.stroke();
+}
+
+function drawTerrain(eco,scroll,t,fade){
+  const A=eco.accent,g=H*.88;
+  ctx.save();ctx.globalAlpha=fade;
+
+  // moon
+  ctx.strokeStyle=alphaColor(LINE,.5);ctx.lineWidth=1;
+  ctx.save();ctx.shadowColor=alphaColor(A,.5);ctx.shadowBlur=24;
+  ctx.beginPath();ctx.arc(W*.8,H*.16,34,0,TAU);ctx.stroke();
+  ctx.fillStyle=alphaColor(LINE,.05);ctx.fill();ctx.restore();
+
+  // stars
+  for(const s of stars){
+    const tw=.35+.3*Math.sin(t*1.4+s.ph);
+    ctx.fillStyle=alphaColor(LINE,tw*.5);
+    const sx=(s.x*W-scroll*.015)%(W+20);
+    ctx.fillRect(sx<0?sx+W+20:sx,s.y*H,s.r,s.r);
+  }
+  // drifting motes
+  for(const m of motes){
+    const mx=((m.x*W-t*m.v*22)%(W+30));
+    ctx.fillStyle=alphaColor(LINE,.12);
+    ctx.fillRect(mx<0?mx+W+30:mx,m.y*H,m.r,m.r);
+  }
+
+  if(eco.key==="forest"){
+    drawRidge(scroll*.12,H*.62,H*.14,.004,alphaColor(LINE,.1),1);
+    decorate(scroll*.35,90,(x,k)=>conifer(x,H*.78-noise1(k*.7)*14,26+hash(k)*30,alphaColor(A,.16)));
+    drawRidge(scroll*.35,H*.78,H*.05,.006,alphaColor(A,.14),1);
+    decorate(scroll,150,(x,k)=>{
+      const h=60+hash(k*2)*70;
+      hash(k*13)>.45?conifer(x,g,h,alphaColor(A,.4)):broadleaf(x,g,h,alphaColor(A,.34));
+    });
+  }else if(eco.key==="wetland"){
+    drawRidge(scroll*.1,H*.6,H*.08,.003,alphaColor(LINE,.09),1);
+    // water
+    const wy=H*.845;
+    ctx.strokeStyle=alphaColor(A,.4);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,wy);ctx.lineTo(W,wy);ctx.stroke();
+    decorate(scroll*.7,60,(x,k)=>{
+      const sh=.15+.12*Math.sin(t*1.6+k*2.1);
+      ctx.strokeStyle=alphaColor(A,sh);
+      ctx.beginPath();ctx.moveTo(x,wy+6+hash(k*7)*26);ctx.lineTo(x+14+hash(k)*18,wy+6+hash(k*7)*26);ctx.stroke();
+    });
+    decorate(scroll*.55,140,(x,k)=>reedClump(x,wy,34+hash(k)*22,alphaColor(A,.22),t,k));
+    decorate(scroll,120,(x,k)=>reedClump(x,H*.9,52+hash(k)*34,alphaColor(A,.42),t,k+99));
+  }else if(eco.key==="grassland"){
+    drawRidge(scroll*.12,H*.66,H*.1,.0025,alphaColor(LINE,.1),1);
+    drawRidge(scroll*.4,H*.8,H*.06,.004,alphaColor(A,.18),1);
+    decorate(scroll,90,(x,k)=>grassTuft(x,g,14+hash(k)*16,alphaColor(A,.4),k));
+    decorate(scroll,430,(x,k)=>fencePost(x,g-4,alphaColor(A,.35)));
+  }else{ // coast
+    const sea=H*.6;
+    drawRidge(scroll*.08,sea,H*.02,.002,alphaColor(LINE,.14),1);
+    for(let i=0;i<5;i++){
+      const wy=sea+18+i*((g-sea-20)/5);
+      decorate(scroll*(.25+i*.16),110-i*12,(x,k)=>{
+        const sh=.1+.1*Math.sin(t*1.3+k*1.7+i);
+        ctx.strokeStyle=alphaColor(ECOS.coast.accent,sh+.06);
+        ctx.beginPath();ctx.moveTo(x,wy);
+        ctx.quadraticCurveTo(x+12,wy-3,x+24,wy);ctx.stroke();
+      });
+    }
+    drawRidge(scroll*.85,H*.86,H*.035,.005,alphaColor(A,.35),1);
+    decorate(scroll,100,(x,k)=>grassTuft(x,H*.885,10+hash(k)*14,alphaColor(A,.35),k));
+    decorate(scroll,520,(x,k)=>{ // jetty posts
+      ctx.strokeStyle=alphaColor(LINE,.25);ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(x,H*.9);ctx.lineTo(x,H*.9-20-hash(k)*10);ctx.stroke();ctx.lineWidth=1;
+    });
+  }
+  // ground line
+  ctx.strokeStyle=alphaColor(A,.5);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,g);ctx.lineTo(W,g);ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================== bird drawing ============================== */
+
+function bodyPath(c,L,p){
+  const neck=(p.neck||0)*0,plump=p.plump||1,beak=p.beak||.5,tail=p.tail||.9,tailUp=p.tailUp||0;
+  const tx=.6*L*tail,ty=-.06*L-tailUp*.3*L;
+  c.moveTo(tx,ty);
+  c.quadraticCurveTo(.08*L,-.46*L*plump,-.26*L,-.4*L);          // back to head-top
+  c.quadraticCurveTo(-.46*L,-.36*L,-.47*L,-.26*L);               // forehead
+  c.lineTo(-.47*L-beak*.34*L,-.22*L);                            // beak tip
+  c.lineTo(-.44*L,-.14*L);                                       // under beak
+  c.quadraticCurveTo(-.34*L,-.02*L,-.16*L,.1*L*plump);           // throat→breast
+  c.quadraticCurveTo(.12*L,.16*L*plump,.34*L,0);                 // belly→vent
+  c.closePath();
+}
+function crestPath(c,L,p){
+  const cr=p.crest||0;if(!cr)return;
+  c.moveTo(-.3*L,-.38*L);
+  c.lineTo(-.18*L,-.38*L-cr*.24*L);
+  c.lineTo(-.1*L,-.36*L);
+}
+function drawStandingBird(c,L,p,legLen){
+  bodyPath(c,L,p);crestPath(c,L,p);
+  if(legLen>0){
+    c.moveTo(-.02*L,.12*L);c.lineTo(-.02*L,.12*L+legLen);
+    c.moveTo(.12*L,.12*L);c.lineTo(.12*L,.12*L+legLen);
+  }
+}
+function drawWader(c,L,p){
+  const beak=p.beak||1,neckH=(p.neck||1)*.8*L,legs=(p.legs||1)*.75*L;
+  // body
+  c.moveTo(.55*L,-.14*L);
+  c.quadraticCurveTo(.1*L,-.4*L,-.22*L,-.3*L);
+  c.quadraticCurveTo(.05*L,.18*L,.4*L,.05*L);
+  c.closePath();
+  // neck S-curve up to head
+  const hx=-.34*L,hy=-.3*L-neckH;
+  c.moveTo(-.2*L,-.28*L);
+  c.quadraticCurveTo(-.44*L,-.3*L-neckH*.45,hx,hy);
+  // head + beak
+  c.moveTo(hx,hy);
+  c.lineTo(hx+.14*L,hy-.02*L);
+  c.moveTo(hx,hy-.04*L);
+  c.lineTo(hx-beak*.42*L,hy+.06*L);
+  // legs
+  c.moveTo(.02*L,.1*L);c.lineTo(.04*L,.1*L+legs);
+  c.moveTo(.16*L,.08*L);c.lineTo(.2*L,.08*L+legs);
+}
+function drawSoar(c,L,p,flap){
+  const span=(p.span||1.2)*L,kink=(p.kink||.4),beak=p.beak||.4;
+  const dy=flap*L*.22;
+  // wings — gentle M
+  c.moveTo(-span, -.28*L+dy);
+  c.quadraticCurveTo(-span*.45,-.42*L*kink- .06*L, -.12*L,-.05*L);
+  c.quadraticCurveTo(0,.02*L,.12*L,-.05*L);
+  c.quadraticCurveTo(span*.45,-.42*L*kink-.06*L, span*.92,-.24*L+dy);
+  // body + head + beak (facing left)
+  c.moveTo(.3*L,.02*L);
+  c.quadraticCurveTo(0,.14*L,-.3*L,.02*L);
+  c.lineTo(-.42*L,-.0*L);
+  c.lineTo(-.42*L-beak*.3*L,.04*L);
+  // tail
+  c.moveTo(.3*L,.02*L);c.lineTo(.5*L+((p.tail||.6)*.2*L),.1*L);
+}
+function drawBirdShape(c,spec,t,mode){
+  const p=spec.p,L=54*(p.s||1);
+  if(spec.pose==="wader")drawWader(c,L,p);
+  else if(spec.pose==="soar")drawSoar(c,L,p,0);
+  else if(spec.pose==="fly")drawSoar(c,L,p,reducedMotion?0:Math.sin(t*16));
+  else if(spec.pose==="hover"){drawSoar(c,L,p,reducedMotion?.4:Math.sin(t*26));}
+  else if(spec.pose==="float"){bodyPath(c,L,p);crestPath(c,L,p);}
+  else drawStandingBird(c,L,p,spec.pose==="ground"?.3*L*(p.legs||.8):.22*L*(p.legs||.8));
+  return L;
+}
+function drawBird(b,t,accent){
+  const spec=b.spec,L=54*(spec.p.s||1);
+  ctx.save();
+  ctx.translate(b.x,b.y+(b.bob||0));
+  if(spec.pose==="hover")ctx.rotate(-.35);
+  if(b.state==="fleeing")ctx.rotate(b.vy<0?-.3:.15);
+
+  const path=new Path2D();
+  drawBirdShape(path,spec,t+b.seed*7,b.state);
+
+  if(b.state==="active"){
+    ctx.fillStyle=SILH;
+    ctx.strokeStyle=alphaColor(LINE,.42);
+    ctx.lineWidth=1;
+    ctx.fill(path);ctx.stroke(path);
+  }else{
+    const col=b.state==="fleeing"?DANGER:accent;
+    const age=Math.min(1,(t-b.stateT)/.35);
+    ctx.save();
+    ctx.shadowColor=alphaColor(col,.8);ctx.shadowBlur=14*age;
+    ctx.strokeStyle=alphaColor(col,.55+.45*age);
+    ctx.fillStyle=alphaColor(col,.09);
+    ctx.lineWidth=1.6;
+    ctx.fill(path);ctx.stroke(path);
+    // detail lines: eye + wing arc
+    ctx.beginPath();
+    if(spec.pose==="soar"||spec.pose==="fly"||spec.pose==="hover"){
+      ctx.arc(-.38*L,-.02*L,1.6,0,TAU);
+    }else if(spec.pose==="wader"){
+      ctx.arc(-.34*L,-.3*L-(spec.p.neck||1)*.8*L-.04*L,1.6,0,TAU);
+    }else{
+      ctx.arc(-.36*L,-.3*L,1.6,0,TAU);
+      ctx.moveTo(.02*L,-.16*L);
+      ctx.quadraticCurveTo(.2*L,-.1*L,.3*L,.02*L);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // perch hint under perched birds
+  if((spec.pose==="perch")&&b.state==="active"){
+    ctx.strokeStyle=alphaColor(LINE,.18);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(-L*.5,L*.34);ctx.quadraticCurveTo(0,L*.3,L*.55,L*.38);ctx.stroke();
+  }
+  if(spec.pose==="float"){
+    ctx.strokeStyle=alphaColor(accent,.35);ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(-L*.6,L*.16);ctx.lineTo(L*.7,L*.16);ctx.stroke();
+  }
+  ctx.restore();
+
+  // song pulse rings
+  if(b.singUntil>t&&b.state==="active"){
+    const k=1-(b.singUntil-t)/b.singDur;
+    for(let i=0;i<2;i++){
+      const kk=(k+i*.45)%1;
+      ctx.strokeStyle=alphaColor(LINE,.35*(1-kk));
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(b.x-L*.5,b.y-L*.25,6+kk*30,-.9,.9);ctx.stroke();
+    }
+  }
+}
+
+/* ============================== game state ============================== */
+
+const game={
+  mode:"menu",           // menu | playing | paused | over
+  ecoKey:"forest",diffKey:"adult",migration:false,
+  eco:ECOS.forest,prevEco:null,ecoFade:1,
+  diff:DIFFS.adult,
+  birds:[],particles:[],popups:[],
+  scroll:0,time:0,
+  score:0,combo:0,bestCombo:0,lives:3,
+  spawned:0,resolved:0,total:0,
+  lastSpawn:0,target:null,
+  keysGood:0,keysBad:0,
+  lifelist:new Map(),   // name -> got|fled|missed
+  intro:{text:"",t:0},
+  shake:0,
+  ended:"",
+};
+
+function letters(name){return name.toLowerCase().replace(/[^a-z]/g,"");}
+
+function currentSpeed(){
+  const scale=clamp(W/1200,.55,1);
+  return game.diff.speed*scale;
+}
+
+function spawnBird(){
+  const pool=game.eco.birds;
+  const activeNames=new Set(game.birds.filter(b=>b.state==="active").map(b=>b.spec.n));
+  const activeFirsts=new Set(game.birds.filter(b=>b.state==="active").map(b=>letters(b.spec.n)[0]));
+  let key=null;
+  for(let i=0;i<12;i++){
+    const cand=pool[Math.floor(Math.random()*pool.length)];
+    if(activeNames.has(cand))continue;
+    if(activeFirsts.has(letters(cand)[0])&&i<8)continue;
+    key=cand;break;
+  }
+  if(!key)return;
+  const spec=SPECIES[key];
+  const y=lerp(spec.band[0],spec.band[1],Math.random())*H;
+  const b={
+    spec,x:W+70,y,y0:y,
+    seed:Math.random(),
+    state:"active",stateT:0,
+    typed:0,word:letters(spec.n),
+    vx:0,vy:0,bob:0,
+    nextSing:game.time+.4,singUntil:0,singDur:1,
+    spawnT:game.time,
+  };
+  game.birds.push(b);
+  game.spawned++;
+  game.lastSpawn=game.time;
+}
+
+function resolveBird(b,how){ // got | fled | missed
+  game.resolved++;
+  const cur=game.lifelist.get(b.spec.n);
+  if(how==="got"||cur===undefined||cur==="missed")game.lifelist.set(b.spec.n,how);
+  if(game.target===b)game.target=null;
+}
+
+function revealBird(b){
+  b.state="revealed";b.stateT=game.time;
+  b.vx=40;b.vy=-90;
+  resolveBird(b,"got");
+  game.combo++;game.bestCombo=Math.max(game.bestCombo,game.combo);
+  const dwell=game.time-b.spawnT;
+  const speedBonus=clamp(1.6-dwell*.08,1,1.6);
+  const comboMult=1+Math.min(1.5,game.combo*.1);
+  const pts=Math.round(10*b.word.length*speedBonus*comboMult);
+  game.score+=pts;
+  game.popups.push({x:b.x,y:b.y-50,text:"+"+pts,t:game.time,col:game.eco.accent});
+  playSong(SPECIES[b.spec.n].song,{rate:1.5,vol:.18});
+  burst(b.x,b.y,game.eco.accent);
+}
+function scareBird(b){
+  b.state="fleeing";b.stateT=game.time;
+  b.vx=-60-Math.random()*80;b.vy=-160-Math.random()*80;
+  resolveBird(b,"fled");
+  game.combo=0;
+  sfxScare();
+  game.shake=reducedMotion?0:6;
+  game.popups.push({x:b.x,y:b.y-50,text:"scared!",t:game.time,col:DANGER});
+}
+function missBird(b){
+  b.state="gone";
+  resolveBird(b,"missed");
+  game.combo=0;game.lives--;
+  sfxMiss();
+  game.shake=reducedMotion?0:4;
+  if(game.lives<=0)endRun("GROUNDED");
+}
+
+function burst(x,y,col){
+  const n=reducedMotion?6:16;
+  for(let i=0;i<n;i++){
+    const a=Math.random()*TAU,v=40+Math.random()*130;
+    game.particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,t:game.time,life:.5+Math.random()*.4,col});
+  }
+}
+
+/* -------- ecosystem sequencing -------- */
+
+function ecoForProgress(){
+  if(!game.migration)return ECOS[game.ecoKey];
+  const per=game.diff.perEco;
+  const idx=Math.min(ECO_ORDER.length-1,Math.floor(game.spawned/per));
+  return ECOS[ECO_ORDER[idx]];
+}
+function maybeShiftEco(){
+  const next=ecoForProgress();
+  if(next!==game.eco){
+    game.prevEco=game.eco;game.ecoFade=0;
+    game.eco=next;
+    game.intro={text:next.name,t:game.time};
+    document.documentElement.style.setProperty("--accent",next.accent);
+  }
+}
+
+/* -------- run lifecycle -------- */
+
+function startRun(){
+  const d=DIFFS[game.diffKey];
+  game.diff=d;
+  game.migration=game.ecoKey==="migration";
+  game.eco=game.migration?ECOS[ECO_ORDER[0]]:ECOS[game.ecoKey];
+  game.prevEco=null;game.ecoFade=1;
+  game.total=game.migration?d.perEco*ECO_ORDER.length:d.total;
+  game.birds=[];game.particles=[];game.popups=[];
+  game.scroll=0;game.time=0;
+  game.score=0;game.combo=0;game.bestCombo=0;game.lives=3;
+  game.spawned=0;game.resolved=0;game.lastSpawn=-99;game.target=null;
+  game.keysGood=0;game.keysBad=0;game.lifelist=new Map();
+  game.intro={text:game.eco.name,t:0};
+  game.shake=0;game.ended="";
+  game.mode="playing";
+  document.documentElement.style.setProperty("--accent",game.eco.accent);
+  show("none");
+  focusMobile();
+}
+function endRun(reason){
+  game.ended=reason;
+  game.mode="over";
+  showResults();
+}
+
+/* ============================== input ============================== */
+
+function handleLetter(ch){
+  if(game.mode!=="playing")return;
+  if(game.target&&(game.target.state!=="active"))game.target=null;
+  if(!game.target){
+    // lock: nearest-to-escape active bird starting with ch
+    let best=null;
+    for(const b of game.birds){
+      if(b.state!=="active")continue;
+      if(b.word[0]===ch&&(!best||b.x<best.x))best=b;
+    }
+    if(best){
+      game.target=best;best.typed=1;game.keysGood++;
+      sfxLock();
+      if(best.typed>=best.word.length){game.target=null;revealBird(best);}
+    }else{
+      game.keysBad++;sfxDud();
+    }
+    return;
+  }
+  const b=game.target;
+  if(b.word[b.typed]===ch){
+    b.typed++;game.keysGood++;sfxKey();
+    if(b.typed>=b.word.length){game.target=null;revealBird(b);}
+  }else{
+    game.keysBad++;
+    game.target=null;
+    scareBird(b);
+  }
+}
+
+addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if(game.mode==="playing"){
+    if(k==="escape"){pauseGame();return;}
+    if(k==="m"){setMuted(!muted);return;}
+    if(/^[a-z]$/.test(k)){e.preventDefault();handleLetter(k);}
+    if(k===" ")e.preventDefault();
+  }else if(game.mode==="paused"&&k==="escape"){resumeGame();}
+  else if(game.mode==="menu"&&k==="enter"){startBtn.click();}
+});
+
+// mobile: hidden input summons the keyboard
+const mobileInput=document.getElementById("mobileInput");
+const isTouch=matchMedia("(pointer: coarse)").matches;
+function focusMobile(){if(isTouch){mobileInput.value="";mobileInput.focus({preventScroll:true});}}
+mobileInput.addEventListener("input",()=>{
+  const v=mobileInput.value.toLowerCase();
+  for(const ch of v)if(/[a-z]/.test(ch))handleLetter(ch);
+  mobileInput.value="";
+});
+canvas.addEventListener("pointerdown",()=>{if(game.mode==="playing")focusMobile();});
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&game.mode==="playing")pauseGame();
+});
+
+/* ============================== update ============================== */
+
+function update(dt){
+  const t=game.time+=dt;
+  const spd=currentSpeed();
+  game.scroll+=spd*dt;
+  game.ecoFade=Math.min(1,game.ecoFade+dt/2.2);
+  game.shake=Math.max(0,game.shake-dt*18);
+
+  maybeShiftEco();
+
+  // spawning
+  const active=game.birds.filter(b=>b.state==="active").length;
+  if(game.spawned<game.total&&active<game.diff.concurrent&&t-game.lastSpawn>game.diff.gap){
+    spawnBird();
+  }
+  // end condition
+  if(game.resolved>=game.total&&game.mode==="playing"){
+    endRun(game.migration?"MIGRATION COMPLETE":game.eco.name+" CLEARED");
+  }
+
+  for(const b of game.birds){
+    const spec=b.spec;
+    if(b.state==="active"){
+      if(spec.pose==="soar"){b.x-=spd*.75*dt;b.bob=Math.sin(t*.9+b.seed*9)*6;}
+      else if(spec.pose==="fly"){b.x-=spd*.85*dt;b.bob=Math.sin(t*3+b.seed*9)*9;}
+      else if(spec.pose==="hover"){b.x-=spd*.55*dt;b.bob=Math.sin(t*7+b.seed*9)*2;}
+      else b.x-=spd*dt;
+      if(b.x<-70){missBird(b);continue;}
+      if(t>=b.nextSing){
+        const dur=playSong(spec.song,{vol:.14});
+        b.singDur=Math.max(.6,dur);b.singUntil=t+b.singDur;
+        b.nextSing=t+4.5+Math.random()*3.5;
+      }
+    }else if(b.state==="revealed"||b.state==="fleeing"){
+      b.vy+=(b.state==="revealed"?-60:-140)*dt;
+      b.x+=b.vx*dt;b.y+=b.vy*dt;
+      if(b.y<-120||b.x<-160||b.x>W+160)b.state="gone";
+    }
+  }
+  game.birds=game.birds.filter(b=>b.state!=="gone");
+
+  for(const p of game.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.96;p.vy*=.96;}
+  game.particles=game.particles.filter(p=>t-p.t<p.life);
+  game.popups=game.popups.filter(p=>t-p.t<1.1);
+}
+
+/* ============================== render ============================== */
+
+function drawLabel(b,accent){
+  const L=54*(b.spec.p.s||1);
+  const name=b.spec.n;
+  ctx.font='600 15px ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace';
+  const chW=ctx.measureText("m").width+2;
+  const totalW=name.length*chW;
+  let x=b.x-totalW/2;
+  const y=b.y+(b.bob||0)+L*.72+18;
+  const locked=game.target===b;
+  // letter index → typed position mapping (skip non-letters)
+  let li=0;
+  for(let i=0;i<name.length;i++){
+    const ch=name[i];
+    const isLetter=/[a-z]/.test(ch);
+    let col;
+    if(isLetter){
+      if(li<b.typed)col=accent;
+      else col=locked?alphaColor(LINE,.9):alphaColor(LINE,.55);
+      li++;
+    }else col=alphaColor(LINE,.3);
+    ctx.fillStyle=col;
+    if(li-1<b.typed&&isLetter&&li<=b.typed){
+      ctx.save();ctx.shadowColor=accent;ctx.shadowBlur=8;
+      ctx.fillText(ch,x,y);ctx.restore();
+    }else ctx.fillText(ch,x,y);
+    x+=chW;
+  }
+  if(locked){
+    // caret under next letter
+    let li2=0,cx=b.x-totalW/2;
+    for(let i=0;i<name.length;i++){
+      if(/[a-z]/.test(name[i])){if(li2===b.typed)break;li2++;}
+      cx+=chW;
+    }
+    ctx.fillStyle=accent;
+    ctx.fillRect(cx,y+4,chW-3,2);
+  }
+}
+
+function render(){
+  const t=game.time;
+  ctx.fillStyle="#070B10";
+  ctx.fillRect(0,0,W,H);
+  ctx.save();
+  if(game.shake>0)ctx.translate((Math.random()-.5)*game.shake,(Math.random()-.5)*game.shake);
+
+  if(game.prevEco&&game.ecoFade<1)drawTerrain(game.prevEco,game.scroll,t,1-game.ecoFade);
+  drawTerrain(game.eco,game.scroll,t,game.prevEco?game.ecoFade:1);
+
+  const accent=game.eco.accent;
+
+  // birds
+  for(const b of game.birds){
+    drawBird(b,t,accent);
+    if(b.state==="active")drawLabel(b,accent);
+  }
+  // lock ring
+  if(game.target&&game.target.state==="active"){
+    const b=game.target,L=54*(b.spec.p.s||1);
+    ctx.save();
+    ctx.strokeStyle=alphaColor(accent,.8);
+    ctx.setLineDash([6,7]);
+    ctx.lineDashOffset=-t*30;
+    ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.arc(b.x,b.y+(b.bob||0),L*1.05+8,0,TAU);ctx.stroke();
+    ctx.restore();
+  }
+
+  // particles
+  for(const p of game.particles){
+    const k=1-(t-p.t)/p.life;
+    ctx.strokeStyle=alphaColor(p.col,k*.9);
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+    ctx.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);
+    ctx.stroke();
+  }
+  // popups
+  ctx.font='600 14px "Avenir Next",Futura,"Century Gothic",sans-serif';
+  ctx.textAlign="center";
+  for(const p of game.popups){
+    const k=(t-p.t)/1.1;
+    ctx.fillStyle=alphaColor(p.col,1-k);
+    ctx.fillText(p.text,p.x,p.y-k*36);
+  }
+  ctx.textAlign="left";
+
+  // level intro
+  if(t-game.intro.t<2.6&&game.mode==="playing"){
+    const k=(t-game.intro.t)/2.6;
+    const a=k<.15?k/.15:k>.7?(1-k)/.3:1;
+    ctx.save();
+    ctx.font='600 34px "Avenir Next",Futura,"Century Gothic",sans-serif';
+    ctx.textAlign="center";
+    const label=game.intro.text.split("").join("  ");
+    ctx.fillStyle=alphaColor(accent,a*.9);
+    ctx.shadowColor=alphaColor(accent,a*.8);ctx.shadowBlur=18;
+    ctx.fillText(label,W/2,H*.3);
+    ctx.restore();
+  }
+
+  ctx.restore(); // shake
+
+  drawHUD(t,accent);
+}
+
+function drawHUD(t,accent){
+  if(game.mode!=="playing"&&game.mode!=="paused")return;
+  ctx.font='600 13px "Avenir Next",Futura,"Century Gothic",sans-serif';
+  // score
+  ctx.fillStyle=alphaColor(LINE,.45);
+  ctx.fillText("SCORE",20,30);
+  ctx.font='600 24px "Avenir Next",Futura,"Century Gothic",sans-serif';
+  ctx.fillStyle=alphaColor(LINE,.95);
+  ctx.fillText(String(game.score),20,56);
+  if(game.combo>1){
+    ctx.font='600 13px "Avenir Next",Futura,"Century Gothic",sans-serif';
+    ctx.fillStyle=alphaColor(accent,.9);
+    ctx.fillText("×"+game.combo+" combo",20,76);
+  }
+  // lives — small soaring-bird glyphs
+  for(let i=0;i<3;i++){
+    const x=W-28-i*26,y=30,on=i<game.lives;
+    ctx.strokeStyle=on?alphaColor(accent,.9):alphaColor(LINE,.15);
+    ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(x-9,y);ctx.quadraticCurveTo(x-4,y-7,x,y);
+    ctx.quadraticCurveTo(x+4,y-7,x+9,y);
+    ctx.stroke();
+  }
+  // progress
+  const pw=Math.min(320,W*.5),px=(W-pw)/2,py=H-16;
+  ctx.strokeStyle=alphaColor(LINE,.15);
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+pw,py);ctx.stroke();
+  ctx.strokeStyle=alphaColor(accent,.8);
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+pw*(game.resolved/Math.max(1,game.total)),py);ctx.stroke();
+  ctx.fillStyle=alphaColor(LINE,.4);
+  ctx.font='600 10px "Avenir Next",Futura,"Century Gothic",sans-serif';
+  ctx.textAlign="center";
+  ctx.fillText(game.eco.name+" · "+game.resolved+" / "+game.total,W/2,py-8);
+  ctx.textAlign="left";
+}
+
+/* ============================== loop ============================== */
+
+let lastT=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-lastT)/1000);
+  lastT=now;
+  if(game.mode==="playing")update(dt);
+  render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ============================== screens ============================== */
+
+const menuScreen=document.getElementById("menuScreen"),
+      resultScreen=document.getElementById("resultScreen"),
+      pauseScreen=document.getElementById("pauseScreen"),
+      startBtn=document.getElementById("startBtn");
+
+function show(which){
+  menuScreen.classList.toggle("hidden",which!=="menu");
+  resultScreen.classList.toggle("hidden",which!=="result");
+  pauseScreen.classList.toggle("hidden",which!=="pause");
+}
+
+const ecoRow=document.getElementById("ecoRow"),diffRow=document.getElementById("diffRow");
+const ECO_CHOICES=[...ECO_ORDER.map(k=>({key:k,name:ECOS[k].name,accent:ECOS[k].accent})),
+  {key:"migration",name:"MIGRATION",accent:"#DCE8EC"}];
+for(const c of ECO_CHOICES){
+  const b=document.createElement("button");
+  b.className="chip";b.textContent=c.name;
+  b.style.setProperty("--chip",c.accent);
+  b.onclick=()=>{game.ecoKey=c.key;refreshMenu();};
+  b.dataset.key=c.key;
+  ecoRow.appendChild(b);
+}
+for(const k of Object.keys(DIFFS)){
+  const b=document.createElement("button");
+  b.className="chip";b.textContent=DIFFS[k].name;
+  b.onclick=()=>{game.diffKey=k;refreshMenu();};
+  b.dataset.key=k;
+  diffRow.appendChild(b);
+}
+function bestKey(){return game.ecoKey+"|"+game.diffKey;}
+function refreshMenu(){
+  for(const b of ecoRow.children)b.classList.toggle("sel",b.dataset.key===game.ecoKey);
+  for(const b of diffRow.children)b.classList.toggle("sel",b.dataset.key===game.diffKey);
+  let best="—";
+  try{
+    const store=JSON.parse(localStorage.getItem("avitype-best")||"{}");
+    if(store[bestKey()])best=String(store[bestKey()]);
+  }catch(e){}
+  document.getElementById("bestLabel").textContent=best;
+}
+refreshMenu();
+
+startBtn.onclick=()=>{
+  AC.resume();
+  startRun();
+};
+document.getElementById("againBtn").onclick=()=>{AC.resume();startRun();};
+document.getElementById("menuBtn").onclick=()=>{game.mode="menu";show("menu");refreshMenu();};
+document.getElementById("resumeBtn").onclick=resumeGame;
+document.getElementById("quitBtn").onclick=()=>{game.mode="menu";show("menu");refreshMenu();};
+
+function pauseGame(){game.mode="paused";show("pause");}
+function resumeGame(){if(game.mode!=="paused")return;game.mode="playing";show("none");lastT=performance.now();focusMobile();}
+
+function showResults(){
+  document.getElementById("resultTitle").textContent=game.ended;
+  document.getElementById("resultScore").textContent=String(game.score);
+  const keys=game.keysGood+game.keysBad;
+  document.getElementById("stAcc").textContent=keys?Math.round(100*game.keysGood/keys)+"%":"—";
+  document.getElementById("stCombo").textContent="×"+game.bestCombo;
+  const got=[...game.lifelist.values()].filter(v=>v==="got").length;
+  document.getElementById("stBirds").textContent=got+" / "+game.lifelist.size;
+  const ll=document.getElementById("lifeList");
+  ll.innerHTML="";
+  for(const[name,v]of game.lifelist){
+    const s=document.createElement("span");
+    s.textContent=name;
+    if(v==="got")s.classList.add("got");
+    else if(v==="fled")s.classList.add("fled");
+    ll.appendChild(s);
+  }
+  // persist best
+  try{
+    const store=JSON.parse(localStorage.getItem("avitype-best")||"{}");
+    if(game.score>(store[bestKey()]||0)){
+      store[bestKey()]=game.score;
+      localStorage.setItem("avitype-best",JSON.stringify(store));
+    }
+  }catch(e){}
+  show("result");
+}
+
+window.__avitype={game,handleLetter}; // debug/test handle
+
+})();
+</script>
+</body>
+</html>
