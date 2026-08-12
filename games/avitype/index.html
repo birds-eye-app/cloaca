@@ -697,8 +697,24 @@ function paintBird(sg,p,pose,frame,S){
   if(pose==="float")R(cx-bw-2,by+bh-1,bw*2+6,1,"rgba(255,255,255,.0)");
 }
 function getSprite(slug,state,frame){
+  // every unidentified bird shows the SAME mystery icon — no shape/size tells
+  if(state==="silhouette"){slug="__mystery";frame=0;}
   const key=slug+"|"+state+"|"+frame;
   if(spriteCache.has(key))return spriteCache.get(key);
+  if(slug==="__mystery"){
+    const S={w:56,h:44};
+    const spr=document.createElement("canvas");spr.width=S.w;spr.height=S.h;
+    const sg=spr.getContext("2d");
+    paintBird(sg,{L:14,body:"#233048",belly:"#233048",head:"#233048",beak:"#233048"},"stand",0,S);
+    const out=document.createElement("canvas");out.width=S.w;out.height=S.h;
+    const og=out.getContext("2d");
+    og.drawImage(spr,0,0);
+    og.font='9px PS2P,"Courier New",monospace';
+    og.fillStyle="#8FA2C8";
+    og.fillText("?",S.w/2-6,S.h/2-2);
+    spriteCache.set(key,out);
+    return out;
+  }
   const spec=SPECIES[slug];
   const S={w:56,h:44};
   const spr=document.createElement("canvas");spr.width=S.w;spr.height=S.h;
@@ -1308,38 +1324,39 @@ function drawLabel(b,t){
   const frac=hintFrac(b,t);
   const locked=game.target===b;
   if(frac<=0&&!locked)return; // pure ear-ID phase: silhouette + song only
+  const letterCount=b.word.length;
+  const shown=Math.floor(frac*letterCount+1e-6);
+  const prefix=Math.max(b.typed,shown);
+  if(prefix<=0)return; // no letters earned yet — nothing to show, not even length
+  // build revealed prefix + a single "?" (never leaks the name's length)
+  const chars=[];let li=0;
+  for(let i=0;i<name.length;i++){
+    const ch=name[i];
+    if(/[a-z]/.test(ch)){
+      if(li>=prefix)break;
+      chars.push({ch,typed:li<b.typed});
+      li++;
+    }else chars.push({ch,punct:true});
+  }
+  while(chars.length&&chars[chars.length-1].punct)chars.pop();
+  chars.push({ch:"?",mystery:true});
   const fs=Math.max(9,Math.min(12,Math.round(W/90)));
   ctx.font=fs+'px PS2P,"Courier New",monospace';
   const cw=fs+1;
-  const totalW=name.length*cw;
+  const totalW=chars.length*cw;
   const bx=b.x-totalW/2,by=b.y+(b.bob||0)+26*PXS/3+14;
-  // plate
   ctx.fillStyle=locked?"rgba(27,32,68,.92)":"rgba(27,32,68,.72)";
   ctx.fillRect(bx-5,by-fs-3,totalW+10,fs+10);
   if(locked){ctx.strokeStyle="#FFD24A";ctx.lineWidth=2;ctx.strokeRect(bx-5,by-fs-3,totalW+10,fs+10);}
-  const letterCount=b.word.length;
-  const shown=Math.floor(frac*letterCount+1e-6);
-  let li=0,x=bx;
-  for(let i=0;i<name.length;i++){
-    const ch=name[i],isL=/[a-z]/.test(ch);
-    let col="#FFFFFF",draw=ch;
-    if(isL){
-      if(li<b.typed)col="#39FF6E";
-      else if(li<shown)col=locked?"#FFFFFF":"#C8CCE8";
-      else{draw="_";col="rgba(200,204,232,.45)";}
-      li++;
-    }else col="#8A8CB8";
-    ctx.fillStyle=col;
-    ctx.fillText(draw,x,by);
+  let x=bx;
+  for(const c of chars){
+    ctx.fillStyle=c.typed?"#39FF6E":c.mystery?"rgba(143,162,200,.7)":c.punct?"#8A8CB8":(locked?"#FFFFFF":"#C8CCE8");
+    ctx.fillText(c.ch,x,by);
     x+=cw;
   }
-  if(locked){
-    let li2=0,cx2=bx;
-    for(let i=0;i<name.length;i++){
-      if(/[a-z]/.test(name[i])){if(li2===b.typed)break;li2++;}
-      cx2+=cw;
-    }
-    if(Math.floor(t*3)%2===0){ctx.fillStyle="#FFD24A";ctx.fillRect(cx2,by+3,cw-2,3);}
+  if(locked&&Math.floor(t*3)%2===0){
+    ctx.fillStyle="#FFD24A";
+    ctx.fillRect(x-cw,by+3,cw-2,3); // caret under the "?"
   }
 }
 
