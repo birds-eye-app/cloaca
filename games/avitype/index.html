@@ -162,7 +162,7 @@
   <div class="box bevel"><span class="cap">SCORE</span><span class="lcd" id="hudScore">0</span></div>
   <div class="box bevel"><span class="cap">LIVES</span><span id="hearts" style="margin-top:4px"><span>&#9829;</span><span>&#9829;</span><span>&#9829;</span></span></div>
   <div class="box bevel" id="levelBox"><span id="levelName">BACKYARD — LEVEL 1</span><span id="progressBar" class="inset"></span></div>
-  <button class="iconbtn bevel" id="muteBtn" title="mute (m)">&#9835;</button>
+  <button class="iconbtn bevel" id="muteBtn" title="mute (0)">&#9835;</button>
   <button class="iconbtn bevel" id="pauseBtn" title="pause (esc)">II</button>
 </div>
 
@@ -516,15 +516,19 @@ const ECOS={
 const ECO_ORDER=["backyard","forest","wetland","grassland","coast"];
 const LEVELS=[
   null,
-  {tiers:[1],total:10,concurrent:2,speed:40,gap:2.8,hint:{delay:2.5,ramp:4.5}},
-  {tiers:[1,2],total:14,concurrent:3,speed:54,gap:2.0,hint:{delay:4,ramp:6}},
-  {tiers:[1,2,3],total:18,concurrent:4,speed:68,gap:1.4,hint:{delay:6,ramp:9}},
+  {tiers:[1],total:10,concurrent:2,speed:40,gap:2.8,hint:{start:.45,end:.85}},
+  {tiers:[1,2],total:14,concurrent:3,speed:54,gap:2.0,hint:{start:.55,end:.9}},
+  {tiers:[1,2,3],total:18,concurrent:4,speed:68,gap:1.4,hint:{start:.68,end:.96}},
 ];
-const MIGRATION={total:30,concurrent:4,speed:62,gap:1.6,perEco:6,hint:{delay:5,ramp:7}};
-// hint ladder: 0 = name fully hidden (ID by ear, double points) → 1 = fully shown
+const MIGRATION={total:30,concurrent:4,speed:62,gap:1.6,perEco:6,hint:{start:.6,end:.92}};
+// hint ladder: 0 = name fully hidden (ID by ear, double points) → 1 = fully shown.
+// Tied to the bird's journey across the screen, not wall time: no letters until
+// it is ~halfway across (a couple of clean song plays), full name only as a
+// last chance right before it escapes.
 function hintFrac(b,t){
-  const h=(game.migration?MIGRATION:game.levelCfg).hint||{delay:0,ramp:.01};
-  return clamp((t-b.spawnT-h.delay)/h.ramp,0,1);
+  const h=(game.migration?MIGRATION:game.levelCfg).hint||{start:0,end:.01};
+  const progress=(W+60-b.x)/(W+120); // 0 at spawn (right edge) → 1 at escape (left)
+  return clamp((progress-h.start)/(h.end-h.start),0,1);
 }
 
 /* ============================ progress ============================ */
@@ -1160,7 +1164,7 @@ addEventListener("keydown",e=>{
   const k=e.key.toLowerCase();
   if(game.mode==="playing"){
     if(k==="escape"){pauseGame();return;}
-    if(k==="m"){setMuted(!muted);return;}
+    if(k==="0"){setMuted(!muted);return;} // never a letter key: m-birds must be typeable
     if(/^[a-z]$/.test(k)){e.preventDefault();handleLetter(k);}
     if(k===" "){
       e.preventDefault();
