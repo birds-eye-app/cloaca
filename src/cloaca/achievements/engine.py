@@ -24,6 +24,7 @@ from enum import Enum
 from cloaca.achievements.config import (
     DEFAULT_PATCHES,
     DEFAULT_REGIONS,
+    KNOWN_EMPTY_CHECKLIST_DAYS,
     Patch,
     Region,
 )
@@ -192,6 +193,7 @@ def compute_achievements(
     observations: list[Observation],
     patches: tuple[Patch, ...] = DEFAULT_PATCHES,
     regions: tuple[Region, ...] = DEFAULT_REGIONS,
+    extra_birding_days: frozenset[str] = KNOWN_EMPTY_CHECKLIST_DAYS,
 ) -> list[Achievement]:
     """Replay observations chronologically and return the achievement timeline."""
     dated_obs = [o for o in observations if _parse_date(o.date) is not None]
@@ -256,13 +258,20 @@ def compute_achievements(
         )
 
     _process_big_days(out, species_obs)
-    # Streaks count every day with any observation — spuhs and hybrids keep a
-    # streak alive even though they don't count toward lists. (Days whose only
-    # checklist had zero species aren't in the export at all, so eBird's own
-    # streak number can still run slightly longer.)
-    _process_streaks(out, dated_obs)
+    # Streaks match eBird's logic: any day with a checklist counts, including
+    # spuh/hybrid-only days. Days whose only checklist reported zero species
+    # leave no rows in the export, so they come in via extra_birding_days.
+    _process_streaks(out, _birding_days(dated_obs, extra_birding_days))
 
     return out.sorted_achievements()
+
+
+def _birding_days(
+    dated_obs: list[Observation], extra_birding_days: frozenset[str]
+) -> list[datetime.date]:
+    days = {d for o in dated_obs if (d := _parse_date(o.date)) is not None}
+    days.update(d for raw in extra_birding_days if (d := _parse_date(raw)) is not None)
+    return sorted(days)
 
 
 def _summarize_checklists(
@@ -719,10 +728,7 @@ def _process_big_days(out: _Emitter, species_obs: list[Observation]) -> None:
                 )
 
 
-def _process_streaks(out: _Emitter, species_obs: list[Observation]) -> None:
-    dates = sorted(
-        {d for obs in species_obs if (d := _parse_date(obs.date)) is not None}
-    )
+def _process_streaks(out: _Emitter, dates: list[datetime.date]) -> None:
     streak = 0
     previous: datetime.date | None = None
     for date in dates:
@@ -769,6 +775,7 @@ def summarize(
     achievements: list[Achievement],
     patches: tuple[Patch, ...] = DEFAULT_PATCHES,
     regions: tuple[Region, ...] = DEFAULT_REGIONS,
+    extra_birding_days: frozenset[str] = KNOWN_EMPTY_CHECKLIST_DAYS,
 ) -> AchievementSummary:
     species_obs = [o for o in observations if is_singular_bird_species(o)]
 
@@ -795,10 +802,10 @@ def summarize(
     longest_streak = 0
     streak = 0
     previous: datetime.date | None = None
-    # Streak days include spuh/hybrid-only days (any observation counts)
-    for date in sorted(
-        {d for o in observations if (d := _parse_date(o.date)) is not None}
-    ):
+    # eBird streak logic: any checklist day counts (spuh-only days, plus
+    # configured zero-species days that leave no rows in the export)
+    dated = [o for o in observations if _parse_date(o.date) is not None]
+    for date in _birding_days(dated, extra_birding_days):
         streak = streak + 1 if previous and (date - previous).days == 1 else 1
         previous = date
         longest_streak = max(longest_streak, streak)

@@ -66,8 +66,13 @@ def events_of(achievements, type_):
     return [a for a in achievements if a.type == type_]
 
 
-def compute(observations):
-    return compute_achievements(observations, patches=PATCHES, regions=REGIONS)
+def compute(observations, extra_birding_days=frozenset()):
+    return compute_achievements(
+        observations,
+        patches=PATCHES,
+        regions=REGIONS,
+        extra_birding_days=extra_birding_days,
+    )
 
 
 class TestLifers:
@@ -281,6 +286,19 @@ class TestBigDaysAndStreaks:
         streaks = events_of(compute(obs), AchievementType.STREAK)
         assert [s.context["length"] for s in streaks] == [3]
 
+    def test_known_empty_checklist_day_bridges_streak(self):
+        # a zero-species checklist leaves no export rows; the configured
+        # extra day keeps the streak alive, matching eBird's count
+        obs = [
+            mk_obs("Rock Pigeon", "Columba livia", "2024-05-01", "S1"),
+            mk_obs("Rock Pigeon", "Columba livia", "2024-05-03", "S2"),
+        ]
+        streaks = events_of(
+            compute(obs, extra_birding_days=frozenset({"2024-05-02"})),
+            AchievementType.STREAK,
+        )
+        assert [s.context["length"] for s in streaks] == [3]
+
     def test_streak_broken_by_gap(self):
         obs = [
             mk_obs("Rock Pigeon", "Columba livia", "2024-05-01", "S1"),
@@ -327,7 +345,13 @@ class TestFilterSinceAndSummary:
             mk_obs("Brant", "Branta bernicla", "2024-01-02", "S2", state_province="US-MA", county="Dukes"),
         ]
         result = compute(obs)
-        summary = summarize(obs, result, patches=PATCHES, regions=REGIONS)
+        summary = summarize(
+            obs,
+            result,
+            patches=PATCHES,
+            regions=REGIONS,
+            extra_birding_days=frozenset(),
+        )
         assert summary.life_list_total == 2
         assert summary.total_checklists == 2
         assert summary.patch_totals["McGolrick Park"] == 1

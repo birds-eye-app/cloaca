@@ -62,6 +62,18 @@ DEFAULT_PATCHES: tuple[Patch, ...] = (
     ),
 )
 
+# Days with a submitted checklist that reported zero species. eBird's streak
+# counts these, but they leave no observation rows in a personal export, so
+# they're invisible to the engine. List them here (ISO dates) to keep streaks
+# aligned with eBird. (2024-12-29: timezone-straddling flight to NZ;
+# 2025-11-06: same trip.)
+KNOWN_EMPTY_CHECKLIST_DAYS: frozenset[str] = frozenset(
+    {
+        "2024-12-29",
+        "2025-11-06",
+    }
+)
+
 DEFAULT_REGIONS: tuple[Region, ...] = (
     Region(name="New York", state_codes=frozenset({"US-NY"})),
     Region(
