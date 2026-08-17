@@ -32,6 +32,7 @@ class AchievementsSummaryResponse(BaseModel):
     biggest_day_date: str | None
     biggest_day_count: int | None
     longest_streak: int
+    current_streak: int
     countries: int
     states: int
     events_by_tier: dict[str, int]
@@ -69,6 +70,7 @@ async def get_achievements(
             biggest_day_date=summary.biggest_day[0] if summary.biggest_day else None,
             biggest_day_count=summary.biggest_day[1] if summary.biggest_day else None,
             longest_streak=summary.longest_streak,
+            current_streak=summary.current_streak,
             countries=summary.countries,
             states=summary.states,
             events_by_tier=summary.events_by_tier,

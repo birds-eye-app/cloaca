@@ -85,6 +85,7 @@ class AchievementSummary:
     region_totals: dict[str, int]
     biggest_day: tuple[str, int] | None  # (date, species count)
     longest_streak: int
+    current_streak: int  # streak still alive on the last birding day in the export
     countries: int
     states: int
     events_by_tier: dict[str, int]
@@ -193,11 +194,8 @@ def compute_achievements(
     regions: tuple[Region, ...] = DEFAULT_REGIONS,
 ) -> list[Achievement]:
     """Replay observations chronologically and return the achievement timeline."""
-    species_obs = [
-        o
-        for o in observations
-        if is_singular_bird_species(o) and _parse_date(o.date) is not None
-    ]
+    dated_obs = [o for o in observations if _parse_date(o.date) is not None]
+    species_obs = [o for o in dated_obs if is_singular_bird_species(o)]
     species_obs.sort(key=_obs_sort_key)
 
     checklists = _summarize_checklists(species_obs)
@@ -258,7 +256,11 @@ def compute_achievements(
         )
 
     _process_big_days(out, species_obs)
-    _process_streaks(out, species_obs)
+    # Streaks count every day with any observation — spuhs and hybrids keep a
+    # streak alive even though they don't count toward lists. (Days whose only
+    # checklist had zero species aren't in the export at all, so eBird's own
+    # streak number can still run slightly longer.)
+    _process_streaks(out, dated_obs)
 
     return out.sorted_achievements()
 
@@ -793,12 +795,14 @@ def summarize(
     longest_streak = 0
     streak = 0
     previous: datetime.date | None = None
+    # Streak days include spuh/hybrid-only days (any observation counts)
     for date in sorted(
-        {d for o in species_obs if (d := _parse_date(o.date)) is not None}
+        {d for o in observations if (d := _parse_date(o.date)) is not None}
     ):
         streak = streak + 1 if previous and (date - previous).days == 1 else 1
         previous = date
         longest_streak = max(longest_streak, streak)
+    current_streak = streak
 
     states = {
         str(o.state_province)
@@ -818,6 +822,7 @@ def summarize(
         region_totals=region_totals,
         biggest_day=(biggest_day[0], len(biggest_day[1])) if biggest_day else None,
         longest_streak=longest_streak,
+        current_streak=current_streak,
         countries=len(countries),
         states=len(states),
         events_by_tier=dict(events_by_tier),

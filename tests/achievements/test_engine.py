@@ -272,6 +272,15 @@ class TestBigDaysAndStreaks:
         streaks = events_of(compute(obs), AchievementType.STREAK)
         assert [s.context["length"] for s in streaks] == [3, 5]
 
+    def test_spuh_only_day_keeps_streak_alive(self):
+        obs = [
+            mk_obs("Rock Pigeon", "Columba livia", "2024-05-01", "S1"),
+            mk_obs("gull sp.", "Larus sp.", "2024-05-02", "S2"),
+            mk_obs("Rock Pigeon", "Columba livia", "2024-05-03", "S3"),
+        ]
+        streaks = events_of(compute(obs), AchievementType.STREAK)
+        assert [s.context["length"] for s in streaks] == [3]
+
     def test_streak_broken_by_gap(self):
         obs = [
             mk_obs("Rock Pigeon", "Columba livia", "2024-05-01", "S1"),

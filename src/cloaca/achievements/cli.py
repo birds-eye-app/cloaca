@@ -62,7 +62,10 @@ def main() -> None:
     if summary.biggest_day:
         date, count = summary.biggest_day
         print(f"Biggest day: {count} species on {date}")
-    print(f"Longest streak: {summary.longest_streak} days")
+    print(
+        f"Streak: {summary.current_streak} days current · "
+        f"{summary.longest_streak} longest"
+    )
     print(f"Countries: {summary.countries} · States/provinces: {summary.states}")
     tiers = summary.events_by_tier
     print(
