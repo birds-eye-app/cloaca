@@ -36,7 +36,14 @@ of the engine. It needs no checkout, no `uv`, and no pandas — just
 and its output is byte-identical to `python -m cloaca.achievements.cli`.
 
 A copy lives in Google Drive so a session with no repository access can still
-produce a report:
+produce a report. Fetch it with the Drive connector's `download_file_content`
+(returns base64) and decode it to a local `.py` — `read_file_content` does
+**not** support `text/x-python` and will fail. When the base64 is too large
+for the tool result, the harness saves it to a file on disk; decode from that
+file rather than pulling it through context. Verified end to end: the Drive
+copy decodes byte-identical and runs under plain `python3`.
+
+Locations:
 
 - Folder: `cloaca-achievements` (`1y8wfGoQY9UFGEnmzsePUT15a8dO8_S8U`)
 - Engine: `ebird_achievements_standalone.py` (`1heyhsM4SeaKNPueI458ejGfHrVBn2BfT`)
