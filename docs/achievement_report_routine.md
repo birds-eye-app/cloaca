@@ -4,6 +4,18 @@ The daily routine that emails an eBird achievement report. Paste the prompt
 below into a Claude Routine (claude.ai → Routines), or use it with
 `create_trigger`.
 
+## The live routine
+
+- Trigger: `trig_01QQbtpD5uL4DLk7s9rvn5ad`, name "eBird achievement report"
+- Schedule: `22 13 * * *` (UTC)
+- Fires a **fresh session** each time (`persistent_session_id` is unset), so it
+  starts with no repo checkout and no prior context.
+
+That last point is the whole reason for the standalone build below: a
+fresh session has no repository permissions, and the `add_repo` call it
+would otherwise attempt is what silently broke runs (they finished
+"successfully" in ~20 seconds having sent nothing).
+
 ## Required connectors
 
 The routine's sessions **must** have these attached, or it cannot run:
