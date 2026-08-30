@@ -23,10 +23,17 @@ of the engine. It needs no checkout, no `uv`, and no pandas — just
 `python3 ebird_achievements_standalone.py MyEBirdData.csv --since YYYY-MM-DD`,
 and its output is byte-identical to `python -m cloaca.achievements.cli`.
 
-Keep a copy in Google Drive (folder `cloaca-achievements`) so a session with
-no repository access can still produce a report. Regenerate after any engine
-change with `python3 scripts/build_standalone_achievements.py` (tests fail if
-the checked-in copy is stale).
+A copy lives in Google Drive so a session with no repository access can still
+produce a report:
+
+- Folder: `cloaca-achievements` (`1y8wfGoQY9UFGEnmzsePUT15a8dO8_S8U`)
+- Engine: `ebird_achievements_standalone.py` (`1heyhsM4SeaKNPueI458ejGfHrVBn2BfT`)
+- This document: `achievement_report_routine.md`
+
+Regenerate after any engine change with
+`python3 scripts/build_standalone_achievements.py` (tests fail if the
+checked-in copy is stale), then re-upload the result to that Drive folder —
+the Drive copy does not update itself.
 
 **The routine must never call `add_repo`.** Sessions fired by a routine
 generally lack repository permissions, and the attempt is what breaks the run.
