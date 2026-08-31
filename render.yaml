@@ -33,6 +33,16 @@ projects:
         sync: false
       - key: EBIRD_MCP_URL
         sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        sync: false
+      - key: EBD_R2_NATIVE_RELEASE
+        value: sample-30
       region: oregon
       preDeployCommand: "uv run alembic upgrade head"
       healthCheckPath: /v1/health
