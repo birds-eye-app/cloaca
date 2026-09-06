@@ -11,6 +11,7 @@ from anthropic.lib.tools.mcp import async_mcp_tool
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client
+from mcp.client.streamable_http import streamablehttp_client
 
 _DUCK_IDLE_SECONDS = 5 * 60
 _duck_lock = asyncio.Lock()
@@ -93,6 +94,21 @@ async def close_duck_conn() -> None:
 
 
 EBIRD_MCP_URL = os.environ.get("EBIRD_MCP_URL", "")
+
+
+async def _open_ebird_transport(stack: AsyncExitStack, url: str):
+    """Open the eBird MCP transport for `url` and return its (read, write) streams.
+
+    `.../sse` selects the legacy SSE transport; any other URL uses streamable HTTP.
+    """
+    if url.rstrip("/").endswith("/sse"):
+        read, write = await stack.enter_async_context(sse_client(url))
+    else:
+        read, write, _get_session_id = await stack.enter_async_context(
+            streamablehttp_client(url)
+        )
+    return read, write
+
 
 SYSTEM_PROMPT = """You are a birding assistant for New York City. You answer questions about bird sightings, eBird observations, hotspots, and birding topics — but only for NYC and the surrounding area (the five boroughs, Long Island, New Jersey, Connecticut, and the lower Hudson Valley).
 
@@ -205,10 +221,10 @@ async def ask_bird_query(
     duck_db_path = os.environ.get("PIPER_DUCK_DB_PATH")
 
     async with AsyncExitStack() as stack:
-        # eBird SSE connection
-        ebird_read, ebird_write = await stack.enter_async_context(
-            sse_client(EBIRD_MCP_URL)
-        )
+        # eBird MCP connection. A URL ending in /sse is the legacy SSE transport (the old
+        # Cloudflare Worker); anything else is streamable HTTP (patch-town's ebird-mcp
+        # container at http://ebird-mcp:8001/).
+        ebird_read, ebird_write = await _open_ebird_transport(stack, EBIRD_MCP_URL)
         ebird_client = await stack.enter_async_context(
             ClientSession(ebird_read, ebird_write)
         )
