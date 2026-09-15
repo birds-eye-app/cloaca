@@ -19,6 +19,7 @@ from cloaca.api.get_new_lifers_by_region import (
 from cloaca.api.get_popular_hotspots import get_popular_hotspots_api
 
 from cloaca.api.upload_lifers_csv import UploadLifersResponse, upload_lifers_csv
+from cloaca.big_days import big_days
 from cloaca.parsing.parsing_helpers import Lifer, LocationToLifers
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -126,6 +127,49 @@ async def get_popular_hotspots_endpoint(
     return await get_popular_hotspots_api(
         get_duck_db_conn_from_state(), latitude, longitude, radius_km, month
     )
+
+
+# Big Days (the personal site's /big-days page): fixed queries over two Parquet files found in
+# BIG_DAYS_DIR. See cloaca/big_days/__init__.py for the shape and the rules.
+@Cloaca_App.get("/v1/big_days/meta")
+def big_days_meta() -> Dict[str, Any]:
+    return big_days.meta
+
+
+@Cloaca_App.get("/v1/big_days/regions")
+def big_days_countries() -> Dict[str, Any]:
+    return big_days.countries()
+
+
+@Cloaca_App.get("/v1/big_days/regions/{code}")
+def big_days_region(code: str) -> Dict[str, Any]:
+    return big_days.region(code)
+
+
+@Cloaca_App.get("/v1/big_days/search")
+def big_days_search(q: str) -> Dict[str, Any]:
+    return big_days.search(q)
+
+
+@Cloaca_App.get("/v1/big_days/top")
+def big_days_top(
+    region: str,
+    year: int | None = None,
+    month: int | None = None,
+    solo: bool = False,
+    limit: int = 50,
+) -> Dict[str, Any]:
+    return big_days.top(region, year, month, solo, limit)
+
+
+@Cloaca_App.on_event("startup")
+@repeat_every(seconds=60 * 30)  # picks up a new release's files without a restart
+async def load_big_days():
+    try:
+        if not big_days.reload_if_changed():
+            print(f"big days: no tables in {big_days.dir} yet")
+    except Exception as e:
+        print(f"big days: load failed: {e}")
 
 
 # this is deprecated but I can't find another way to use the "repeat every" util without it
