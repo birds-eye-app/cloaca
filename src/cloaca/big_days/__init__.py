@@ -7,7 +7,7 @@ and placed in BIG_DAYS_DIR by the deployment; this process reads local files onl
   big_days.parquet         one row per (level, region, observation_date, party):
                            level ∈ country|state|county, region = the eBird code, year, month,
                            observer_id (pseudonymous, e.g. obsr59592), n_species, n_checklists,
-                           n_localities, observers (max party size on the day's lists), solo,
+                           n_localities, observers (max party size on the day's lists),
                            party_size + members (eBirders sharing exactly these checklists),
                            minutes, km, all_complete, checklists = list of structs
                            (id, locality, locality_id, hotspot, lat, lon, time, minutes, km,
@@ -278,15 +278,13 @@ class BigDays:
         if month is not None:
             where.append("month = ?")
             params.append(month)
-        if solo:
-            where.append("solo")
         # Shared-account days are recognised from their checklists in Python, so fetch a window
         # of candidates and cut after filtering. 4x is far more than the flagged share anywhere
         # measured (Texas: 6 of 50); if a board still comes up short it is short, not wrong.
         window = limit if include_shared else min(400, limit * 4)
         rows = self.q(
             f"""SELECT observation_date AS date, year, month, n_species, n_checklists,
-                       n_localities, observers, solo, party_size, minutes, km,
+                       n_localities, observers, party_size, minutes, km,
                        all_complete, checklists
                 FROM big_days WHERE {" AND ".join(where)}
                 ORDER BY {ORDER} LIMIT {int(window)}""",
@@ -302,7 +300,6 @@ class BigDays:
         code: str,
         year: Optional[int] = None,
         month: Optional[int] = None,
-        solo: bool = False,
         include_shared: bool = False,
         limit: int = K,
     ):
@@ -318,7 +315,7 @@ class BigDays:
         rows = [
             dict(r)
             for r in self._leaderboard(
-                row["level"], code, year, month, bool(solo), bool(include_shared), limit
+                row["level"], code, year, month, bool(include_shared), limit
             )
         ]
         # Competition ranking: equal species counts share a rank (106, 106, 106 -> 1, 1, 1, 4).
@@ -329,7 +326,6 @@ class BigDays:
             "filters": {
                 "year": year,
                 "month": month,
-                "solo": bool(solo),
                 "include_shared": bool(include_shared),
                 "limit": limit,
             },
