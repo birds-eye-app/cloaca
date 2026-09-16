@@ -68,6 +68,24 @@ def make_tables(directory):
             2.0,
             True,
         ),
+        (  # a team big-day run: 60 lists in a day — hidden unless include_runs
+            "county",
+            "US-NY-047",
+            dt.date(2020, 5, 24),
+            2020,
+            5,
+            "obsr7",
+            150,
+            60,
+            40,
+            3,
+            False,
+            1,
+            ["obsr7"],
+            660.0,
+            46.0,
+            True,
+        ),
         (  # an aggregator account: 155 h of lists in one "day" — must never rank
             "county",
             "US-NY-047",
@@ -175,6 +193,17 @@ def test_countries_and_tree(client):
     # the 155-hour aggregator day is not the record, even though the regions file said so
     assert (r["region"]["best"], r["region"]["best_date"]) == (120, "2024-05-11")
     assert all(y["year"] != 2021 for y in r["years"])
+    # the 60-list run is hidden by default, shown with include_runs, never sets `best`
+    assert all(y["year"] != 2020 for y in r["years"])
+    with_runs = client.get(
+        "/v1/big_days/regions/US-NY-047", params={"include_runs": "true"}
+    ).json()
+    assert [(y["year"], y["best"]) for y in with_runs["years"]] == [
+        (2020, 150),
+        (2023, 118),
+        (2024, 120),
+    ]
+    assert with_runs["region"]["best"] == 120
     assert all("observer_id" not in y for y in r["years"])
     assert [(y["year"], y["best"], y["days"]) for y in r["years"]] == [
         (2023, 118, 1),
@@ -188,6 +217,12 @@ def test_countries_and_tree(client):
 def test_top_filters_are_applied(client):
     top = client.get("/v1/big_days/top", params={"region": "US-NY-047"}).json()
     assert [r["n_species"] for r in top["rows"]] == [120, 118, 61]
+    runs = client.get(
+        "/v1/big_days/top", params={"region": "US-NY-047", "include_runs": "true"}
+    ).json()
+    assert [r["n_species"] for r in runs["rows"]] == [150, 120, 118, 61]
+    assert runs["filters"]["include_runs"] is True
+    assert top["filters"]["include_runs"] is False
     # observer ids never leave the API
     for r in top["rows"]:
         assert "observer_id" not in r and "members" not in r
@@ -208,7 +243,13 @@ def test_top_filters_are_applied(client):
         "/v1/big_days/top", params={"region": "US-NY-047", "year": 2023, "month": 5}
     ).json()
     assert [r["party_size"] for r in y23["rows"]] == [2]
-    assert y23["filters"] == {"year": 2023, "month": 5, "solo": False, "limit": 50}
+    assert y23["filters"] == {
+        "year": 2023,
+        "month": 5,
+        "solo": False,
+        "include_runs": False,
+        "limit": 50,
+    }
 
 
 def test_search_and_validation(client):

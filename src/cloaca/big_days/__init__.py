@@ -48,6 +48,12 @@ ORDER = "n_species DESC, n_checklists ASC, observation_date ASC, observer_id ASC
 # people's checklists (a club on Global Big Day: 371 lists, 155 h, 2021-05-08) otherwise top
 # every board they touch. Days with no durations at all are kept (mostly historical).
 PLAUSIBLE = "(minutes IS NULL OR minutes <= 1440)"
+# Organised big-day runs — a team sweeping a state by car, filing dozens of short lists — are
+# hidden by default (`include_runs=false`). The tell is the checklist count, not hours or
+# distance: the Texas and New York state records use 50-108 lists, while the biggest genuine
+# local days (Kings County's top 50) use 3-12. 30 is the cut (David, 2026-09-16).
+RUN_CHECKLISTS = 30
+NOT_A_RUN = f"n_checklists < {RUN_CHECKLISTS}"
 
 
 class BigDays:
@@ -87,7 +93,7 @@ class BigDays:
         con.execute(f"""
             CREATE TABLE region_best AS
             SELECT level, region, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
-            FROM big_days WHERE {PLAUSIBLE} GROUP BY 1, 2""")
+            FROM big_days WHERE {PLAUSIBLE} AND {NOT_A_RUN} GROUP BY 1, 2""")
         con.execute(
             "UPDATE regions SET best = b.best, best_date = b.best_date "
             "FROM region_best b WHERE regions.level = b.level AND regions.region = b.region"
@@ -150,14 +156,15 @@ class BigDays:
             )
         }
 
-    def region(self, code: str):
+    def region(self, code: str, include_runs: bool = False):
         check_code(code)
         row = dict(self._region_row(code) or {})
         if not row:
             raise HTTPException(404, "unknown region")
         rec = self.q(
             f"""SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
-               FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE} GROUP BY 1 ORDER BY 1""",
+               FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE}
+                 AND ({"TRUE" if include_runs else NOT_A_RUN}) GROUP BY 1 ORDER BY 1""",
             [row["level"], code],
         )
         activity = {y["year"]: y for y in (row.pop("years") or [])}
@@ -191,8 +198,12 @@ class BigDays:
         return {"results": rows}
 
     # --- leaderboard ----------------------------------------------------------------------
-    def _leaderboard_uncached(self, level, code, year, month, solo, limit):
+    def _leaderboard_uncached(
+        self, level, code, year, month, solo, include_runs, limit
+    ):
         where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
+        if not include_runs:
+            where.append(NOT_A_RUN)
         if year is not None:
             where.append("year = ?")
             params.append(year)
@@ -216,6 +227,7 @@ class BigDays:
         year: Optional[int] = None,
         month: Optional[int] = None,
         solo: bool = False,
+        include_runs: bool = False,
         limit: int = K,
     ):
         check_code(code)
@@ -230,7 +242,7 @@ class BigDays:
         rows = [
             dict(r)
             for r in self._leaderboard(
-                row["level"], code, year, month, bool(solo), limit
+                row["level"], code, year, month, bool(solo), bool(include_runs), limit
             )
         ]
         for i, r in enumerate(rows):
@@ -241,6 +253,7 @@ class BigDays:
                 "year": year,
                 "month": month,
                 "solo": bool(solo),
+                "include_runs": bool(include_runs),
                 "limit": limit,
             },
             "rows": rows,
