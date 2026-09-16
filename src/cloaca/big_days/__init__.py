@@ -28,6 +28,7 @@ Fixed, parameterised queries only; region codes are regex-checked. The files may
 loader re-checks on cloaca's periodic timer so a new release is picked up without a restart.
 """
 
+import math
 import os
 import re
 import threading
@@ -48,6 +49,68 @@ ORDER = "n_species DESC, n_checklists ASC, observation_date ASC, observer_id ASC
 # people's checklists (a club on Global Big Day: 371 lists, 155 h, 2021-05-08) otherwise top
 # every board they touch. Days with no durations at all are kept (mostly historical).
 PLAUSIBLE = "(minutes IS NULL OR minutes <= 1440)"
+# Shared accounts — one eBird account used by people in different places at once (a club or
+# tour company on a Big Day) — are hidden by default (`include_shared=false`). The evidence is
+# in the day's own checklists: two lists that ran concurrently for >= SHARED_MIN_OVERLAP minutes
+# while > SHARED_SLACK_KM apart (allowing the first list's traveled distance, since a traveling
+# list's coordinates are its start). A day is "shared" at >= SHARED_PAIRS such pairs; one pair
+# is treated as a time slip. Verified region by region 2026-09-16: New York's 2024-05-18 "party
+# of 4" has 9 pairs (a 3h41m list in Sullivan County running while lists were filed 80-100 km
+# away in Dutchess); every Kings County day and every ambitious solo day has 0. Speed between
+# consecutive stops was NOT usable alone: minute-rounded times and hotspot-centroid pins put one
+# "impossible" hop on most honest days, including single-van team runs.
+SHARED_SLACK_KM = 5.0
+SHARED_MIN_OVERLAP = 10
+SHARED_PAIRS = 2
+
+
+def _mins(t: str) -> int:
+    h, m = t.split(":")[:2]
+    return int(h) * 60 + int(m)
+
+
+def _km(a_lat, a_lon, b_lat, b_lon) -> float:
+    la1, lo1, la2, lo2 = map(math.radians, (a_lat, a_lon, b_lat, b_lon))
+    h = (
+        math.sin((la2 - la1) / 2) ** 2
+        + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2
+    )
+    return 2 * 6371.0 * math.asin(math.sqrt(h))
+
+
+def shared_pairs(checklists) -> int:
+    """Pairs of the day's checklists that ran concurrently while far apart (see SHARED_*)."""
+    cls = [
+        c
+        for c in checklists
+        if c.get("lat") is not None and c.get("lon") is not None and c.get("time")
+    ]
+    cls.sort(key=lambda c: _mins(c["time"]))
+    n = 0
+    for i, a in enumerate(cls):
+        a0 = _mins(a["time"])
+        a1 = a0 + (a.get("minutes") or 0)
+        for b in cls[i + 1 :]:
+            b0 = _mins(b["time"])
+            if b0 >= a1:
+                break  # sorted by start: nothing later overlaps a
+            b1 = b0 + (b.get("minutes") or 0)
+            if min(a1, b1) - b0 < SHARED_MIN_OVERLAP:
+                continue
+            if (
+                _km(float(a["lat"]), float(a["lon"]), float(b["lat"]), float(b["lon"]))
+                - float(a.get("km") or 0.0)
+                > SHARED_SLACK_KM
+            ):
+                n += 1
+    return n
+
+
+def annotate(row) -> dict:
+    """Add shared_pairs / shared to a leaderboard row (in place) and return it."""
+    row["shared_pairs"] = shared_pairs(row["checklists"])
+    row["shared"] = row["shared_pairs"] >= SHARED_PAIRS
+    return row
 
 
 class BigDays:
@@ -150,25 +213,39 @@ class BigDays:
             )
         }
 
-    def region(self, code: str):
+    def region(self, code: str, include_shared: bool = False):
         check_code(code)
         row = dict(self._region_row(code) or {})
         if not row:
             raise HTTPException(404, "unknown region")
-        rec = self.q(
-            f"""SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
-               FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE} GROUP BY 1 ORDER BY 1""",
+        # Top 3 per year (with their checklists) so the year's record can skip shared days.
+        cands = self.q(
+            f"""SELECT year, n_species, observation_date, checklists FROM (
+                  SELECT year, n_species, observation_date, checklists,
+                         row_number() OVER (PARTITION BY year ORDER BY {ORDER}) AS rn
+                  FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE}) WHERE rn <= 3
+                ORDER BY year, rn""",
             [row["level"], code],
         )
         activity = {y["year"]: y for y in (row.pop("years") or [])}
-        years = [
-            {
-                **r,
-                "days": activity.get(r["year"], {}).get("days"),
-                "observers": activity.get(r["year"], {}).get("observers"),
-            }
-            for r in rec
-        ]
+        years = []
+        for c in cands:
+            if years and years[-1]["year"] == c["year"]:
+                continue
+            if not include_shared and shared_pairs(c["checklists"]) >= SHARED_PAIRS:
+                continue
+            years.append(
+                {
+                    "year": c["year"],
+                    "best": c["n_species"],
+                    "best_date": c["observation_date"],
+                    "days": activity.get(c["year"], {}).get("days"),
+                    "observers": activity.get(c["year"], {}).get("observers"),
+                }
+            )
+        if years:
+            top = max(years, key=lambda y: (y["best"], -y["year"]))
+            row["best"], row["best_date"] = top["best"], top["best_date"]
         return {
             "region": row,
             "breadcrumb": self.breadcrumb(row),
@@ -191,7 +268,9 @@ class BigDays:
         return {"results": rows}
 
     # --- leaderboard ----------------------------------------------------------------------
-    def _leaderboard_uncached(self, level, code, year, month, solo, limit):
+    def _leaderboard_uncached(
+        self, level, code, year, month, solo, include_shared, limit
+    ):
         where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
         if year is not None:
             where.append("year = ?")
@@ -201,14 +280,22 @@ class BigDays:
             params.append(month)
         if solo:
             where.append("solo")
-        return self.q(
+        # Shared-account days are recognised from their checklists in Python, so fetch a window
+        # of candidates and cut after filtering. 4x is far more than the flagged share anywhere
+        # measured (Texas: 6 of 50); if a board still comes up short it is short, not wrong.
+        window = limit if include_shared else min(400, limit * 4)
+        rows = self.q(
             f"""SELECT observation_date AS date, year, month, n_species, n_checklists,
                        n_localities, observers, solo, party_size, minutes, km,
                        all_complete, checklists
                 FROM big_days WHERE {" AND ".join(where)}
-                ORDER BY {ORDER} LIMIT {int(limit)}""",
+                ORDER BY {ORDER} LIMIT {int(window)}""",
             params,
         )
+        rows = [annotate(r) for r in rows]
+        if not include_shared:
+            rows = [r for r in rows if not r["shared"]]
+        return rows[:limit]
 
     def top(
         self,
@@ -216,6 +303,7 @@ class BigDays:
         year: Optional[int] = None,
         month: Optional[int] = None,
         solo: bool = False,
+        include_shared: bool = False,
         limit: int = K,
     ):
         check_code(code)
@@ -230,17 +318,19 @@ class BigDays:
         rows = [
             dict(r)
             for r in self._leaderboard(
-                row["level"], code, year, month, bool(solo), limit
+                row["level"], code, year, month, bool(solo), bool(include_shared), limit
             )
         ]
+        # Competition ranking: equal species counts share a rank (106, 106, 106 -> 1, 1, 1, 4).
         for i, r in enumerate(rows):
-            r["rank"] = i + 1
+            r["rank"] = 1 + sum(1 for o in rows if o["n_species"] > r["n_species"])
         return {
             "region": {k: row[k] for k in ("code", "name", "level", "parent")},
             "filters": {
                 "year": year,
                 "month": month,
                 "solo": bool(solo),
+                "include_shared": bool(include_shared),
                 "limit": limit,
             },
             "rows": rows,
