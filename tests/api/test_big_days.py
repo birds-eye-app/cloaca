@@ -274,13 +274,19 @@ def test_top_filters_are_applied(client):
         assert "observer_id" not in r and "members" not in r
     assert r["party_size"] == 1 and top["rows"][1]["party_size"] == 2
     assert top["rows"][0]["rank"] == 1 and top["rows"][0]["checklists"][0]["id"] == "S1"
-    solo = client.get(
-        "/v1/big_days/top", params={"region": "US-NY-047", "solo": "true"}
+    ev = client.get(
+        "/v1/big_days/top", params={"region": "US-NY-047", "event": "true"}
     ).json()
-    assert [(r["n_species"], r["solo"]) for r in solo["rows"]] == [
-        (120, True),
-        (61, True),
+    # 2024-05-11, 2023-05-13 and 2022-05-14 are all Global Big Days; 2024-01-06 is not
+    assert [(r["n_species"], r["event"]) for r in ev["rows"]] == [
+        (120, "Global Big Day"),
+        (118, "Global Big Day"),
+        (118, "Global Big Day"),
     ]
+    assert ev["filters"]["event"] is True
+    assert (
+        top["rows"][0]["event"] == "Global Big Day" and top["rows"][1]["event"] is None
+    )
     jan = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "month": 1}
     ).json()
@@ -293,6 +299,7 @@ def test_top_filters_are_applied(client):
         "year": 2023,
         "month": 5,
         "include_shared": False,
+        "event": False,
         "limit": 50,
     }
 

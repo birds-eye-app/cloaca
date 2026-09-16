@@ -59,6 +59,37 @@ PLAUSIBLE = "(minutes IS NULL OR minutes <= 1440)"
 # away in Dutchess); every Kings County day and every ambitious solo day has 0. Speed between
 # consecutive stops was NOT usable alone: minute-rounded times and hotspot-centroid pins put one
 # "impossible" hop on most honest days, including single-van team runs.
+# eBird's two worldwide count days, from eBird's announcements (2026-09-16). Global Big Day
+# has run every May since 2015; October Big Day every October since 2018. Rows on these dates
+# carry `event`, and `event=true` restricts a board to them.
+GLOBAL_BIG_DAYS = {
+    "2015-05-09",
+    "2016-05-14",
+    "2017-05-13",
+    "2018-05-05",
+    "2019-05-04",
+    "2020-05-09",
+    "2021-05-08",
+    "2022-05-14",
+    "2023-05-13",
+    "2024-05-11",
+    "2025-05-10",
+    "2026-05-09",
+}
+OCTOBER_BIG_DAYS = {
+    "2018-10-06",
+    "2019-10-19",
+    "2020-10-17",
+    "2021-10-09",
+    "2022-10-08",
+    "2023-10-14",
+    "2024-10-12",
+    "2025-10-11",
+    "2026-10-10",
+}
+EVENT_DATES = ", ".join(
+    f"DATE '{d}'" for d in sorted(GLOBAL_BIG_DAYS | OCTOBER_BIG_DAYS)
+)
 SHARED_SLACK_KM = 5.0
 SHARED_MIN_OVERLAP = 10
 SHARED_PAIRS = 2
@@ -106,10 +137,20 @@ def shared_pairs(checklists) -> int:
     return n
 
 
+def event_name(date) -> Optional[str]:
+    d = date.isoformat() if hasattr(date, "isoformat") else str(date)
+    if d in GLOBAL_BIG_DAYS:
+        return "Global Big Day"
+    if d in OCTOBER_BIG_DAYS:
+        return "October Big Day"
+    return None
+
+
 def annotate(row) -> dict:
-    """Add shared_pairs / shared to a leaderboard row (in place) and return it."""
+    """Add shared_pairs / shared / event to a leaderboard row (in place) and return it."""
     row["shared_pairs"] = shared_pairs(row["checklists"])
     row["shared"] = row["shared_pairs"] >= SHARED_PAIRS
+    row["event"] = event_name(row["date"])
     return row
 
 
@@ -268,8 +309,12 @@ class BigDays:
         return {"results": rows}
 
     # --- leaderboard ----------------------------------------------------------------------
-    def _leaderboard_uncached(self, level, code, year, month, include_shared, limit):
+    def _leaderboard_uncached(
+        self, level, code, year, month, include_shared, event, limit
+    ):
         where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
+        if event:
+            where.append(f"observation_date IN ({EVENT_DATES})")
         if year is not None:
             where.append("year = ?")
             params.append(year)
@@ -299,6 +344,7 @@ class BigDays:
         year: Optional[int] = None,
         month: Optional[int] = None,
         include_shared: bool = False,
+        event: bool = False,
         limit: int = K,
     ):
         check_code(code)
@@ -313,7 +359,13 @@ class BigDays:
         rows = [
             dict(r)
             for r in self._leaderboard(
-                row["level"], code, year, month, bool(include_shared), limit
+                row["level"],
+                code,
+                year,
+                month,
+                bool(include_shared),
+                bool(event),
+                limit,
             )
         ]
         # Competition ranking: equal species counts share a rank (106, 106, 106 -> 1, 1, 1, 4).
@@ -325,6 +377,7 @@ class BigDays:
                 "year": year,
                 "month": month,
                 "include_shared": bool(include_shared),
+                "event": bool(event),
                 "limit": limit,
             },
             "rows": rows,

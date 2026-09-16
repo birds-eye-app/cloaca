@@ -157,9 +157,10 @@ def big_days_top(
     year: int | None = None,
     month: int | None = None,
     include_shared: bool = False,
+    event: bool = False,
     limit: int = 50,
 ) -> Dict[str, Any]:
-    return big_days.top(region, year, month, include_shared, limit)
+    return big_days.top(region, year, month, include_shared, event, limit)
 
 
 @Cloaca_App.on_event("startup")
