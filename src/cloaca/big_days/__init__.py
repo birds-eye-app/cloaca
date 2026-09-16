@@ -40,6 +40,10 @@ REGION_COLS = (
     "best_date, first_year, last_year, lat, lon"
 )
 ORDER = "n_species DESC, n_checklists ASC, observation_date ASC, observer_id ASC"
+# One person's day cannot hold more than 24 hours of birding. Accounts that upload many
+# people's checklists (a club on Global Big Day: 371 lists, 155 h, 2021-05-08) otherwise top
+# every board they touch. Days with no durations at all are kept (mostly historical).
+PLAUSIBLE = "(minutes IS NULL OR minutes <= 1440)"
 
 
 class BigDays:
@@ -74,6 +78,16 @@ class BigDays:
         con.execute("SET memory_limit='256MB'; SET threads=4;")
         con.execute(f"CREATE VIEW big_days AS SELECT * FROM read_parquet('{days}')")
         con.execute(f"CREATE TABLE regions AS SELECT * FROM read_parquet('{regions}')")
+        # The regions file's `best` was computed before the PLAUSIBLE rule; recompute it from
+        # the days that pass. One scan of four narrow columns at load time.
+        con.execute(f"""
+            CREATE TABLE region_best AS
+            SELECT level, region, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
+            FROM big_days WHERE {PLAUSIBLE} GROUP BY 1, 2""")
+        con.execute(
+            "UPDATE regions SET best = b.best, best_date = b.best_date "
+            "FROM region_best b WHERE regions.level = b.level AND regions.region = b.region"
+        )
         levels = dict(
             con.execute("SELECT level, count(*) FROM regions GROUP BY 1").fetchall()
         )
@@ -138,9 +152,9 @@ class BigDays:
         if not row:
             raise HTTPException(404, "unknown region")
         rec = self.q(
-            """SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date,
+            f"""SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date,
                       arg_max(observer_id, n_species) AS observer_id
-               FROM big_days WHERE level = ? AND region = ? GROUP BY 1 ORDER BY 1""",
+               FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE} GROUP BY 1 ORDER BY 1""",
             [row["level"], code],
         )
         activity = {y["year"]: y for y in (row.pop("years") or [])}
@@ -175,7 +189,7 @@ class BigDays:
 
     # --- leaderboard ----------------------------------------------------------------------
     def _leaderboard_uncached(self, level, code, year, month, solo, limit):
-        where, params = ["level = ?", "region = ?"], [level, code]
+        where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
         if year is not None:
             where.append("year = ?")
             params.append(year)

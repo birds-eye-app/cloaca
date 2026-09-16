@@ -68,6 +68,24 @@ def make_tables(directory):
             2.0,
             True,
         ),
+        (  # an aggregator account: 155 h of lists in one "day" — must never rank
+            "county",
+            "US-NY-047",
+            dt.date(2021, 5, 8),
+            2021,
+            5,
+            "obsr9",
+            202,
+            371,
+            200,
+            6,
+            False,
+            1,
+            ["obsr9"],
+            9353.0,
+            270.0,
+            True,
+        ),
         (
             "state",
             "US-NY",
@@ -127,7 +145,7 @@ def make_tables(directory):
                  [{{'year': 2024, 'days': 3, 'observers': 2, 'best': 140, 'best_date': DATE '2024-05-11'}}]),
                 ('state', 'US-NY', 'New York', 'US', 'US', 5, 20, 140, DATE '2024-05-11', 2023, 2024, 40.7, -74.0,
                  [{{'year': 2024, 'days': 3, 'observers': 2, 'best': 140, 'best_date': DATE '2024-05-11'}}]),
-                ('county', 'US-NY-047', 'Kings', 'US-NY', 'US', 3, 6, 120, DATE '2024-05-11', 2023, 2024, 40.66, -73.97,
+                ('county', 'US-NY-047', 'Kings', 'US-NY', 'US', 3, 6, 202, DATE '2021-05-08', 2021, 2024, 40.66, -73.97,
                  [{{'year': 2023, 'days': 1, 'observers': 2, 'best': 118, 'best_date': DATE '2023-05-13'}},
                   {{'year': 2024, 'days': 2, 'observers': 1, 'best': 120, 'best_date': DATE '2024-05-11'}}])
               ) t(level, region, name, parent, country_code, days, checklists, best, best_date,
@@ -154,6 +172,9 @@ def test_countries_and_tree(client):
     r = client.get("/v1/big_days/regions/US-NY-047").json()
     assert [c["code"] for c in r["breadcrumb"]] == ["US", "US-NY", "US-NY-047"]
     assert r["region"]["name"] == "Kings" and "years" not in r["region"]
+    # the 155-hour aggregator day is not the record, even though the regions file said so
+    assert (r["region"]["best"], r["region"]["best_date"]) == (120, "2024-05-11")
+    assert all(y["year"] != 2021 for y in r["years"])
     assert [(y["year"], y["best"], y["days"]) for y in r["years"]] == [
         (2023, 118, 1),
         (2024, 120, 2),
