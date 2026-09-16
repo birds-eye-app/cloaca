@@ -268,9 +268,7 @@ class BigDays:
         return {"results": rows}
 
     # --- leaderboard ----------------------------------------------------------------------
-    def _leaderboard_uncached(
-        self, level, code, year, month, solo, include_shared, limit
-    ):
+    def _leaderboard_uncached(self, level, code, year, month, include_shared, limit):
         where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
         if year is not None:
             where.append("year = ?")
