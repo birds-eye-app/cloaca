@@ -292,7 +292,6 @@ def test_top_filters_are_applied(client):
     assert y23["filters"] == {
         "year": 2023,
         "month": 5,
-        "solo": False,
         "include_shared": False,
         "limit": 50,
     }
