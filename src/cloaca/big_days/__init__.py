@@ -19,6 +19,10 @@ and placed in BIG_DAYS_DIR by the deployment; this process reads local files onl
                            days, checklists, best, best_date, first_year, last_year, lat, lon,
                            years = list of {year, days, observers, best, best_date}.
 
+Observer ids never leave this module: `observer_id` and `members` exist in the files (they
+key the rows and order ties) but no response carries them — a row shows `observers` (people
+in the field) and `party_size` (accounts sharing the checklists) instead.
+
 Fixed, parameterised queries only; region codes are regex-checked. The files may be absent
 (new box, or a release not built yet): every endpoint answers 503 until they appear, and the
 loader re-checks on cloaca's periodic timer so a new release is picked up without a restart.
@@ -152,8 +156,7 @@ class BigDays:
         if not row:
             raise HTTPException(404, "unknown region")
         rec = self.q(
-            f"""SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date,
-                      arg_max(observer_id, n_species) AS observer_id
+            f"""SELECT year, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
                FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE} GROUP BY 1 ORDER BY 1""",
             [row["level"], code],
         )
@@ -199,8 +202,8 @@ class BigDays:
         if solo:
             where.append("solo")
         return self.q(
-            f"""SELECT observation_date AS date, year, month, observer_id, n_species, n_checklists,
-                       n_localities, observers, solo, party_size, members, minutes, km,
+            f"""SELECT observation_date AS date, year, month, n_species, n_checklists,
+                       n_localities, observers, solo, party_size, minutes, km,
                        all_complete, checklists
                 FROM big_days WHERE {" AND ".join(where)}
                 ORDER BY {ORDER} LIMIT {int(limit)}""",
