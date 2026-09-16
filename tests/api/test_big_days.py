@@ -196,7 +196,10 @@ def test_top_filters_are_applied(client):
     solo = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "solo": "true"}
     ).json()
-    assert [r["observer_id"] for r in solo["rows"]] == ["obsr1", "obsr1"]
+    assert [(r["n_species"], r["solo"]) for r in solo["rows"]] == [
+        (120, True),
+        (61, True),
+    ]
     jan = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "month": 1}
     ).json()
