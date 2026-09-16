@@ -284,9 +284,8 @@ def test_top_filters_are_applied(client):
         (118, "Global Big Day"),
     ]
     assert ev["filters"]["event"] is True
-    assert (
-        top["rows"][0]["event"] == "Global Big Day" and top["rows"][1]["event"] is None
-    )
+    assert top["rows"][0]["event"] == "Global Big Day"
+    assert top["rows"][3]["event"] is None  # 2024-01-06
     jan = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "month": 1}
     ).json()
