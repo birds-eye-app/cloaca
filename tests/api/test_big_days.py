@@ -169,7 +169,8 @@ def make_tables(directory):
     one = (
         "{'id': 'S1', 'locality': 'Prospect Park', 'locality_id': 'L109516', 'hotspot': true, "
         "'lat': 40.66, 'lon': -73.97, 'time': '06:00:00', 'minutes': 300, 'km': 5.0, "
-        "'n_species': 90, 'complete': true, 'protocol': 'Traveling'}"
+        "'n_species': 3, 'new_species': 3, 'complete': true, 'protocol': 'Traveling', "
+        "'species': [1::USMALLINT, 2::USMALLINT, 3::USMALLINT]}"
     )
 
     # obsr7: a 4-hour list in Sullivan County while two lists are filed 80+ km away in Dutchess
@@ -177,7 +178,8 @@ def make_tables(directory):
         return (
             f"{{'id': 'S{i}', 'locality': 'Stop {i}', 'locality_id': 'L{i}', 'hotspot': false, "
             f"'lat': {lat}, 'lon': {lon}, 'time': '{t}', 'minutes': {mins}, 'km': 1.0, "
-            f"'n_species': 40, 'complete': true, 'protocol': 'Traveling'}}"
+            f"'n_species': 1, 'new_species': 1, 'complete': true, 'protocol': 'Traveling', "
+            f"'species': [2::USMALLINT]}}"
         )
 
     shared = ", ".join(
@@ -190,9 +192,17 @@ def make_tables(directory):
     )
     con.execute(
         f"""COPY (
-              SELECT *, CASE WHEN observer_id = 'obsr7' THEN [{shared}] ELSE [{one}] END AS checklists
+              SELECT *, CASE WHEN observer_id = 'obsr7' THEN 2 ELSE 0 END AS shared_pairs,
+                     CASE WHEN observer_id = 'obsr7' THEN [{shared}] ELSE [{one}] END AS checklists
               FROM d ORDER BY level, region, n_species DESC
             ) TO '{directory}/big_days.parquet' (FORMAT parquet)"""
+    )
+    con.execute(
+        f"""COPY (SELECT * FROM (VALUES (1::USMALLINT, 'Branta canadensis', 'Canada Goose', 1.0),
+                                       (2::USMALLINT, 'Anas platyrhynchos', 'Mallard', 2.0),
+                                       (3::USMALLINT, 'Cardinalis cardinalis', 'Northern Cardinal', 3.0))
+                   t(id, scientific_name, common_name, taxon_order))
+            TO '{directory}/big_day_species.parquet' (FORMAT parquet)"""
     )
     con.execute(
         f"""COPY (
@@ -274,13 +284,21 @@ def test_top_filters_are_applied(client):
         assert "observer_id" not in r and "members" not in r
     assert r["party_size"] == 1 and top["rows"][1]["party_size"] == 2
     assert top["rows"][0]["rank"] == 1 and top["rows"][0]["checklists"][0]["id"] == "S1"
-    solo = client.get(
-        "/v1/big_days/top", params={"region": "US-NY-047", "solo": "true"}
+    first = top["rows"][0]["checklists"][0]
+    assert first["species"] == ["Canada Goose", "Mallard", "Northern Cardinal"]
+    assert first["new_species"] == 3
+    ev = client.get(
+        "/v1/big_days/top", params={"region": "US-NY-047", "event": "true"}
     ).json()
-    assert [(r["n_species"], r["solo"]) for r in solo["rows"]] == [
-        (120, True),
-        (61, True),
+    # 2024-05-11, 2023-05-13 and 2022-05-14 are all Global Big Days; 2024-01-06 is not
+    assert [(r["n_species"], r["event"]) for r in ev["rows"]] == [
+        (120, "Global Big Day"),
+        (118, "Global Big Day"),
+        (118, "Global Big Day"),
     ]
+    assert ev["filters"]["event"] is True
+    assert top["rows"][0]["event"] == "Global Big Day"
+    assert top["rows"][3]["event"] is None  # 2024-01-06
     jan = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "month": 1}
     ).json()
@@ -292,8 +310,8 @@ def test_top_filters_are_applied(client):
     assert y23["filters"] == {
         "year": 2023,
         "month": 5,
-        "solo": False,
         "include_shared": False,
+        "event": False,
         "limit": 50,
     }
 
@@ -315,7 +333,10 @@ def test_search_and_validation(client):
         == 400
     )
     assert client.get("/v1/big_days/regions/ZZ-ZZ").status_code == 404
-    assert client.get("/v1/big_days/meta").json()["ready"] is True
+    meta = client.get("/v1/big_days/meta").json()
+    assert (
+        meta["ready"] is True and meta["shared_pairs_column"] and meta["species_lists"]
+    )
 
 
 def test_missing_files_are_503(tmp_path, monkeypatch):

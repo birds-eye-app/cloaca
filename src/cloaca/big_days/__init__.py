@@ -7,7 +7,7 @@ and placed in BIG_DAYS_DIR by the deployment; this process reads local files onl
   big_days.parquet         one row per (level, region, observation_date, party):
                            level ∈ country|state|county, region = the eBird code, year, month,
                            observer_id (pseudonymous, e.g. obsr59592), n_species, n_checklists,
-                           n_localities, observers (max party size on the day's lists), solo,
+                           n_localities, observers (max party size on the day's lists),
                            party_size + members (eBirders sharing exactly these checklists),
                            minutes, km, all_complete, checklists = list of structs
                            (id, locality, locality_id, hotspot, lat, lon, time, minutes, km,
@@ -18,6 +18,12 @@ and placed in BIG_DAYS_DIR by the deployment; this process reads local files onl
   big_day_regions.parquet  one row per region: level, region, name, parent, country_code,
                            days, checklists, best, best_date, first_year, last_year, lat, lon,
                            years = list of {year, days, observers, best, best_date}.
+  big_day_species.parquet  id (taxonomic order), scientific_name, common_name — the ids that
+                           checklists[].species carry (rebuild of 2026-09-16 onward).
+
+Rebuild columns (feature-detected at load, so an older file still serves): `shared_pairs` per
+day, and per checklist `species` (ids) + `new_species` (first seen that day on that list). With
+them the shared-account rule is a SQL predicate; without them it is computed in Python.
 
 Observer ids never leave this module: `observer_id` and `members` exist in the files (they
 key the rows and order ties) but no response carries them — a row shows `observers` (people
@@ -59,9 +65,41 @@ PLAUSIBLE = "(minutes IS NULL OR minutes <= 1440)"
 # away in Dutchess); every Kings County day and every ambitious solo day has 0. Speed between
 # consecutive stops was NOT usable alone: minute-rounded times and hotspot-centroid pins put one
 # "impossible" hop on most honest days, including single-van team runs.
+# eBird's two worldwide count days, from eBird's announcements (2026-09-16). Global Big Day
+# has run every May since 2015; October Big Day every October since 2018. Rows on these dates
+# carry `event`, and `event=true` restricts a board to them.
+GLOBAL_BIG_DAYS = {
+    "2015-05-09",
+    "2016-05-14",
+    "2017-05-13",
+    "2018-05-05",
+    "2019-05-04",
+    "2020-05-09",
+    "2021-05-08",
+    "2022-05-14",
+    "2023-05-13",
+    "2024-05-11",
+    "2025-05-10",
+    "2026-05-09",
+}
+OCTOBER_BIG_DAYS = {
+    "2018-10-06",
+    "2019-10-19",
+    "2020-10-17",
+    "2021-10-09",
+    "2022-10-08",
+    "2023-10-14",
+    "2024-10-12",
+    "2025-10-11",
+    "2026-10-10",
+}
+EVENT_DATES = ", ".join(
+    f"DATE '{d}'" for d in sorted(GLOBAL_BIG_DAYS | OCTOBER_BIG_DAYS)
+)
 SHARED_SLACK_KM = 5.0
 SHARED_MIN_OVERLAP = 10
 SHARED_PAIRS = 2
+NOT_SHARED = f"shared_pairs < {SHARED_PAIRS}"
 
 
 def _mins(t: str) -> int:
@@ -106,10 +144,26 @@ def shared_pairs(checklists) -> int:
     return n
 
 
-def annotate(row) -> dict:
-    """Add shared_pairs / shared to a leaderboard row (in place) and return it."""
-    row["shared_pairs"] = shared_pairs(row["checklists"])
+def event_name(date) -> Optional[str]:
+    d = date.isoformat() if hasattr(date, "isoformat") else str(date)
+    if d in GLOBAL_BIG_DAYS:
+        return "Global Big Day"
+    if d in OCTOBER_BIG_DAYS:
+        return "October Big Day"
+    return None
+
+
+def annotate(row, species: Optional[Dict[int, Dict[str, str]]] = None) -> dict:
+    """Finish a leaderboard row in place: shared_pairs (from the column, else computed), the
+    shared flag, the event name, and species ids -> common names on each checklist."""
+    if row.get("shared_pairs") is None:
+        row["shared_pairs"] = shared_pairs(row["checklists"])
     row["shared"] = row["shared_pairs"] >= SHARED_PAIRS
+    row["event"] = event_name(row["date"])
+    if species:
+        for c in row["checklists"]:
+            ids = c.pop("species", None) or []
+            c["species"] = [species[i]["common_name"] for i in ids if i in species]
     return row
 
 
@@ -122,6 +176,9 @@ class BigDays:
         self._lock = threading.Lock()
         self._mtimes: tuple = ()
         self.meta: Dict[str, Any] = {"ready": False}
+        self.has_pairs = False  # shared_pairs column present
+        self.has_species = False  # checklists[].species / new_species present
+        self.species: Dict[int, Dict[str, str]] = {}
         self._region_row = lru_cache(maxsize=4096)(self._region_row_uncached)
         self._children = lru_cache(maxsize=4096)(self._children_uncached)
         self._leaderboard = lru_cache(maxsize=2048)(self._leaderboard_uncached)
@@ -145,12 +202,24 @@ class BigDays:
         con.execute("SET memory_limit='256MB'; SET threads=4;")
         con.execute(f"CREATE VIEW big_days AS SELECT * FROM read_parquet('{days}')")
         con.execute(f"CREATE TABLE regions AS SELECT * FROM read_parquet('{regions}')")
+        cols = {c[0]: c[1] for c in con.execute("DESCRIBE big_days").fetchall()}
+        has_pairs = "shared_pairs" in cols
+        has_species = "new_species" in cols.get("checklists", "")
+        species: Dict[int, Dict[str, str]] = {}
+        sp_file = os.path.join(self.dir, "big_day_species.parquet")
+        if has_species and os.path.exists(sp_file):
+            species = {
+                int(i): {"common_name": c, "scientific_name": sn}
+                for i, sn, c in con.execute(
+                    f"SELECT id, scientific_name, common_name FROM read_parquet('{sp_file}')"
+                ).fetchall()
+            }
         # The regions file's `best` was computed before the PLAUSIBLE rule; recompute it from
         # the days that pass. One scan of four narrow columns at load time.
         con.execute(f"""
             CREATE TABLE region_best AS
             SELECT level, region, max(n_species) AS best, arg_max(observation_date, n_species) AS best_date
-            FROM big_days WHERE {PLAUSIBLE} GROUP BY 1, 2""")
+            FROM big_days WHERE {PLAUSIBLE}{" AND " + NOT_SHARED if has_pairs else ""} GROUP BY 1, 2""")
         con.execute(
             "UPDATE regions SET best = b.best, best_date = b.best_date "
             "FROM region_best b WHERE regions.level = b.level AND regions.region = b.region"
@@ -160,11 +229,18 @@ class BigDays:
         )
         with self._lock:
             old, self._con, self._mtimes = self._con, con, mtimes
+            self.has_pairs, self.has_species, self.species = (
+                has_pairs,
+                has_species,
+                species,
+            )
             self._region_row.cache_clear()
             self._children.cache_clear()
             self._leaderboard.cache_clear()
             self.meta = {
                 "ready": True,
+                "shared_pairs_column": has_pairs,
+                "species_lists": has_species,
                 "regions": sum(levels.values()),
                 "levels": levels,
                 "k": K,
@@ -218,21 +294,34 @@ class BigDays:
         row = dict(self._region_row(code) or {})
         if not row:
             raise HTTPException(404, "unknown region")
-        # Top 3 per year (with their checklists) so the year's record can skip shared days.
-        cands = self.q(
-            f"""SELECT year, n_species, observation_date, checklists FROM (
-                  SELECT year, n_species, observation_date, checklists,
-                         row_number() OVER (PARTITION BY year ORDER BY {ORDER}) AS rn
-                  FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE}) WHERE rn <= 3
-                ORDER BY year, rn""",
-            [row["level"], code],
-        )
+        if self.has_pairs:
+            shared_sql = "" if include_shared else f" AND {NOT_SHARED}"
+            cands = self.q(
+                f"""SELECT year, max(n_species) AS n_species, arg_max(observation_date, n_species) AS observation_date
+                    FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE}{shared_sql}
+                    GROUP BY 1 ORDER BY 1""",
+                [row["level"], code],
+            )
+        else:
+            # Older file: top 3 per year with their checklists, so the record can skip shared days.
+            cands = self.q(
+                f"""SELECT year, n_species, observation_date, checklists FROM (
+                      SELECT year, n_species, observation_date, checklists,
+                             row_number() OVER (PARTITION BY year ORDER BY {ORDER}) AS rn
+                      FROM big_days WHERE level = ? AND region = ? AND {PLAUSIBLE}) WHERE rn <= 3
+                    ORDER BY year, rn""",
+                [row["level"], code],
+            )
         activity = {y["year"]: y for y in (row.pop("years") or [])}
         years = []
         for c in cands:
             if years and years[-1]["year"] == c["year"]:
                 continue
-            if not include_shared and shared_pairs(c["checklists"]) >= SHARED_PAIRS:
+            if (
+                not include_shared
+                and not self.has_pairs
+                and shared_pairs(c["checklists"]) >= SHARED_PAIRS
+            ):
                 continue
             years.append(
                 {
@@ -269,30 +358,37 @@ class BigDays:
 
     # --- leaderboard ----------------------------------------------------------------------
     def _leaderboard_uncached(
-        self, level, code, year, month, solo, include_shared, limit
+        self, level, code, year, month, include_shared, event, limit
     ):
         where, params = ["level = ?", "region = ?", PLAUSIBLE], [level, code]
+        if event:
+            where.append(f"observation_date IN ({EVENT_DATES})")
         if year is not None:
             where.append("year = ?")
             params.append(year)
         if month is not None:
             where.append("month = ?")
             params.append(month)
-        if solo:
-            where.append("solo")
-        # Shared-account days are recognised from their checklists in Python, so fetch a window
-        # of candidates and cut after filtering. 4x is far more than the flagged share anywhere
-        # measured (Texas: 6 of 50); if a board still comes up short it is short, not wrong.
-        window = limit if include_shared else min(400, limit * 4)
+        if self.has_pairs:
+            if not include_shared:
+                where.append(NOT_SHARED)
+            window = limit
+            extra = ", shared_pairs"
+        else:
+            # Older file: recognise shared-account days from their checklists in Python, so
+            # fetch a window of candidates and cut after filtering (4x is far more than the
+            # flagged share anywhere measured).
+            window = limit if include_shared else min(400, limit * 4)
+            extra = ""
         rows = self.q(
             f"""SELECT observation_date AS date, year, month, n_species, n_checklists,
-                       n_localities, observers, solo, party_size, minutes, km,
-                       all_complete, checklists
+                       n_localities, observers, party_size, minutes, km,
+                       all_complete{extra}, checklists
                 FROM big_days WHERE {" AND ".join(where)}
                 ORDER BY {ORDER} LIMIT {int(window)}""",
             params,
         )
-        rows = [annotate(r) for r in rows]
+        rows = [annotate(r, self.species) for r in rows]
         if not include_shared:
             rows = [r for r in rows if not r["shared"]]
         return rows[:limit]
@@ -302,8 +398,8 @@ class BigDays:
         code: str,
         year: Optional[int] = None,
         month: Optional[int] = None,
-        solo: bool = False,
         include_shared: bool = False,
+        event: bool = False,
         limit: int = K,
     ):
         check_code(code)
@@ -318,7 +414,13 @@ class BigDays:
         rows = [
             dict(r)
             for r in self._leaderboard(
-                row["level"], code, year, month, bool(solo), bool(include_shared), limit
+                row["level"],
+                code,
+                year,
+                month,
+                bool(include_shared),
+                bool(event),
+                limit,
             )
         ]
         # Competition ranking: equal species counts share a rank (106, 106, 106 -> 1, 1, 1, 4).
@@ -329,8 +431,8 @@ class BigDays:
             "filters": {
                 "year": year,
                 "month": month,
-                "solo": bool(solo),
                 "include_shared": bool(include_shared),
+                "event": bool(event),
                 "limit": limit,
             },
             "rows": rows,
