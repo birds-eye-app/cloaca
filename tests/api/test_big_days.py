@@ -175,6 +175,7 @@ def test_countries_and_tree(client):
     # the 155-hour aggregator day is not the record, even though the regions file said so
     assert (r["region"]["best"], r["region"]["best_date"]) == (120, "2024-05-11")
     assert all(y["year"] != 2021 for y in r["years"])
+    assert all("observer_id" not in y for y in r["years"])
     assert [(y["year"], y["best"], y["days"]) for y in r["years"]] == [
         (2023, 118, 1),
         (2024, 120, 2),
@@ -187,11 +188,18 @@ def test_countries_and_tree(client):
 def test_top_filters_are_applied(client):
     top = client.get("/v1/big_days/top", params={"region": "US-NY-047"}).json()
     assert [r["n_species"] for r in top["rows"]] == [120, 118, 61]
+    # observer ids never leave the API
+    for r in top["rows"]:
+        assert "observer_id" not in r and "members" not in r
+    assert r["party_size"] == 1 and top["rows"][1]["party_size"] == 2
     assert top["rows"][0]["rank"] == 1 and top["rows"][0]["checklists"][0]["id"] == "S1"
     solo = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "solo": "true"}
     ).json()
-    assert [r["observer_id"] for r in solo["rows"]] == ["obsr1", "obsr1"]
+    assert [(r["n_species"], r["solo"]) for r in solo["rows"]] == [
+        (120, True),
+        (61, True),
+    ]
     jan = client.get(
         "/v1/big_days/top", params={"region": "US-NY-047", "month": 1}
     ).json()
