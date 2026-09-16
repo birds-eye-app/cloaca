@@ -142,8 +142,8 @@ def big_days_countries() -> Dict[str, Any]:
 
 
 @Cloaca_App.get("/v1/big_days/regions/{code}")
-def big_days_region(code: str, include_runs: bool = False) -> Dict[str, Any]:
-    return big_days.region(code, include_runs)
+def big_days_region(code: str, include_shared: bool = False) -> Dict[str, Any]:
+    return big_days.region(code, include_shared)
 
 
 @Cloaca_App.get("/v1/big_days/search")
@@ -157,10 +157,10 @@ def big_days_top(
     year: int | None = None,
     month: int | None = None,
     solo: bool = False,
-    include_runs: bool = False,
+    include_shared: bool = False,
     limit: int = 50,
 ) -> Dict[str, Any]:
-    return big_days.top(region, year, month, solo, include_runs, limit)
+    return big_days.top(region, year, month, solo, include_shared, limit)
 
 
 @Cloaca_App.on_event("startup")
